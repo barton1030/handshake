@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bfc211ad-9590-49b0-84dd-babe67cd35d1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/persistent/internal/db.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/persistent/internal/init.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/persistent/internal/redis.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/domain/role/role.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,6 +49,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/persistent" />
       <recent name="$PROJECT_DIR$/persistent/internal" />
     </key>
   </component>
