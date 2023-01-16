@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/fvbock/endless"
 	"handshake/conf"
+	"handshake/persistent"
 	"handshake/router"
 	"strconv"
 )
@@ -11,6 +12,8 @@ import (
 func main() {
 	conf.Init()
 	context.Background()
+	persistent.Init()
+	defer persistent.Close()
 	r := router.Router()
 	addr := structure()
 	endless.ListenAndServe(addr, r)
