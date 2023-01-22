@@ -23,6 +23,10 @@ func newActuator(actuatorId int, topic inter.Topic) *actuator {
 	}
 }
 
-func (a actuator) run() {
+func (a actuator) start() {
+
+}
+
+func (a actuator) stop() {
 
 }

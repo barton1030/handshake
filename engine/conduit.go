@@ -49,23 +49,23 @@ func (c *conduit) setUpFusingConduit(name string, conduitCap int) {
 	c.fusing[name] = make(chan int, conduitCap)
 }
 
-func (c *conduit) errorConduitByName(name string) (errorConduit *chan int) {
+func (c *conduit) errorConduitByName(name string) (errorConduit chan int) {
 	if cErrorConduit, ok := c.error[name]; ok {
-		errorConduit = &cErrorConduit
+		errorConduit = cErrorConduit
 	}
 	return
 }
 
-func (c *conduit) statisticsConduitByName(name string) (statisticsConduit *chan int) {
+func (c *conduit) statisticsConduitByName(name string) (statisticsConduit chan int) {
 	if cStatisticsConduit, ok := c.error[name]; ok {
-		statisticsConduit = &cStatisticsConduit
+		statisticsConduit = cStatisticsConduit
 	}
 	return
 }
 
-func (c *conduit) fusingConduitByName(name string) (fusingConduit *chan int) {
+func (c *conduit) fusingConduitByName(name string) (fusingConduit chan int) {
 	if cFusingConduit, ok := c.error[name]; ok {
-		fusingConduit = &cFusingConduit
+		fusingConduit = cFusingConduit
 	}
 	return
 }

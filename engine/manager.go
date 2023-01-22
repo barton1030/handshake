@@ -18,7 +18,7 @@ func managerInit() {
 	managerUnit.controllerCollection = make(map[string]*controller)
 }
 
-func (m *manager) MonitorTopic(topic inter.Topic) {
+func (m *manager) RegisterTopic(topic inter.Topic) {
 	topicName := topic.Name()
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -26,5 +26,24 @@ func (m *manager) MonitorTopic(topic inter.Topic) {
 		return
 	}
 	topicController := newController(topic)
+	startResult := topicController.start()
+	if !startResult {
+		return
+	}
 	m.controllerCollection[topicName] = topicController
+}
+
+func (m *manager) CancelTopic(topic inter.Topic) {
+	topicName := topic.Name()
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	topicController, ok := m.controllerCollection[topicName]
+	if !ok {
+		return
+	}
+	stopResult := topicController.stop()
+	if !stopResult {
+		return
+	}
+	delete(m.controllerCollection, topicName)
 }
