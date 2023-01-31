@@ -4,6 +4,8 @@ type list struct {
 	storage map[int]role
 }
 
+var List list
+
 func (l *list) Add() (err error) {
 	return err
 }
