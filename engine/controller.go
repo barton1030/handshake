@@ -14,50 +14,49 @@ type controller struct {
 	actuator                     map[string]*actuator
 	timeSliceErrorStatistics     map[string]int
 	timeSliceErrorStatisticsLock sync.Mutex
+	errorPipe                    chan int
+	fusingPipe                   chan int
+	statisticsPipe               chan int
 }
 
 func newController(topic inter.Topic) *controller {
+	pipeName := topic.Name()
+	pipeCap := topic.MaxConcurrency()
+	errorPipe := conduitUnit.setUpErrorConduit(pipeName, pipeCap)
+	fusingPipe := conduitUnit.setUpFusingConduit(pipeName, pipeCap)
+	statisticsPipe := conduitUnit.setUpStatisticsConduit(pipeName, pipeCap)
 	return &controller{
 		topic:                    topic,
 		actuator:                 make(map[string]*actuator),
 		timeSliceErrorStatistics: make(map[string]int),
+		errorPipe:                errorPipe,
+		fusingPipe:               fusingPipe,
+		statisticsPipe:           statisticsPipe,
 	}
 }
 
-// 创建控制器、执行器通信管道
-func (c *controller) createPipe() {
-	pipeName := c.topic.Name()
-	pipeCap := c.topic.MaxConcurrency()
-	conduitUnit.setUpErrorConduit(pipeName, pipeCap)
-	conduitUnit.setUpFusingConduit(pipeName, pipeCap)
-	conduitUnit.setUpStatisticsConduit(pipeName, pipeCap)
-}
-
 func (c *controller) monitorPipe() {
-	topicName := c.topic.Name()
-	errorPipe := conduitUnit.errorConduitByName(topicName)
-	fusingPipe := conduitUnit.fusingConduitByName(topicName)
-	statisticsPipe := conduitUnit.statisticsConduitByName(topicName)
 	for {
 		select {
-		case err := <-errorPipe:
-			analysisResult := c.fuseAnalysis(err)
+		case <-c.errorPipe:
+			analysisResult := c.fuseAnalysis()
 			if !analysisResult {
 				break
 			}
 			actuatorNum := len(c.actuator)
 			for i := 0; i < actuatorNum; i++ {
-				fusingPipe <- 1
+				c.fusingPipe <- 1
 			}
-		case statistics := <-statisticsPipe:
+		case statistics := <-c.statisticsPipe:
 			fmt.Println(statistics)
 		}
 	}
 }
 
-func (c *controller) fuseAnalysis(err int) (analysisResult bool) {
+func (c *controller) fuseAnalysis() (analysisResult bool) {
 	c.timeSliceErrorStatisticsLock.Lock()
 	defer c.timeSliceErrorStatisticsLock.Unlock()
+
 	timeFormat := time.Now().Format("2006-01-02 15:04")
 	if _, ok := c.timeSliceErrorStatistics[timeFormat]; !ok {
 		c.timeSliceErrorStatistics[timeFormat] = 1
@@ -76,7 +75,6 @@ func (c *controller) schedule() {
 }
 
 func (c *controller) start() (startResult bool) {
-	c.createPipe()
 
 	return
 }

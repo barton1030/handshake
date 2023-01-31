@@ -22,31 +22,37 @@ func conduitInit() {
 	conduitUnit.fusing = make(map[string]chan int)
 }
 
-func (c *conduit) setUpErrorConduit(name string, conduitCap int) {
+func (c *conduit) setUpErrorConduit(name string, conduitCap int) (errorConduit chan int) {
 	c.errorLock.Lock()
 	defer c.errorLock.Unlock()
 	if _, ok := c.error[name]; ok {
 		return
 	}
 	c.error[name] = make(chan int, conduitCap)
+	errorConduit = c.error[name]
+	return
 }
 
-func (c *conduit) setUpStatisticsConduit(name string, conduitCap int) {
+func (c *conduit) setUpStatisticsConduit(name string, conduitCap int) (statisticsConduit chan int) {
 	c.statisticsLock.Lock()
 	defer c.statisticsLock.Unlock()
 	if _, ok := c.statistics[name]; ok {
 		return
 	}
 	c.statistics[name] = make(chan int, conduitCap)
+	statisticsConduit = c.statistics[name]
+	return
 }
 
-func (c *conduit) setUpFusingConduit(name string, conduitCap int) {
+func (c *conduit) setUpFusingConduit(name string, conduitCap int) (fusingConduit chan int) {
 	c.fusingLock.Lock()
 	defer c.fusingLock.Unlock()
 	if _, ok := c.fusing[name]; ok {
 		return
 	}
 	c.fusing[name] = make(chan int, conduitCap)
+	fusingConduit = c.fusing[name]
+	return
 }
 
 func (c *conduit) errorConduitByName(name string) (errorConduit chan int) {
