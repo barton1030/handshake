@@ -5,17 +5,19 @@ type Topic interface {
 	MinConcurrency() int
 	MaxConcurrency() int
 	FuseSalt() int
+	MaxRetryCont() int
 	CallbackHandler() Callback
 	AlarmHandler() Alarm
 	MessageQueuingHandler() MessageQueuing
+	Recipients() (recipients []interface{})
 }
 
 type Callback interface {
-	Do() (res map[string]interface{}, err error)
+	Do(data map[string]interface{}) (res map[string]interface{}, err error)
 }
 
 type Alarm interface {
-	Do(information string, recipients []interface{})
+	Do(information map[string]interface{}, recipients []interface{})
 }
 
 type MessageQueuing interface {
@@ -26,6 +28,7 @@ type MessageQueuing interface {
 }
 
 type Message interface {
+	Id() int
 	Data() (data map[string]interface{}, err error)
 	RetryCount() (retryCont int)
 	IncrRetryCont()
