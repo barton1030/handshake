@@ -14,12 +14,10 @@ type conduit struct {
 	fusingLock     sync.Mutex
 }
 
-var conduitUnit conduit
-
-func conduitInit() {
-	conduitUnit.error = make(map[string]chan int)
-	conduitUnit.statistics = make(map[string]chan int)
-	conduitUnit.fusing = make(map[string]chan int)
+var conduitUnit = conduit{
+	error:      make(map[string]chan int),
+	statistics: make(map[string]chan int),
+	fusing:     make(map[string]chan int),
 }
 
 func (c *conduit) setUpErrorConduit(name string, conduitCap int) (errorConduit chan int) {

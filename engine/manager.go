@@ -12,11 +12,7 @@ type manager struct {
 	lock                 sync.Mutex
 }
 
-var managerUnit manager
-
-func managerInit() {
-	managerUnit.controllerCollection = make(map[string]*controller)
-}
+var managerUnit = manager{controllerCollection: make(map[string]*controller)}
 
 func (m *manager) RegisterTopic(topic inter.Topic) {
 	topicName := topic.Name()
