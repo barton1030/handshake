@@ -7,9 +7,15 @@ import (
 
 func Router() *gin.Engine {
 	root := gin.Default()
+	role(root)
 	user(root)
 	topic(root)
 	return root
+}
+
+func role(r *gin.Engine) {
+	roleGroup := r.Group("/role")
+	roleGroup.POST("/add", app.RoleController.Add)
 }
 
 func user(r *gin.Engine) {

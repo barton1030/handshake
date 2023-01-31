@@ -1,10 +1,11 @@
 package topic
 
 type list struct {
+	nextId  int
 	storage map[int]topic
 }
 
-var List list
+var List = list{storage: make(map[int]topic)}
 
 func (l *list) Add() (err error) {
 	return

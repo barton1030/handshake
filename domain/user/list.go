@@ -5,7 +5,7 @@ type list struct {
 	storage map[int]user
 }
 
-var List list
+var List = list{storage: make(map[int]user)}
 
 func (l *list) Add(user2 user) (err error) {
 	return err
