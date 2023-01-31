@@ -21,6 +21,7 @@ type Alarm interface {
 type MessageQueuing interface {
 	Pop() (message Message, err error)
 	Push(message Message) (err error)
+	Finish(message Message) (err error)
 	Count() (count int)
 }
 
