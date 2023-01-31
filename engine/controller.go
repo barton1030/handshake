@@ -9,14 +9,27 @@ import (
 
 // 控制单元负责执行器调度、错误执行数据统计、熔断保护计算触发、执行器管理等
 
+const (
+	SingleActuatorTaskVolume = 2000
+	ControllerInitStatus     = 0
+	ControllerRunStatus      = 1
+	ControllerFusingStatus   = 2
+	ControllerToBeExitStatus = -1
+	ControllerExitStatus     = -2
+)
+
 type controller struct {
-	topic                        inter.Topic
-	actuator                     map[string]*actuator
-	timeSliceErrorStatistics     map[string]int
-	timeSliceErrorStatisticsLock sync.Mutex
-	errorPipe                    chan int
-	fusingPipe                   chan int
-	statisticsPipe               chan int
+	topic                    inter.Topic
+	status                   int
+	actuator                 map[int]*actuator
+	timeSliceErrorStatistics map[string]int
+	errorPipe                chan int
+	fusingPipe               chan int
+	statisticsPipe           chan int
+	toBeExitSignal           chan int
+	exitSignal               chan int
+	nextActuatorId           int
+	snapInLock               sync.Mutex
 }
 
 func newController(topic inter.Topic) *controller {
@@ -27,15 +40,35 @@ func newController(topic inter.Topic) *controller {
 	statisticsPipe := conduitUnit.setUpStatisticsConduit(pipeName, pipeCap)
 	return &controller{
 		topic:                    topic,
-		actuator:                 make(map[string]*actuator),
+		status:                   ControllerInitStatus,
+		actuator:                 make(map[int]*actuator),
 		timeSliceErrorStatistics: make(map[string]int),
 		errorPipe:                errorPipe,
 		fusingPipe:               fusingPipe,
 		statisticsPipe:           statisticsPipe,
+		toBeExitSignal:           make(chan int),
+		exitSignal:               make(chan int),
 	}
 }
 
-func (c *controller) monitorPipe() {
+func (c *controller) start() (startResult bool) {
+	c.status = ControllerRunStatus
+	targetTaskNum := c.topic.MinConcurrency()
+	c.actuatorSnapIn(targetTaskNum)
+	go c.monitor()
+	return
+}
+
+func (c *controller) stop() (stopResult bool) {
+	c.status = ControllerToBeExitStatus
+	targetTaskNum := len(c.actuator)
+	c.actuatorSnapIn(targetTaskNum)
+	c.toBeExitSignal <- 1
+	<-c.exitSignal
+	return
+}
+
+func (c *controller) monitor() {
 	for {
 		select {
 		case <-c.errorPipe:
@@ -43,20 +76,24 @@ func (c *controller) monitorPipe() {
 			if !analysisResult {
 				break
 			}
-			actuatorNum := len(c.actuator)
-			for i := 0; i < actuatorNum; i++ {
-				c.fusingPipe <- 1
+			c.status = ControllerFusingStatus
+			for _, cActuator := range c.actuator {
+				cActuator.suspend()
 			}
 		case statistics := <-c.statisticsPipe:
 			fmt.Println(statistics)
+		case <-time.After(1 * time.Minute):
+			taskNum := c.queueCountAnalysis()
+			c.actuatorSnapIn(taskNum)
+		case <-c.toBeExitSignal:
+			c.exitSignal <- 1
+			return
 		}
 	}
 }
 
+// fuseAnalysis 计算规定时间片段内错误数据量，进行熔断计算保护
 func (c *controller) fuseAnalysis() (analysisResult bool) {
-	c.timeSliceErrorStatisticsLock.Lock()
-	defer c.timeSliceErrorStatisticsLock.Unlock()
-
 	timeFormat := time.Now().Format("2006-01-02 15:04")
 	if _, ok := c.timeSliceErrorStatistics[timeFormat]; !ok {
 		c.timeSliceErrorStatistics[timeFormat] = 1
@@ -70,15 +107,51 @@ func (c *controller) fuseAnalysis() (analysisResult bool) {
 	return
 }
 
-func (c *controller) schedule() {
-
-}
-
-func (c *controller) start() (startResult bool) {
-
+// queueCountAnalysis 分析队列数据量，计算并发执行量
+func (c *controller) queueCountAnalysis() (taskNum int) {
+	topicMessageQueuing := c.topic.MessageQueuingHandler()
+	messageDataCount := topicMessageQueuing.Count()
+	taskNum = messageDataCount / SingleActuatorTaskVolume
 	return
 }
 
-func (c *controller) stop() (stopResult bool) {
-	return
+// actuatorSnapIn 执行器管理单元，统一管理执行器的新增和收缩操作
+func (c *controller) actuatorSnapIn(targetActuatorNum int) {
+	c.snapInLock.Lock()
+	defer c.snapInLock.Unlock()
+	if c.status != ControllerRunStatus {
+		return
+	}
+	if targetActuatorNum < 0 {
+		return
+	}
+	// 最大并发数不能大于设置上限
+	if targetActuatorNum > c.topic.MaxConcurrency() {
+		targetActuatorNum = c.topic.MaxConcurrency()
+	}
+
+	currentActuatorNum := len(c.actuator)
+	toIncr := true
+	if currentActuatorNum > targetActuatorNum {
+		toIncr = false
+	}
+
+	for {
+		cActuatorNum := len(c.actuator)
+		if cActuatorNum == targetActuatorNum {
+			return
+		}
+		if toIncr {
+			cActuator := newActuator(c.nextActuatorId, c.topic)
+			cActuator.start()
+			c.actuator[c.nextActuatorId] = cActuator
+			c.nextActuatorId++
+		} else {
+			preActuatorId := c.nextActuatorId - 1
+			cActuator := c.actuator[preActuatorId]
+			cActuator.stop()
+			delete(c.actuator, preActuatorId)
+			c.nextActuatorId--
+		}
+	}
 }
