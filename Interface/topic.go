@@ -1,14 +1,14 @@
 package Interface
 
 type Topic interface {
-	Name() string
-	MinConcurrency() int
-	MaxConcurrency() int
-	FuseSalt() int
-	MaxRetryCont() int
-	CallbackHandler() Callback
-	AlarmHandler() Alarm
-	MessageQueuingHandler() MessageQueuing
+	Name() (name string)
+	MinConcurrency() (minConcurrency int)
+	MaxConcurrency() (maxConcurrency int)
+	FuseSalt() (fuseSalt int)
+	MaxRetryCount() (maxRetryCount int)
+	CallbackHandler() (callback Callback)
+	AlarmHandler() (alarm Alarm)
+	MessageQueuingHandler() (messageQueuing MessageQueuing)
 	Recipients() (recipients []interface{})
 }
 
@@ -28,7 +28,7 @@ type MessageQueuing interface {
 }
 
 type Message interface {
-	Id() int
+	Id() (id int)
 	Data() (data map[string]interface{}, err error)
 	RetryCount() (retryCont int)
 	IncrRetryCont()

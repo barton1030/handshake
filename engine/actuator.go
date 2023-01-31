@@ -115,7 +115,7 @@ func (a *actuator) alarm(err interface{}, messageId int) {
 }
 
 func (a *actuator) handleFail(message inter.Message) (err error) {
-	maxRetryCount := a.topic.MaxRetryCont()
+	maxRetryCount := a.topic.MaxRetryCount()
 	retryCount := message.RetryCount()
 	messageQueuing := a.topic.MessageQueuingHandler()
 	if retryCount < maxRetryCount {
