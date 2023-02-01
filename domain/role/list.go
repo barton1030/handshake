@@ -34,27 +34,28 @@ func (l *list) List() (roleList map[int]role, err error) {
 }
 
 func (l *list) RoleById(roleId int) (role2 role, err error) {
-	role, err := l.storage.RoleById(roleId)
+	storageRole, err := l.storage.RoleById(roleId)
 	if err != nil {
 		return
 	}
-	role2.id = role.RoleId()
-	role2.name = role.RoleName()
-	role2.creator = role.RoleCreator()
-	role2.permissionMap = role.RolePermissionMap()
-	role2.createTime = role.RoleCreateTime()
+	role2 = l.reconstruction(storageRole)
 	return
 }
 
 func (l *list) RoleByName(roleName string) (role2 role, err error) {
-	role, err := l.storage.RoleByName(roleName)
+	storageRole, err := l.storage.RoleByName(roleName)
 	if err != nil {
 		return
 	}
-	role2.id = role.RoleId()
-	role2.name = role.RoleName()
-	role2.creator = role.RoleCreator()
-	role2.permissionMap = role.RolePermissionMap()
-	role2.createTime = role.RoleCreateTime()
+	role2 = l.reconstruction(storageRole)
+	return
+}
+
+func (l *list) reconstruction(originRole inter.RoleStorage) (role2 role) {
+	role2.id = originRole.RoleId()
+	role2.name = originRole.RoleName()
+	role2.creator = originRole.RoleCreator()
+	role2.permissionMap = originRole.RolePermissionMap()
+	role2.createTime = originRole.RoleCreateTime()
 	return
 }
