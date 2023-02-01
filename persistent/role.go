@@ -36,10 +36,10 @@ func (r roleDao) Delete(role2 inter.DomainRole) (err error) {
 	return err
 }
 
-func (r roleDao) RoleById(roleId int) (role2 inter.RoleStorage, err error) {
-	role2 = storageRole{}
-	err = internal.DbConn().Table(r.tableName).Where("id", roleId).Scan(&role2).Error
-	return
+func (r roleDao) RoleById(roleId int) (inter.RoleStorage, error) {
+	role := storageRole{}
+	err := internal.DbConn().Table(r.tableName).First(&role, roleId).Error
+	return role, err
 }
 
 type storageRole struct {

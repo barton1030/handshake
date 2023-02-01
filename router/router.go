@@ -16,6 +16,7 @@ func Router() *gin.Engine {
 func role(r *gin.Engine) {
 	roleGroup := r.Group("/role")
 	roleGroup.POST("/add", app.RoleController.Add)
+	roleGroup.GET("/id", app.RoleController.RoleById)
 }
 
 func user(r *gin.Engine) {

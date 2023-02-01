@@ -33,6 +33,15 @@ func (l *list) List() (roleList map[int]role, err error) {
 	return
 }
 
-func (l *list) Role(roleId int) (role2 role, err error) {
+func (l *list) RoleById(roleId int) (role2 role, err error) {
+	role, err := l.storage.RoleById(roleId)
+	if err != nil {
+		return
+	}
+	role2.id = role.RoleId()
+	role2.name = role.RoleName()
+	role2.creator = role.RoleCreator()
+	role2.permissionMap = role.RolePermissionMap()
+	role2.createTime = role.RoleCreateTime()
 	return
 }
