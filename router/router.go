@@ -20,6 +20,7 @@ func role(r *gin.Engine) {
 	roleGroup.GET("/name/edit", app.RoleController.EditName)
 	roleGroup.GET("/permission/edit", app.RoleController.SetPermission)
 	roleGroup.GET("/list", app.RoleController.List)
+	roleGroup.GET("/delete", app.RoleController.Delete)
 }
 
 func user(r *gin.Engine) {

@@ -30,6 +30,9 @@ func (r roleDao) Edit(role2 inter.DomainRole) (err error) {
 }
 
 func (r roleDao) Delete(role2 inter.DomainRole) (err error) {
+	err = internal.DbConn().Table(r.tableName).Delete(&struct {
+		Id int
+	}{Id: role2.Id()}).Limit(1).Error
 	return err
 }
 

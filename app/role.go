@@ -37,6 +37,10 @@ type ListRequest struct {
 	Limit  int `json:"limit" form:"limit" binding:"required"`
 }
 
+type DeleteRequest struct {
+	RoleId int `json:"role_id" form:"role_id" binding:"required"`
+}
+
 // Add 角色添加入口
 func (r roleController) Add(c *gin.Context) {
 	request := AddRequest{}
@@ -129,5 +133,24 @@ func (r roleController) List(c *gin.Context) {
 		return
 	}
 	helper.Response(c, 200, roles, "")
+	return
+}
+
+// Delete 删除角色
+func (r roleController) Delete(c *gin.Context) {
+	request := DeleteRequest{}
+	if err := c.ShouldBind(&request); err != nil {
+		err = fmt.Errorf("app role Delete: params %v error: %v", request, err)
+		helper.Response(c, 1000, nil, err.Error())
+		return
+	}
+
+	err := service.RoleService.Delete(request.RoleId)
+	if err != nil {
+		err = fmt.Errorf("app role Delete: params %v error: %v", request, err)
+		helper.Response(c, 1001, nil, err.Error())
+		return
+	}
+	helper.Response(c, 200, nil, "")
 	return
 }

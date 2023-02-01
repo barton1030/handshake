@@ -78,3 +78,16 @@ func (r role) List(offset, limit int) (roles []map[string]interface{}, err error
 	}
 	return
 }
+
+func (r role) Delete(roleId int) (err error) {
+	domainRole, err := role2.List.RoleById(roleId)
+	if err != nil {
+		return
+	}
+	if domainRole.Id() <= 0 {
+		err = errors.New("角色不存在")
+		return
+	}
+	err = role2.List.Delete(domainRole)
+	return
+}
