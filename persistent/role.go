@@ -42,6 +42,15 @@ func (r roleDao) RoleById(roleId int) (inter.RoleStorage, error) {
 	return role, err
 }
 
+func (r roleDao) RoleByName(roleName string) (inter.RoleStorage, error) {
+	role := storageRole{}
+	err := internal.DbConn().Table(r.tableName).Where("name = ?", roleName).First(&role).Error
+	if err.Error() == "record not found" {
+		err = nil
+	}
+	return role, err
+}
+
 type storageRole struct {
 	Id            int       `json:"id" gorm:"id"`
 	Name          string    `json:"name" gorm:"name"`

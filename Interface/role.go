@@ -7,6 +7,7 @@ type RoleListStorage interface {
 	Edit(role2 DomainRole) (err error)
 	Delete(role2 DomainRole) (err error)
 	RoleById(roleId int) (RoleStorage, error)
+	RoleByName(roleName string) (RoleStorage, error)
 }
 
 type RoleStorage interface {

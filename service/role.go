@@ -1,6 +1,9 @@
 package service
 
-import role2 "handshake/domain/role"
+import (
+	"errors"
+	role2 "handshake/domain/role"
+)
 
 type role struct {
 }
@@ -8,8 +11,15 @@ type role struct {
 var RoleService role
 
 func (r role) Add(name string, creator int) (err error) {
-	// 新增
-	domainRole := role2.NewRole(name, creator)
+	domainRole, err := role2.List.RoleByName(name)
+	if domainRole.Id() > 0 {
+		err = errors.New("不要重复添加")
+	}
+	if err != nil {
+		return err
+	}
+
+	domainRole = role2.NewRole(name, creator)
 	err = role2.List.Add(domainRole)
 	return err
 }
@@ -19,6 +29,7 @@ func (r role) RoleById(roleId int) (role map[string]interface{}, err error) {
 	if err != nil {
 		return
 	}
+
 	role = make(map[string]interface{})
 	role["id"] = domainRole.Id()
 	role["name"] = domainRole.Name()
