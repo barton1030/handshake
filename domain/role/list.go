@@ -1,19 +1,27 @@
 package role
 
+import (
+	inter "handshake/Interface"
+	"handshake/persistent"
+)
+
 type list struct {
 	nextId  int
-	storage map[int]role
+	storage inter.RoleListStorage
 }
 
-var List = list{storage: make(map[int]role)}
+var List = list{nextId: 1, storage: persistent.RoleDao}
 
 func (l *list) Add(role2 role) (err error) {
-	l.storage[l.nextId] = role2
-	l.nextId++
+	role2.id = l.nextId
+	err = l.storage.Add(&role2)
+	if err == nil {
+		l.nextId++
+	}
 	return err
 }
 
-func (l *list) Edit(roles role) (err error) {
+func (l *list) Edit(role2 role) (err error) {
 	return err
 }
 
@@ -25,6 +33,6 @@ func (l *list) List() (roleList map[int]role, err error) {
 	return
 }
 
-func (l *list) Role(roleId int) (cRole role, err error) {
+func (l *list) Role(roleId int) (role2 role, err error) {
 	return
 }

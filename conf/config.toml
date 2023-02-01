@@ -7,7 +7,7 @@ port = 3306
 user = "root"
 password = ""
 type = "mysql"
-db_name = "bullet"
+db_name = "handshake"
 init_conn = 20
 max_conn = 200
 [redis]
