@@ -22,6 +22,7 @@ func (l *list) Add(role2 role) (err error) {
 }
 
 func (l *list) Edit(role2 role) (err error) {
+	err = l.storage.Edit(&role2)
 	return err
 }
 
@@ -29,7 +30,15 @@ func (l *list) Delete(roleId int) (err error) {
 	return err
 }
 
-func (l *list) List() (roleList map[int]role, err error) {
+func (l *list) List(offset, limit int) (roleList []role, err error) {
+	storageRoles, err := l.storage.List(offset, limit)
+	if err != nil {
+		return
+	}
+	for _, storageRole := range storageRoles {
+		role2 := l.reconstruction(storageRole)
+		roleList = append(roleList, role2)
+	}
 	return
 }
 
@@ -56,6 +65,9 @@ func (l *list) reconstruction(originRole inter.RoleStorage) (role2 role) {
 	role2.name = originRole.RoleName()
 	role2.creator = originRole.RoleCreator()
 	role2.permissionMap = originRole.RolePermissionMap()
+	if role2.permissionMap == nil {
+		role2.permissionMap = make(map[string]bool)
+	}
 	role2.createTime = originRole.RoleCreateTime()
 	return
 }

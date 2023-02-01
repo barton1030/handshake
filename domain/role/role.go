@@ -30,6 +30,10 @@ func (r *role) Name() string {
 	return r.name
 }
 
+func (r *role) SetName(roleName string) {
+	r.name = roleName
+}
+
 func (r *role) PermissionMap() map[string]bool {
 	return r.permissionMap
 }
