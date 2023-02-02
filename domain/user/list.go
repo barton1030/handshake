@@ -38,10 +38,6 @@ func (l *list) UserId(userId int) (user2 user, err error) {
 	return
 }
 
-func (l *list) UserName(userName string) (user2 user, err error) {
-	return
-}
-
 func (l *list) List(offset, limit int) (userList []user, err error) {
 	storageUserList, err := l.storage.UserList(offset, limit)
 	if err != nil {
