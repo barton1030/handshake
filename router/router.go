@@ -27,6 +27,8 @@ func user(r *gin.Engine) {
 	userGroup := r.Group("/user")
 	userGroup.POST("/add", app.User.Add)
 	userGroup.POST("/edit", app.User.SetRoleId)
+	userGroup.GET("/delete", app.User.Delete)
+	userGroup.GET("/list", app.User.List)
 }
 
 func topic(r *gin.Engine) {

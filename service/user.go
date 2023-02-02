@@ -46,3 +46,36 @@ func (u user) SetRoleId(userId, roleId int) error {
 	err = user2.List.Edit(user3)
 	return err
 }
+
+func (u user) Delete(userId int) error {
+	user3, err := user2.List.UserId(userId)
+	if err != nil {
+		return err
+	}
+	if user3.Id() <= 0 {
+		err = errors.New("用户不存在，请确认")
+		return err
+	}
+	err = user2.List.Delete(user3)
+	return err
+}
+
+func (u user) List(offset, limit int) (userList []map[string]interface{}, err error) {
+	users, err := user2.List.List(offset, limit)
+	if err != nil {
+		return
+	}
+	userNum := len(users)
+	userList = make([]map[string]interface{}, userNum, userNum)
+	for index, user3 := range users {
+		user4 := make(map[string]interface{})
+		user4["id"] = user3.Id()
+		user4["name"] = user3.Name()
+		user4["phone"] = user3.Phone()
+		user4["role_id"] = user3.RoleId()
+		user4["create_time"] = user3.CreateTime()
+		userList[index] = user4
+	}
+
+	return userList, err
+}

@@ -42,6 +42,23 @@ func (l *list) UserName(userName string) (user2 user, err error) {
 	return
 }
 
+func (l *list) List(offset, limit int) (userList []user, err error) {
+	storageUserList, err := l.storage.UserList(offset, limit)
+	if err != nil {
+		return
+	}
+	if len(storageUserList) <= 0 {
+		return
+	}
+
+	for _, storageUser := range storageUserList {
+		user2 := l.reconstruction(storageUser)
+		userList = append(userList, user2)
+	}
+
+	return
+}
+
 func (l *list) reconstruction(user inter.User) (user2 user) {
 	user2.id = user.Id()
 	user2.name = user.Name()
