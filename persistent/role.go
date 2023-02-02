@@ -39,6 +39,9 @@ func (r roleDao) Delete(role2 inter.DomainRole) (err error) {
 func (r roleDao) RoleById(roleId int) (inter.RoleStorage, error) {
 	role := storageRole{}
 	err := internal.DbConn().Table(r.tableName).First(&role, roleId).Error
+	if err != nil && err.Error() == "record not found" {
+		err = nil
+	}
 	return role, err
 }
 

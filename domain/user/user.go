@@ -6,34 +6,57 @@ type user struct {
 	id         int
 	name       string
 	phone      string
-	role       int
+	roleId     int
+	pwd        string
 	createTime time.Time
 }
 
-func NewUser(name, phone string) user {
+func NewUser(name, phone, pwd string, roleId int) user {
 	return user{
 		name:       name,
 		phone:      phone,
+		pwd:        pwd,
+		roleId:     roleId,
 		createTime: time.Now(),
 	}
 }
 
-func (u *user) SetId(id int) (err error) {
+func (u *user) Id() int {
+	return u.id
+}
+
+func (u *user) SetId(id int) {
 	u.id = id
-	return err
 }
 
-func (u *user) SetRole(roleId int) (err error) {
-	u.role = roleId
-	return err
+func (u *user) RoleId() int {
+	return u.roleId
 }
 
-func (u *user) SetName(name string) (err error) {
+func (u *user) SetRole(roleId int) {
+	u.roleId = roleId
+}
+
+func (u *user) Name() string {
+	return u.name
+}
+
+func (u *user) SetName(name string) {
 	u.name = name
-	return err
 }
 
-func (u *user) SetPhone(phone string) (err error) {
+func (u *user) Phone() string {
+	return u.phone
+}
+
+func (u *user) SetPhone(phone string) {
 	u.phone = phone
-	return err
+}
+
+func (u *user) CreateTime() time.Time {
+	return u.createTime
+}
+
+func (u *user) Pwd() string {
+	return u.pwd
 }

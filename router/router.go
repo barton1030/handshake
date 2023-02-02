@@ -24,7 +24,9 @@ func role(r *gin.Engine) {
 }
 
 func user(r *gin.Engine) {
-
+	userGroup := r.Group("/user")
+	userGroup.POST("/add", app.User.Add)
+	userGroup.POST("/edit", app.User.SetRoleId)
 }
 
 func topic(r *gin.Engine) {
