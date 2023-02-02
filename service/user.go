@@ -76,7 +76,6 @@ func (u user) List(offset, limit int) (userList []map[string]interface{}, err er
 		user4["create_time"] = user3.CreateTime()
 		userList[index] = user4
 	}
-
 	return userList, err
 }
 
@@ -91,6 +90,5 @@ func (u user) UserId(userId int) (user4 map[string]interface{}, err error) {
 	user4["phone"] = user3.Phone()
 	user4["role_id"] = user3.RoleId()
 	user4["create_time"] = user3.CreateTime()
-
 	return user4, err
 }
