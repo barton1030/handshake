@@ -79,3 +79,18 @@ func (u user) List(offset, limit int) (userList []map[string]interface{}, err er
 
 	return userList, err
 }
+
+func (u user) UserId(userId int) (user4 map[string]interface{}, err error) {
+	user3, err := user2.List.UserId(userId)
+	if err != nil {
+		return
+	}
+	user4 = make(map[string]interface{})
+	user4["id"] = user3.Id()
+	user4["name"] = user3.Name()
+	user4["phone"] = user3.Phone()
+	user4["role_id"] = user3.RoleId()
+	user4["create_time"] = user3.CreateTime()
+
+	return user4, err
+}

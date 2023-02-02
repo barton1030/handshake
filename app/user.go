@@ -33,6 +33,10 @@ type listRequest struct {
 	Limit  int `json:"limit" form:"limit" binding:"required"`
 }
 
+type userIdRequest struct {
+	UserId int `json:"user_id" form:"user_id" binding:"required"`
+}
+
 func (u userController) Add(c *gin.Context) {
 	request := userAddRequest{}
 	if err := c.ShouldBind(&request); err != nil {
@@ -102,5 +106,23 @@ func (u userController) List(c *gin.Context) {
 		return
 	}
 	helper.Response(c, 200, userList, "")
+	return
+}
+
+func (u userController) UserId(c *gin.Context) {
+	request := userIdRequest{}
+	if err := c.ShouldBind(&request); err != nil {
+		err = fmt.Errorf("app user UserId: params %v error: %v", request, err)
+		helper.Response(c, 1000, nil, err.Error())
+		return
+	}
+
+	user, err := service.UserService.UserId(request.UserId)
+	if err != nil {
+		err = fmt.Errorf("app user UserId: params %v error: %v", request, err)
+		helper.Response(c, 1001, nil, err.Error())
+		return
+	}
+	helper.Response(c, 200, user, "")
 	return
 }
