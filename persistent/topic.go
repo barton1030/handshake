@@ -1,6 +1,7 @@
 package persistent
 
 import (
+	"encoding/json"
 	inter "handshake/Interface"
 	"handshake/persistent/internal"
 )
@@ -64,6 +65,23 @@ func (t topicDao) transformation(topic inter.Topic) (topic2 storageTopic) {
 	topic2.SMaxRetryCount = topic.MaxRetryCount()
 	topic2.SFuseSalt = topic.FuseSalt()
 	topic2.SCreator = topic.Creator()
+	domainCallback := topic.CallbackHandler()
+	callback := storageCallback{
+		SUrl:     domainCallback.Url(),
+		SMethod:  domainCallback.Method(),
+		SHeaders: domainCallback.Headers(),
+		SCookies: domainCallback.Cookies(),
+	}
+	callbackJson, _ := json.Marshal(callback)
+	topic2.SCallback = string(callbackJson)
+	domainAlarm := topic.AlarmHandler()
+	alarm := storageAlarm{
+		SUrl:        domainAlarm.Url(),
+		SMethod:     domainAlarm.Method(),
+		SRecipients: domainAlarm.Recipients(),
+	}
+	alarmJson, _ := json.Marshal(alarm)
+	topic2.SAlarm = string(alarmJson)
 	return topic2
 }
 
@@ -80,55 +98,99 @@ type storageTopic struct {
 	SCreator        int    `json:"s_creator" gorm:"s_creator"`
 }
 
-func (t storageTopic) Id() (id int) {
-	id = t.SId
+func (t storageTopic) Id() int {
+	return t.SId
+}
+
+func (t storageTopic) Name() string {
+	return t.SName
+}
+
+func (t storageTopic) Status() int {
+	return t.SStatus
+}
+
+func (t storageTopic) MinConcurrency() int {
+	return t.SMinConcurrency
+}
+
+func (t storageTopic) MaxConcurrency() int {
+	return t.SMaxConcurrency
+}
+
+func (t storageTopic) FuseSalt() int {
+	return t.SFuseSalt
+}
+
+func (t storageTopic) MaxRetryCount() int {
+	return t.SMaxRetryCount
+}
+
+func (t storageTopic) CallbackHandler() inter.Callback {
+	callback := storageCallback{}
+	json.Unmarshal([]byte(t.SCallback), &callback)
+	return callback
+}
+
+func (t storageTopic) AlarmHandler() inter.Alarm {
+	alarm := storageAlarm{}
+	json.Unmarshal([]byte(t.SAlarm), &alarm)
+	return alarm
+}
+
+func (t storageTopic) MessageQueuingHandler() (queue inter.MessageQueuing) {
 	return
 }
 
-func (t storageTopic) Name() (name string) {
-	name = t.SName
+func (t storageTopic) Creator() int {
+	return t.SCreator
+}
+
+type storageCallback struct {
+	SUrl     string                 `json:"s_url" gorm:"s_url"`
+	SMethod  string                 `json:"s_method" gorm:"s_method"`
+	SHeaders map[string]interface{} `json:"s_headers" gorm:"s_headers"`
+	SCookies map[string]interface{} `json:"s_cookies" gorm:"s_cookies"`
+}
+
+func (c storageCallback) Do(data map[string]interface{}) (res map[string]interface{}, err error) {
 	return
 }
 
-func (t storageTopic) Status() (status int) {
-	status = t.SStatus
+func (c storageCallback) Headers() map[string]interface{} {
+	return c.SHeaders
+}
+
+func (c storageCallback) Cookies() map[string]interface{} {
+	return c.SCookies
+}
+
+func (c storageCallback) Url() string {
+	return c.SUrl
+}
+
+func (c storageCallback) Method() string {
+	return c.SMethod
+}
+
+type storageAlarm struct {
+	SUrl        string        `json:"s_url" gorm:"s_url"`
+	SMethod     string        `json:"s_method" gorm:"s_method"`
+	SRecipients []interface{} `json:"s_recipients" gorm:"s_recipients"`
+}
+
+func (a storageAlarm) Do(information map[string]interface{}, recipients []interface{}) (res map[string]interface{}, err error) {
 	return
 }
 
-func (t storageTopic) MinConcurrency() (minConcurrency int) {
-	minConcurrency = t.SMinConcurrency
-	return
+func (a storageAlarm) Url() string {
+	return a.SUrl
 }
 
-func (t storageTopic) MaxConcurrency() (maxConcurrency int) {
-	maxConcurrency = t.SMaxConcurrency
-	return
+func (a storageAlarm) Method() string {
+	return a.SMethod
 }
 
-func (t storageTopic) FuseSalt() (fuseSalt int) {
-	return
-}
-
-func (t storageTopic) MaxRetryCount() (maxRetryCount int) {
-	return
-}
-
-func (t storageTopic) CallbackHandler() (callback inter.Callback) {
-	return
-}
-
-func (t storageTopic) AlarmHandler() (alarm inter.Alarm) {
-	return
-}
-
-func (t storageTopic) MessageQueuingHandler() (messageQueuing inter.MessageQueuing) {
-	return
-}
-
-func (t storageTopic) Recipients() (recipients []interface{}) {
-	return
-}
-
-func (t storageTopic) Creator() (creatorId int) {
-	return
+func (a storageAlarm) Recipients() []interface{} {
+	return a.SRecipients
 }

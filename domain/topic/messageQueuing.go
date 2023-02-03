@@ -7,14 +7,11 @@ type messageQueuing struct {
 	storage   map[int]interface{}
 }
 
-func newMessageQueuing(topicName string) messageQueuing {
-	return messageQueuing{
-		topicName: topicName,
-		storage:   make(map[int]interface{}),
-	}
-}
-
 func (m *messageQueuing) Pop() (message inter.Message, err error) {
+	data := make(map[string]interface{})
+	data["name"] = "barton"
+	messageData := NewMessage(data)
+	message = &messageData
 	return
 }
 

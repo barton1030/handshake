@@ -9,26 +9,32 @@ type StorageTopicList interface {
 }
 
 type Topic interface {
-	Id() (id int)
-	Name() (name string)
-	Status() (status int)
-	MinConcurrency() (minConcurrency int)
-	MaxConcurrency() (maxConcurrency int)
-	FuseSalt() (fuseSalt int)
-	MaxRetryCount() (maxRetryCount int)
-	CallbackHandler() (callback Callback)
-	AlarmHandler() (alarm Alarm)
-	MessageQueuingHandler() (messageQueuing MessageQueuing)
-	Recipients() (recipients []interface{})
-	Creator() (creatorId int)
+	Id() int
+	Name() string
+	Status() int
+	MinConcurrency() int
+	MaxConcurrency() int
+	FuseSalt() int
+	MaxRetryCount() int
+	CallbackHandler() Callback
+	AlarmHandler() Alarm
+	MessageQueuingHandler() (queue MessageQueuing)
+	Creator() int
 }
 
 type Callback interface {
 	Do(data map[string]interface{}) (res map[string]interface{}, err error)
+	Headers() map[string]interface{}
+	Cookies() map[string]interface{}
+	Url() string
+	Method() string
 }
 
 type Alarm interface {
-	Do(information map[string]interface{}, recipients []interface{})
+	Do(information map[string]interface{}, recipients []interface{}) (res map[string]interface{}, err error)
+	Url() string
+	Method() string
+	Recipients() []interface{}
 }
 
 type MessageQueuing interface {

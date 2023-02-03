@@ -48,19 +48,22 @@ func (a *actuator) stop() {
 }
 
 func (a *actuator) suspend() {
+	if a.status != ActuatorRunStatus {
+		return
+	}
 	a.status = ActuatorToBeSuspendStatus
 	<-a.suspendSignal
 }
 
-func (a actuator) implement() {
+func (a *actuator) implement() {
 	for {
 		if a.status == ActuatorInitStatus {
 			a.startSignal <- 1
 			a.status = ActuatorRunStatus
 		}
 		if a.status == ActuatorToBeSuspendStatus {
-			a.suspendSignal <- 1
 			a.status = ActuatorSuspendStatus
+			a.suspendSignal <- 1
 		}
 		if a.status == ActuatorSuspendStatus {
 			continue
@@ -111,7 +114,7 @@ func (a *actuator) alarm(err interface{}, messageId int) {
 	information["topic"] = a.topic.Name()
 	information["messageId"] = messageId
 	information["err"] = err
-	recipients := a.topic.Recipients()
+	recipients := a.topic.AlarmHandler().Recipients()
 	alarm.Do(information, recipients)
 }
 

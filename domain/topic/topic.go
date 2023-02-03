@@ -32,63 +32,52 @@ func NewTopic(name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSa
 		minConcurrency: minConcurrency,
 		maxConcurrency: maxConcurrency,
 		fuseSalt:       fuseSalt,
-		queue:          newMessageQueuing(name),
-		creator:        creator,
+		queue: messageQueuing{
+			topicName: name,
+			storage:   make(map[int]interface{}),
+		},
+		creator: creator,
 	}
 }
 
-func (t *topic) Id() (id int) {
-	id = t.id
-	return
+func (t *topic) Id() int {
+	return t.id
 }
 
-func (t *topic) Name() (name string) {
-	name = t.name
-	return
+func (t *topic) Name() string {
+	return t.name
 }
 
-func (t *topic) Status() (status int) {
-	status = t.status
-	return
+func (t *topic) Status() int {
+	return t.status
 }
 
-func (t *topic) MinConcurrency() (minConcurrency int) {
-	minConcurrency = t.minConcurrency
-	return
+func (t *topic) MinConcurrency() int {
+	return t.minConcurrency
 }
 
-func (t *topic) MaxConcurrency() (maxConcurrency int) {
-	maxConcurrency = t.maxConcurrency
-	return
+func (t *topic) MaxConcurrency() int {
+	return t.maxConcurrency
 }
 
-func (t *topic) FuseSalt() (fuseSalt int) {
-	fuseSalt = t.fuseSalt
-	return
+func (t *topic) FuseSalt() int {
+	return t.fuseSalt
 }
 
-func (t *topic) MaxRetryCount() (maxRetryCount int) {
-	maxRetryCount = t.maxRetryCount
-	return
+func (t *topic) MaxRetryCount() int {
+	return t.maxRetryCount
 }
 
-func (t *topic) CallbackHandler() (callback inter.Callback) {
-	callback = &t.callback
-	return
+func (t *topic) CallbackHandler() inter.Callback {
+	return &t.callback
 }
 
-func (t *topic) AlarmHandler() (alarm inter.Alarm) {
-	alarm = &t.alarm
-	return
+func (t *topic) AlarmHandler() inter.Alarm {
+	return &t.alarm
 }
 
-func (t *topic) MessageQueuingHandler() (messageQueuing inter.MessageQueuing) {
-	messageQueuing = &t.queue
-	return
-}
-
-func (t *topic) Recipients() (recipients []interface{}) {
-	return
+func (t *topic) MessageQueuingHandler() (queue inter.MessageQueuing) {
+	return &t.queue
 }
 
 func (t *topic) SetAlarm(alarm inter.Alarm) (err error) {
@@ -99,13 +88,24 @@ func (t *topic) SetCallback(callback inter.Callback) (err error) {
 	return
 }
 
-func (t *topic) Creator() (creatorId int) {
-	creatorId = t.creator
-	return
+func (t *topic) Creator() int {
+	return t.creator
 }
 
 func (t *topic) Start() (err error) {
+	if t.status == StartStatus {
+		return err
+	}
 	t.status = StartStatus
 	engine.ManagerUnit.RegisterTopic(t)
+	return
+}
+
+func (t *topic) Stop() (err error) {
+	if t.status == StopStatus {
+		return err
+	}
+	t.status = StopStatus
+	engine.ManagerUnit.CancelTopic(t)
 	return
 }

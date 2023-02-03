@@ -48,6 +48,22 @@ func (l *list) reconstruction(topic2 inter.Topic) (topic3 topic) {
 	topic3.minConcurrency = topic2.MinConcurrency()
 	topic3.maxConcurrency = topic2.MaxConcurrency()
 	topic3.fuseSalt = topic2.FuseSalt()
-	topic3.queue = newMessageQueuing(topic3.name)
+	topic3.queue = messageQueuing{
+		topicName: topic2.Name(),
+		storage:   make(map[int]interface{}),
+	}
+	topic2AlamHandler := topic2.AlarmHandler()
+	topic3.alarm = alarm{
+		url:        topic2AlamHandler.Url(),
+		method:     topic2AlamHandler.Method(),
+		recipients: topic2AlamHandler.Recipients(),
+	}
+	topic2CallbackHandler := topic2.CallbackHandler()
+	topic3.callback = callback{
+		url:     topic2CallbackHandler.Url(),
+		method:  topic2CallbackHandler.Method(),
+		headers: topic2CallbackHandler.Headers(),
+		cookies: topic2CallbackHandler.Cookies(),
+	}
 	return
 }

@@ -12,7 +12,7 @@ var dbConnHandler *gorm.DB
 // DbInit -- 初始化数据库连接
 func DbInit() {
 	dbConf := conf.DbConf()
-	dbAddr := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?parseTime=true", dbConf.User, dbConf.Pwd, dbConf.Host, dbConf.Port, dbConf.DbName)
+	dbAddr := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?charset=utf8mb4&parseTime=true&loc=Local", dbConf.User, dbConf.Pwd, dbConf.Host, dbConf.Port, dbConf.DbName)
 	fmt.Println(dbAddr)
 	dbConn, err := gorm.Open(dbConf.Type, dbAddr)
 	if err != nil {

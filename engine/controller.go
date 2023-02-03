@@ -21,7 +21,7 @@ const (
 type controller struct {
 	topic                    inter.Topic
 	status                   int
-	actuator                 map[int]*actuator
+	actuatorMap              map[int]*actuator
 	timeSliceErrorStatistics map[string]int
 	errorPipe                chan int
 	fusingPipe               chan int
@@ -41,7 +41,7 @@ func newController(topic inter.Topic) *controller {
 	return &controller{
 		topic:                    topic,
 		status:                   ControllerInitStatus,
-		actuator:                 make(map[int]*actuator),
+		actuatorMap:              make(map[int]*actuator),
 		timeSliceErrorStatistics: make(map[string]int),
 		errorPipe:                errorPipe,
 		fusingPipe:               fusingPipe,
@@ -61,10 +61,11 @@ func (c *controller) start() (startResult bool) {
 
 func (c *controller) stop() (stopResult bool) {
 	c.status = ControllerToBeExitStatus
-	targetTaskNum := len(c.actuator)
+	targetTaskNum := len(c.actuatorMap)
 	c.actuatorSnapIn(targetTaskNum)
 	c.toBeExitSignal <- 1
 	<-c.exitSignal
+	c.status = ControllerExitStatus
 	return
 }
 
@@ -72,17 +73,20 @@ func (c *controller) monitor() {
 	for {
 		select {
 		case <-c.errorPipe:
+			if c.status != ControllerRunStatus {
+				break
+			}
 			analysisResult := c.fuseAnalysis()
 			if !analysisResult {
 				break
 			}
 			c.status = ControllerFusingStatus
-			for _, cActuator := range c.actuator {
+			for _, cActuator := range c.actuatorMap {
 				cActuator.suspend()
 			}
 		case statistics := <-c.statisticsPipe:
 			fmt.Println(statistics)
-		case <-time.After(1 * time.Minute):
+		case <-time.After(5 * time.Second):
 			taskNum := c.queueCountAnalysis()
 			c.actuatorSnapIn(taskNum)
 		case <-c.toBeExitSignal:
@@ -122,35 +126,38 @@ func (c *controller) actuatorSnapIn(targetActuatorNum int) {
 	if c.status != ControllerRunStatus {
 		return
 	}
-	if targetActuatorNum < 0 {
+
+	if targetActuatorNum <= 0 {
 		return
 	}
 	// 最大并发数不能大于设置上限
 	if targetActuatorNum > c.topic.MaxConcurrency() {
 		targetActuatorNum = c.topic.MaxConcurrency()
 	}
-
-	currentActuatorNum := len(c.actuator)
+	currentActuatorNum := len(c.actuatorMap)
+	if currentActuatorNum == targetActuatorNum {
+		return
+	}
 	toIncr := true
 	if currentActuatorNum > targetActuatorNum {
 		toIncr = false
 	}
 
 	for {
-		cActuatorNum := len(c.actuator)
+		cActuatorNum := len(c.actuatorMap)
 		if cActuatorNum == targetActuatorNum {
 			return
 		}
 		if toIncr {
 			cActuator := newActuator(c.nextActuatorId, c.topic)
 			cActuator.start()
-			c.actuator[c.nextActuatorId] = cActuator
+			c.actuatorMap[c.nextActuatorId] = cActuator
 			c.nextActuatorId++
 		} else {
 			preActuatorId := c.nextActuatorId - 1
-			cActuator := c.actuator[preActuatorId]
+			cActuator := c.actuatorMap[preActuatorId]
 			cActuator.stop()
-			delete(c.actuator, preActuatorId)
+			delete(c.actuatorMap, preActuatorId)
 			c.nextActuatorId--
 		}
 	}
