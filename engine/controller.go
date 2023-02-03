@@ -81,9 +81,11 @@ func (c *controller) monitor() {
 				break
 			}
 			c.status = ControllerFusingStatus
-			for _, cActuator := range c.actuatorMap {
-				cActuator.suspend()
-			}
+			go func() {
+				for _, cActuator := range c.actuatorMap {
+					cActuator.suspend()
+				}
+			}()
 		case statistics := <-c.statisticsPipe:
 			fmt.Println(statistics)
 		case <-time.After(5 * time.Second):

@@ -13,22 +13,32 @@ const (
 )
 
 type actuator struct {
-	id            int
-	status        int8
-	topic         inter.Topic
-	startSignal   chan int
-	exitSignal    chan int
-	suspendSignal chan int
+	id             int
+	status         int8
+	topic          inter.Topic
+	startSignal    chan int
+	exitSignal     chan int
+	suspendSignal  chan int
+	errorPipe      chan int
+	fusingPipe     chan int
+	statisticsPipe chan int
 }
 
 func newActuator(actuatorId int, topic inter.Topic) *actuator {
+	pipeName := topic.Name()
+	errorPipe := conduitUnit.errorConduitByName(pipeName)
+	fusingPipe := conduitUnit.fusingConduitByName(pipeName)
+	statisticsPipe := conduitUnit.statisticsConduitByName(pipeName)
 	return &actuator{
-		id:            actuatorId,
-		status:        ActuatorInitStatus,
-		topic:         topic,
-		startSignal:   make(chan int),
-		exitSignal:    make(chan int),
-		suspendSignal: make(chan int),
+		id:             actuatorId,
+		status:         ActuatorInitStatus,
+		topic:          topic,
+		startSignal:    make(chan int),
+		exitSignal:     make(chan int),
+		suspendSignal:  make(chan int),
+		errorPipe:      errorPipe,
+		fusingPipe:     fusingPipe,
+		statisticsPipe: statisticsPipe,
 	}
 }
 
@@ -90,6 +100,7 @@ func (a *actuator) implement() {
 			if err != nil {
 				a.alarm(err.Error(), message.Id())
 			}
+			a.errorPipe <- 1
 			continue
 		}
 		if res["code"] != 0 {
@@ -98,6 +109,7 @@ func (a *actuator) implement() {
 			if err != nil {
 				a.alarm(err.Error(), message.Id())
 			}
+			a.errorPipe <- 1
 			continue
 		}
 		message.Success()
