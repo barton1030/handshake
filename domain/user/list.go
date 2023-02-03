@@ -34,6 +34,9 @@ func (l *list) Delete(user2 user) (err error) {
 
 func (l *list) UserId(userId int) (user2 user, err error) {
 	storageUser, err := l.storage.UserById(userId)
+	if err != nil {
+		return
+	}
 	user2 = l.reconstruction(storageUser)
 	return
 }

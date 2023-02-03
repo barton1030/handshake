@@ -1,6 +1,9 @@
 package topic
 
-import inter "handshake/Interface"
+import (
+	inter "handshake/Interface"
+	"handshake/engine"
+)
 
 type topic struct {
 	id             int
@@ -15,6 +18,11 @@ type topic struct {
 	queue          messageQueuing
 	creator        int
 }
+
+const (
+	StartStatus = 1
+	StopStatus  = 0
+)
 
 func NewTopic(name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, creator int) topic {
 	return topic{
@@ -65,14 +73,17 @@ func (t *topic) MaxRetryCount() (maxRetryCount int) {
 }
 
 func (t *topic) CallbackHandler() (callback inter.Callback) {
+	callback = &t.callback
 	return
 }
 
 func (t *topic) AlarmHandler() (alarm inter.Alarm) {
+	alarm = &t.alarm
 	return
 }
 
 func (t *topic) MessageQueuingHandler() (messageQueuing inter.MessageQueuing) {
+	messageQueuing = &t.queue
 	return
 }
 
@@ -90,5 +101,11 @@ func (t *topic) SetCallback(callback inter.Callback) (err error) {
 
 func (t *topic) Creator() (creatorId int) {
 	creatorId = t.creator
+	return
+}
+
+func (t *topic) Start() (err error) {
+	t.status = StartStatus
+	engine.ManagerUnit.RegisterTopic(t)
 	return
 }

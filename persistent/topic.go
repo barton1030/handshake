@@ -21,7 +21,7 @@ func (t topicDao) Add(topic inter.Topic) error {
 
 func (t topicDao) Edit(topic inter.Topic) error {
 	topic2 := t.transformation(topic)
-	err := internal.DbConn().Table(t.tableName).Model(&struct {
+	var err = internal.DbConn().Table(t.tableName).Model(&struct {
 		SId int
 	}{SId: topic2.Id()}).Updates(topic2).Error
 	return err
@@ -81,22 +81,27 @@ type storageTopic struct {
 }
 
 func (t storageTopic) Id() (id int) {
+	id = t.SId
 	return
 }
 
 func (t storageTopic) Name() (name string) {
+	name = t.SName
 	return
 }
 
 func (t storageTopic) Status() (status int) {
+	status = t.SStatus
 	return
 }
 
 func (t storageTopic) MinConcurrency() (minConcurrency int) {
+	minConcurrency = t.SMinConcurrency
 	return
 }
 
 func (t storageTopic) MaxConcurrency() (maxConcurrency int) {
+	maxConcurrency = t.SMaxConcurrency
 	return
 }
 

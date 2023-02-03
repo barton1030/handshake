@@ -35,4 +35,5 @@ func user(r *gin.Engine) {
 func topic(r *gin.Engine) {
 	topicGroup := r.Group("/topic")
 	topicGroup.POST("/add", app.TopicController.Add)
+	topicGroup.POST("/start", app.TopicController.Start)
 }

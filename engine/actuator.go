@@ -1,6 +1,8 @@
 package engine
 
-import inter "handshake/Interface"
+import (
+	inter "handshake/Interface"
+)
 
 const (
 	ActuatorInitStatus        = 0
@@ -101,7 +103,6 @@ func (a actuator) implement() {
 			a.alarm(err.Error(), message.Id())
 		}
 	}
-
 }
 
 func (a *actuator) alarm(err interface{}, messageId int) {
