@@ -29,23 +29,38 @@ func NewTopic(name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSa
 	}
 }
 
+func (t *topic) Id() (id int) {
+	id = t.id
+	return
+}
+
 func (t *topic) Name() (name string) {
+	name = t.name
+	return
+}
+
+func (t *topic) Status() (status int) {
+	status = t.status
 	return
 }
 
 func (t *topic) MinConcurrency() (minConcurrency int) {
+	minConcurrency = t.minConcurrency
 	return
 }
 
 func (t *topic) MaxConcurrency() (maxConcurrency int) {
+	maxConcurrency = t.maxConcurrency
 	return
 }
 
 func (t *topic) FuseSalt() (fuseSalt int) {
+	fuseSalt = t.fuseSalt
 	return
 }
 
 func (t *topic) MaxRetryCount() (maxRetryCount int) {
+	maxRetryCount = t.maxRetryCount
 	return
 }
 
@@ -70,5 +85,10 @@ func (t *topic) SetAlarm(alarm inter.Alarm) (err error) {
 }
 
 func (t *topic) SetCallback(callback inter.Callback) (err error) {
+	return
+}
+
+func (t *topic) Creator() (creatorId int) {
+	creatorId = t.creator
 	return
 }

@@ -1,7 +1,17 @@
 package Interface
 
+type StorageTopicList interface {
+	Add(topic Topic) error
+	Edit(topic Topic) error
+	Delete(topic Topic) error
+	TopicById(topicId int) (Topic, error)
+	TopicByName(topicName string) (Topic, error)
+}
+
 type Topic interface {
+	Id() (id int)
 	Name() (name string)
+	Status() (status int)
 	MinConcurrency() (minConcurrency int)
 	MaxConcurrency() (maxConcurrency int)
 	FuseSalt() (fuseSalt int)
@@ -10,6 +20,7 @@ type Topic interface {
 	AlarmHandler() (alarm Alarm)
 	MessageQueuingHandler() (messageQueuing MessageQueuing)
 	Recipients() (recipients []interface{})
+	Creator() (creatorId int)
 }
 
 type Callback interface {
