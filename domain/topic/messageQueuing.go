@@ -15,10 +15,6 @@ func newMessageQueuing(topicName string) messageQueuing {
 }
 
 func (m *messageQueuing) Pop() (message inter.Message, err error) {
-	data := make(map[string]interface{})
-	data["name"] = "barton"
-	domainMessage := NewMessage(data)
-	message = &domainMessage
 	return
 }
 
