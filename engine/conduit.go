@@ -31,6 +31,17 @@ func (c *conduit) setUpErrorConduit(name string, conduitCap int) (errorConduit c
 	return
 }
 
+func (c *conduit) closeErrorConduit(name string) {
+	c.errorLock.Lock()
+	defer c.errorLock.Unlock()
+	if _, ok := c.error[name]; !ok {
+		return
+	}
+	close(c.error[name])
+	delete(c.error, name)
+	return
+}
+
 func (c *conduit) setUpStatisticsConduit(name string, conduitCap int) (statisticsConduit chan int) {
 	c.statisticsLock.Lock()
 	defer c.statisticsLock.Unlock()
@@ -42,6 +53,17 @@ func (c *conduit) setUpStatisticsConduit(name string, conduitCap int) (statistic
 	return
 }
 
+func (c *conduit) closeStatisticsConduit(name string) {
+	c.statisticsLock.Lock()
+	defer c.statisticsLock.Unlock()
+	if _, ok := c.statistics[name]; !ok {
+		return
+	}
+	close(c.statistics[name])
+	delete(c.statistics, name)
+	return
+}
+
 func (c *conduit) setUpFusingConduit(name string, conduitCap int) (fusingConduit chan int) {
 	c.fusingLock.Lock()
 	defer c.fusingLock.Unlock()
@@ -50,6 +72,17 @@ func (c *conduit) setUpFusingConduit(name string, conduitCap int) (fusingConduit
 	}
 	c.fusing[name] = make(chan int, conduitCap)
 	fusingConduit = c.fusing[name]
+	return
+}
+
+func (c *conduit) closeFusingConduit(name string) {
+	c.fusingLock.Lock()
+	defer c.fusingLock.Unlock()
+	if _, ok := c.fusing[name]; !ok {
+		return
+	}
+	close(c.fusing[name])
+	delete(c.fusing, name)
 	return
 }
 

@@ -24,10 +24,9 @@ type controller struct {
 	errorPipe                chan int
 	fusingPipe               chan int
 	statisticsPipe           chan int
-	toBeExitSignal           chan int
 	exitSignal               chan int
+	fuseTerminationSignal    chan int
 	nextActuatorId           int
-	snapInLock               sync.Mutex
 	lock                     sync.Mutex
 }
 
@@ -45,8 +44,8 @@ func newController(topic inter.Topic) *controller {
 		errorPipe:                errorPipe,
 		fusingPipe:               fusingPipe,
 		statisticsPipe:           statisticsPipe,
-		toBeExitSignal:           make(chan int),
 		exitSignal:               make(chan int),
+		fuseTerminationSignal:    make(chan int),
 	}
 }
 
@@ -65,43 +64,91 @@ func (c *controller) stop() (stopResult bool) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.status = ControllerExitStatus
+	// 执行器退出
 	c.actuatorSnapIn(0)
-	c.toBeExitSignal <- 1
-	<-c.exitSignal
+	c.exitSignal <- 1
+	// 关闭通信管道和自身通信channel
+	c.clearPipe()
 	stopResult = true
 	return
 }
 
+// monitor 控制器监听单元
 func (c *controller) monitor() {
 	for {
 		select {
 		case <-c.errorPipe:
-			if c.status != ControllerRunStatus {
-				break
-			}
-			analysisResult := c.fuseAnalysis()
-			if !analysisResult {
-				break
-			}
-			c.status = ControllerFusingStatus
-			go func() {
-				for _, cActuator := range c.actuatorMap {
-					cActuator.suspend()
-				}
-			}()
+			c.errorPipeProcessor()
 		case <-c.statisticsPipe:
 		case <-time.After(5 * time.Second):
-			if c.status != ControllerRunStatus {
-				break
-			}
-			// 统计队列数量并通过分析计算所需任务数量
-			taskNum := c.queueCountAnalysis()
-			c.actuatorSnapIn(taskNum)
-		case <-c.toBeExitSignal:
-			c.exitSignal <- 1
+			c.queueCountProcessor()
+		case <-c.exitSignal:
 			return
+		case <-c.fuseTerminationSignal:
+			c.fuseTerminationProcessor()
 		}
 	}
+}
+
+// errorPipeProcessor 错误信息通信管道处理逻辑
+func (c *controller) errorPipeProcessor() {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	if c.status != ControllerRunStatus {
+		return
+	}
+	analysisResult := c.fuseAnalysis()
+	if !analysisResult {
+		return
+	}
+	c.status = ControllerFusingStatus
+	for _, cActuator := range c.actuatorMap {
+		cActuator.suspend()
+	}
+	go func() {
+		// 熔断接触时间
+		sleepTime := 30 * time.Second
+		time.Sleep(sleepTime)
+		c.fuseTerminationSignal <- 1
+	}()
+}
+
+// queueCountProcessor 消息队列统计处理逻辑
+func (c *controller) queueCountProcessor() {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	if c.status != ControllerRunStatus {
+		return
+	}
+	// 统计队列数量并通过分析计算所需任务数量
+	taskNum := c.queueCountAnalysis()
+	if taskNum <= c.topic.MinConcurrency() {
+		return
+	}
+	c.actuatorSnapIn(taskNum)
+}
+
+// clearPipe 关闭不同执行体和自身通信管道或channel
+func (c *controller) clearPipe() {
+	pipeName := c.topic.Name()
+	conduitUnit.closeErrorConduit(pipeName)
+	conduitUnit.closeFusingConduit(pipeName)
+	conduitUnit.closeStatisticsConduit(pipeName)
+	close(c.exitSignal)
+	close(c.fuseTerminationSignal)
+}
+
+// fuseTerminationProcessor 熔断接触逻辑
+func (c *controller) fuseTerminationProcessor() {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	if c.status != ControllerFusingStatus {
+		return
+	}
+	for _, cActuator := range c.actuatorMap {
+		cActuator.restart()
+	}
+	c.status = ControllerRunStatus
 }
 
 // fuseAnalysis 计算规定时间片段内错误数据量，进行熔断计算保护
@@ -129,8 +176,6 @@ func (c *controller) queueCountAnalysis() (taskNum int) {
 
 // actuatorSnapIn 执行器管理单元，统一管理执行器的新增和收缩操作
 func (c *controller) actuatorSnapIn(targetActuatorNum int) {
-	c.snapInLock.Lock()
-	defer c.snapInLock.Unlock()
 	if targetActuatorNum < 0 {
 		return
 	}

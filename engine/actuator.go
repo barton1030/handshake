@@ -42,13 +42,13 @@ func newActuator(actuatorId int, topic inter.Topic) *actuator {
 	}
 }
 
-func (a *actuator) start() {
-	go a.implement()
+func (a *actuator) restart() {
+	a.status = ActuatorInitStatus
 	<-a.startSignal
 }
 
-func (a *actuator) restart() {
-	a.status = ActuatorInitStatus
+func (a *actuator) start() {
+	go a.implement()
 	<-a.startSignal
 }
 
@@ -82,6 +82,7 @@ func (a *actuator) implement() {
 			a.exitSignal <- 1
 			return
 		}
+		// 消息队列具柄
 		messageQueuing := a.topic.MessageQueuingHandler()
 		message, err := messageQueuing.Pop()
 		if err != nil {
@@ -91,6 +92,7 @@ func (a *actuator) implement() {
 		if err != nil {
 			continue
 		}
+		// 消息回调处理工具具柄
 		callback := a.topic.CallbackHandler()
 		res, err := callback.Do(data)
 		message.IncrRetryCont()
@@ -103,7 +105,7 @@ func (a *actuator) implement() {
 			a.errorPipe <- 1
 			continue
 		}
-		if res["code"] != 0 {
+		if code, ok := res["code"]; ok && code != 0 {
 			a.alarm(res["err"], message.Id())
 			err = a.handleFail(message)
 			if err != nil {
