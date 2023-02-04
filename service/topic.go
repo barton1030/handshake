@@ -40,3 +40,20 @@ func (t topic) Start(topicId int) error {
 	err = topic2.List.Edit(topic3)
 	return err
 }
+
+func (t topic) Stop(topicId int) error {
+	topic3, err := topic2.List.TopicId(topicId)
+	if err != nil {
+		return err
+	}
+	if topic3.Id() <= 0 {
+		err = errors.New("主题不存在，请确认！")
+		return err
+	}
+	err = topic3.Stop()
+	if err != nil {
+		return err
+	}
+	err = topic2.List.Edit(topic3)
+	return err
+}

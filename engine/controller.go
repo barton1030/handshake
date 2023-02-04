@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"fmt"
 	inter "handshake/Interface"
 	"sync"
 	"time"
@@ -14,7 +13,6 @@ const (
 	ControllerInitStatus     = 0
 	ControllerRunStatus      = 1
 	ControllerFusingStatus   = 2
-	ControllerToBeExitStatus = -1
 	ControllerExitStatus     = -2
 )
 
@@ -30,6 +28,7 @@ type controller struct {
 	exitSignal               chan int
 	nextActuatorId           int
 	snapInLock               sync.Mutex
+	lock                     sync.Mutex
 }
 
 func newController(topic inter.Topic) *controller {
@@ -52,20 +51,24 @@ func newController(topic inter.Topic) *controller {
 }
 
 func (c *controller) start() (startResult bool) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	c.status = ControllerRunStatus
 	targetTaskNum := c.topic.MinConcurrency()
 	c.actuatorSnapIn(targetTaskNum)
 	go c.monitor()
+	startResult = true
 	return
 }
 
 func (c *controller) stop() (stopResult bool) {
-	c.status = ControllerToBeExitStatus
-	targetTaskNum := len(c.actuatorMap)
-	c.actuatorSnapIn(targetTaskNum)
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	c.status = ControllerExitStatus
+	c.actuatorSnapIn(0)
 	c.toBeExitSignal <- 1
 	<-c.exitSignal
-	c.status = ControllerExitStatus
+	stopResult = true
 	return
 }
 
@@ -86,9 +89,12 @@ func (c *controller) monitor() {
 					cActuator.suspend()
 				}
 			}()
-		case statistics := <-c.statisticsPipe:
-			fmt.Println(statistics)
+		case <-c.statisticsPipe:
 		case <-time.After(5 * time.Second):
+			if c.status != ControllerRunStatus {
+				break
+			}
+			// 统计队列数量并通过分析计算所需任务数量
 			taskNum := c.queueCountAnalysis()
 			c.actuatorSnapIn(taskNum)
 		case <-c.toBeExitSignal:
@@ -125,11 +131,7 @@ func (c *controller) queueCountAnalysis() (taskNum int) {
 func (c *controller) actuatorSnapIn(targetActuatorNum int) {
 	c.snapInLock.Lock()
 	defer c.snapInLock.Unlock()
-	if c.status != ControllerRunStatus {
-		return
-	}
-
-	if targetActuatorNum <= 0 {
+	if targetActuatorNum < 0 {
 		return
 	}
 	// 最大并发数不能大于设置上限
@@ -144,7 +146,6 @@ func (c *controller) actuatorSnapIn(targetActuatorNum int) {
 	if currentActuatorNum > targetActuatorNum {
 		toIncr = false
 	}
-
 	for {
 		cActuatorNum := len(c.actuatorMap)
 		if cActuatorNum == targetActuatorNum {

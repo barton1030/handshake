@@ -21,12 +21,12 @@ type topic struct {
 
 const (
 	StartStatus = 1
-	StopStatus  = 0
+	StopStatus  = 2
 )
 
 func NewTopic(name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, creator int) topic {
 	return topic{
-		status:         0,
+		status:         StopStatus,
 		name:           name,
 		maxRetryCount:  maxRetryCount,
 		minConcurrency: minConcurrency,
