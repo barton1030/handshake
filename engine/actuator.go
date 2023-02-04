@@ -55,6 +55,9 @@ func (a *actuator) start() {
 func (a *actuator) stop() {
 	a.status = ActuatorExitStatus
 	<-a.exitSignal
+	close(a.startSignal)
+	close(a.suspendSignal)
+	close(a.exitSignal)
 }
 
 func (a *actuator) suspend() {
