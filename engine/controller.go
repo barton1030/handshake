@@ -30,8 +30,14 @@ type controller struct {
 	toExitSignal             chan int
 	exitSignal               chan int
 	fuseTerminationSignal    chan int
+	errorCounter             errorCounter
 	nextActuatorId           int
 	lock                     sync.Mutex
+}
+
+type errorCounter struct {
+	timeFormat string
+	counter    int
 }
 
 func newController(topic inter.Topic) *controller {
@@ -171,15 +177,17 @@ func (c *controller) fuseTerminationProcessor() {
 // fuseAnalysis 计算规定时间片段内错误数据量，进行熔断计算保护
 func (c *controller) fuseAnalysis() (analysisResult bool) {
 	timeFormat := time.Now().Format("2006-01-02 15:04")
-	if _, ok := c.timeSliceErrorStatistics[timeFormat]; !ok {
-		c.timeSliceErrorStatistics[timeFormat] = 1
+	if c.errorCounter.timeFormat == timeFormat {
+		c.errorCounter.counter++
+	} else {
+		c.errorCounter.timeFormat = timeFormat
+		c.errorCounter.counter = 0
+	}
+	if c.errorCounter.counter < c.topic.FuseSalt() {
 		return
 	}
-	c.timeSliceErrorStatistics[timeFormat]++
-	if c.timeSliceErrorStatistics[timeFormat] < c.topic.FuseSalt() {
-		return
-	}
-	c.timeSliceErrorStatistics[timeFormat] = 0
+	// 重新计数
+	c.errorCounter.counter = 0
 	analysisResult = true
 	return
 }
