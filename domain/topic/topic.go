@@ -20,8 +20,9 @@ type topic struct {
 }
 
 const (
-	StartStatus = 1
-	StopStatus  = 2
+	StopStatus   = 1
+	StartStatus  = 2
+	DeleteStatus = -1
 )
 
 func NewTopic(name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, creator int) topic {
@@ -92,20 +93,35 @@ func (t *topic) Creator() int {
 	return t.creator
 }
 
-func (t *topic) Start() (err error) {
+func (t *topic) Start() bool {
 	if t.status == StartStatus {
-		return err
+		return true
 	}
 	t.status = StartStatus
 	engine.ManagerUnit.RegisterTopic(t)
-	return
+	return true
 }
 
-func (t *topic) Stop() (err error) {
+func (t *topic) Stop() bool {
 	if t.status == StopStatus {
-		return err
+		return true
 	}
 	t.status = StopStatus
 	engine.ManagerUnit.CancelTopic(t)
-	return
+	return true
+}
+
+func (t *topic) InOperation() bool {
+	if t.status == StopStatus {
+		return false
+	}
+	return true
+}
+
+func (t *topic) Abandonment() bool {
+	if t.status != StopStatus {
+		return false
+	}
+	t.status = DeleteStatus
+	return true
 }

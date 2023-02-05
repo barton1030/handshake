@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	inter "handshake/Interface"
 	"handshake/persistent/internal"
+	"strconv"
 )
 
 type topicDao struct {
@@ -20,27 +21,17 @@ func (t topicDao) Add(topic inter.Topic) error {
 	return err
 }
 
+// Edit 解决一下子
 func (t topicDao) Edit(topic inter.Topic) error {
 	topic2 := t.transformation(topic)
-	var err = internal.DbConn().Table(t.tableName).Model(&struct {
-		SId int
-	}{SId: topic2.Id()}).Updates(topic2).Error
-	return err
-}
-
-func (t topicDao) Delete(topic inter.Topic) error {
-	topic2 := t.transformation(topic)
-	err := internal.DbConn().Table(t.tableName).Delete(&struct {
-		SId int
-	}{SId: topic2.Id()}).Limit(1).Error
+	err := internal.DbConn().Table(t.tableName).Model(&storageTopic{SId: topic2.SId}).Updates(topic2).Limit(1).Error
 	return err
 }
 
 func (t topicDao) TopicById(topicId int) (inter.Topic, error) {
 	topic := storageTopic{}
-	err := internal.DbConn().Table(t.tableName).First(&topic, struct {
-		SId int
-	}{SId: topicId}).Error
+	whereTopicId := strconv.Itoa(topicId)
+	err := internal.DbConn().Table(t.tableName).Where("s_id = ?", whereTopicId).First(&topic).Error
 	if err != nil && err.Error() == "record not found" {
 		err = nil
 	}
@@ -86,16 +77,16 @@ func (t topicDao) transformation(topic inter.Topic) (topic2 storageTopic) {
 }
 
 type storageTopic struct {
-	SId             int    `json:"s_id" gorm:"s_id"`
-	SName           string `json:"s_name" gorm:"s_name"`
-	SStatus         int    `json:"s_status" gorm:"s_status"`
-	SMaxRetryCount  int    `json:"s_max_retry_count" gorm:"s_max_retry_count"`
-	SMinConcurrency int    `json:"s_min_concurrency" gorm:"s_min_concurrency"`
-	SMaxConcurrency int    `json:"s_max_concurrency" gorm:"s_max_concurrency"`
-	SFuseSalt       int    `json:"s_fuse_salt" gorm:"s_fuse_salt"`
-	SAlarm          string `json:"s_alarm" gorm:"s_alarm"`
-	SCallback       string `json:"s_callback" gorm:"s_callback"`
-	SCreator        int    `json:"s_creator" gorm:"s_creator"`
+	SId             int    `json:"s_id" gorm:"column:s_id;primary_key" `
+	SName           string `json:"s_name" gorm:"column:s_name"`
+	SStatus         int    `json:"s_status" gorm:"column:s_status"`
+	SMaxRetryCount  int    `json:"s_max_retry_count" gorm:"column:s_max_retry_count"`
+	SMinConcurrency int    `json:"s_min_concurrency" gorm:"column:s_min_concurrency"`
+	SMaxConcurrency int    `json:"s_max_concurrency" gorm:"column:s_max_concurrency"`
+	SFuseSalt       int    `json:"s_fuse_salt" gorm:"column:s_fuse_salt"`
+	SAlarm          string `json:"s_alarm" gorm:"column:s_alarm"`
+	SCallback       string `json:"s_callback" gorm:"column:s_callback"`
+	SCreator        int    `json:"s_creator" gorm:"column:s_creator"`
 }
 
 func (t storageTopic) Id() int {

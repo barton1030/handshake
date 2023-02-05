@@ -3,7 +3,6 @@ package Interface
 type StorageTopicList interface {
 	Add(topic Topic) error
 	Edit(topic Topic) error
-	Delete(topic Topic) error
 	TopicById(topicId int) (Topic, error)
 	TopicByName(topicName string) (Topic, error)
 }

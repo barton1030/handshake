@@ -23,10 +23,6 @@ func (l *list) Edit(topic2 topic) (err error) {
 	return
 }
 
-func (l *list) Delete() (err error) {
-	return
-}
-
 func (l *list) TopicId(topicId int) (topic2 topic, err error) {
 	storageTopic, err := l.storage.TopicById(topicId)
 	if err != nil {
