@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	inter "handshake/Interface"
 	"sync"
 	"time"
@@ -24,6 +25,9 @@ type controller struct {
 	errorPipe                chan int
 	fusingPipe               chan int
 	statisticsPipe           chan int
+	toStartSignal            chan int
+	startSignal              chan int
+	toExitSignal             chan int
 	exitSignal               chan int
 	fuseTerminationSignal    chan int
 	nextActuatorId           int
@@ -44,31 +48,25 @@ func newController(topic inter.Topic) *controller {
 		errorPipe:                errorPipe,
 		fusingPipe:               fusingPipe,
 		statisticsPipe:           statisticsPipe,
-		exitSignal:               make(chan int),
-		fuseTerminationSignal:    make(chan int),
+		toStartSignal:            make(chan int, 1),
+		startSignal:              make(chan int, 1),
+		toExitSignal:             make(chan int, 1),
+		exitSignal:               make(chan int, 1),
+		fuseTerminationSignal:    make(chan int, 1),
 	}
 }
 
 func (c *controller) start() (startResult bool) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-	c.status = ControllerRunStatus
-	targetTaskNum := c.topic.MinConcurrency()
-	c.actuatorSnapIn(targetTaskNum)
 	go c.monitor()
+	c.toStartSignal <- 1
+	<-c.startSignal
 	startResult = true
 	return
 }
 
 func (c *controller) stop() (stopResult bool) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-	c.status = ControllerExitStatus
-	// 执行器退出
-	c.actuatorSnapIn(0)
-	c.exitSignal <- 1
-	// 关闭通信管道和自身通信channel
-	c.clearPipe()
+	c.toExitSignal <- 1
+	<-c.exitSignal
 	stopResult = true
 	return
 }
@@ -77,23 +75,46 @@ func (c *controller) stop() (stopResult bool) {
 func (c *controller) monitor() {
 	for {
 		select {
+		case <-c.toStartSignal:
+			c.init()
+		case <-c.toExitSignal:
+			c.exit()
+			return
 		case <-c.errorPipe:
 			c.errorPipeProcessor()
 		case <-c.statisticsPipe:
 		case <-time.After(5 * time.Second):
 			c.queueCountProcessor()
-		case <-c.exitSignal:
-			return
 		case <-c.fuseTerminationSignal:
 			c.fuseTerminationProcessor()
 		}
 	}
 }
 
+// init 初始化启动逻辑
+func (c *controller) init() {
+	if c.status != ControllerInitStatus {
+		return
+	}
+	c.status = ControllerRunStatus
+	targetTaskNum := c.topic.MinConcurrency()
+	c.actuatorSnapIn(targetTaskNum)
+	c.startSignal <- 1
+}
+
+// exit 退出逻辑
+func (c *controller) exit() {
+	if c.status == ControllerExitStatus {
+		return
+	}
+	c.status = ControllerExitStatus
+	c.actuatorSnapIn(0)
+	c.exitSignal <- 1
+	c.clearPipe()
+}
+
 // errorPipeProcessor 错误信息通信管道处理逻辑
 func (c *controller) errorPipeProcessor() {
-	c.lock.Lock()
-	defer c.lock.Unlock()
 	if c.status != ControllerRunStatus {
 		return
 	}
@@ -106,17 +127,17 @@ func (c *controller) errorPipeProcessor() {
 		cActuator.suspend()
 	}
 	go func() {
-		// 熔断接触时间
-		sleepTime := 30 * time.Second
-		time.Sleep(sleepTime)
+		defer func() {
+			err := recover()
+			fmt.Println(err)
+		}()
+		time.Sleep(10 * time.Second)
 		c.fuseTerminationSignal <- 1
 	}()
 }
 
 // queueCountProcessor 消息队列统计处理逻辑
 func (c *controller) queueCountProcessor() {
-	c.lock.Lock()
-	defer c.lock.Unlock()
 	if c.status != ControllerRunStatus {
 		return
 	}
@@ -140,8 +161,6 @@ func (c *controller) clearPipe() {
 
 // fuseTerminationProcessor 熔断接触逻辑
 func (c *controller) fuseTerminationProcessor() {
-	c.lock.Lock()
-	defer c.lock.Unlock()
 	if c.status != ControllerFusingStatus {
 		return
 	}
@@ -162,6 +181,7 @@ func (c *controller) fuseAnalysis() (analysisResult bool) {
 	if c.timeSliceErrorStatistics[timeFormat] < c.topic.FuseSalt() {
 		return
 	}
+	c.timeSliceErrorStatistics[timeFormat] = 0
 	analysisResult = true
 	return
 }
