@@ -41,6 +41,13 @@ type setTopicCallbackRequest struct {
 	Cookies map[string]interface{} `json:"cookies" form:"cookies" binding:"required"`
 }
 
+type setTopicAlarmRequest struct {
+	TopicId    int           `json:"topicId" form:"topicId" binding:"required"`
+	Url        string        `json:"url" form:"url" binding:"required"`
+	Method     string        `json:"method" form:"method" binding:"required"`
+	Recipients []interface{} `json:"recipients" form:"recipients" binding:"required"`
+}
+
 func (t topic) Add(c *gin.Context) {
 	request := addTopicRequest{}
 	if err := c.ShouldBind(&request); err != nil {
@@ -119,6 +126,23 @@ func (t topic) Stop(c *gin.Context) {
 	err := service.TopicService.Stop(request.TopicId)
 	if err != nil {
 		err = fmt.Errorf("app topic Stop: params %v error: %v", request, err)
+		helper.Response(c, 1001, nil, err.Error())
+		return
+	}
+	helper.Response(c, 200, nil, "")
+	return
+}
+
+func (t topic) SetAlarm(c *gin.Context) {
+	request := setTopicAlarmRequest{}
+	if err := c.ShouldBind(&request); err != nil {
+		err = fmt.Errorf("app topic SetAlarm: params %v error: %v", request, err)
+		helper.Response(c, 1000, nil, err.Error())
+		return
+	}
+	err := service.TopicService.SetAlarm(request.TopicId, request.Url, request.Method, request.Recipients)
+	if err != nil {
+		err = fmt.Errorf("app topic SetAlarm: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
 		return
 	}

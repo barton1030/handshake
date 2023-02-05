@@ -39,4 +39,5 @@ func topic(r *gin.Engine) {
 	topicGroup.POST("/start", app.TopicController.Start)
 	topicGroup.POST("/stop", app.TopicController.Stop)
 	topicGroup.POST("/set/callback", app.TopicController.SetCallback)
+	topicGroup.POST("/set/alarm", app.TopicController.SetAlarm)
 }

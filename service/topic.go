@@ -97,3 +97,18 @@ func (t topic) SetCallback(topicId int, url, method string, headers, cookies map
 	err = topic2.List.Edit(topic3)
 	return err
 }
+
+func (t topic) SetAlarm(topicId int, url, method string, recipients []interface{}) error {
+	topic3, err := topic2.List.TopicId(topicId)
+	if err != nil {
+		return err
+	}
+	if topic3.Id() <= 0 {
+		err = errors.New("主题不存在，请确认！")
+		return err
+	}
+	alarm := topic2.NewAlarm(url, method, recipients)
+	topic3.SetAlarm(alarm)
+	err = topic2.List.Edit(topic3)
+	return err
+}

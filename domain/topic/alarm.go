@@ -6,6 +6,14 @@ type alarm struct {
 	recipients []interface{}
 }
 
+func NewAlarm(url, method string, recipients []interface{}) alarm {
+	return alarm{
+		url:        url,
+		method:     method,
+		recipients: recipients,
+	}
+}
+
 func (a alarm) Do(information map[string]interface{}, recipients []interface{}) (res map[string]interface{}, err error) {
 	return
 }
