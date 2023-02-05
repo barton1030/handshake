@@ -81,11 +81,13 @@ func (t *topic) MessageQueuingHandler() (queue inter.MessageQueuing) {
 	return &t.queue
 }
 
-func (t *topic) SetAlarm(alarm inter.Alarm) (err error) {
+func (t *topic) SetAlarm(topicAlarm alarm) {
+	t.alarm = topicAlarm
 	return
 }
 
-func (t *topic) SetCallback(callback inter.Callback) (err error) {
+func (t *topic) SetCallback(topicCallback callback) {
+	t.callback = topicCallback
 	return
 }
 

@@ -33,6 +33,14 @@ type deleteTopicRequest struct {
 	TopicId int `json:"topicId" form:"topicId" binding:"required"`
 }
 
+type setTopicCallbackRequest struct {
+	TopicId int                    `json:"topicId" form:"topicId" binding:"required"`
+	Url     string                 `json:"url" form:"url" binding:"required"`
+	Method  string                 `json:"method" form:"method" binding:"required"`
+	Headers map[string]interface{} `json:"headers" form:"headers" binding:"required"`
+	Cookies map[string]interface{} `json:"cookies" form:"cookies" binding:"required"`
+}
+
 func (t topic) Add(c *gin.Context) {
 	request := addTopicRequest{}
 	if err := c.ShouldBind(&request); err != nil {
@@ -50,8 +58,21 @@ func (t topic) Add(c *gin.Context) {
 	return
 }
 
-func (t topic) Edit(c *gin.Context) {
-
+func (t topic) SetCallback(c *gin.Context) {
+	request := setTopicCallbackRequest{}
+	if err := c.ShouldBind(&request); err != nil {
+		err = fmt.Errorf("app topic SetCallback: params %v error: %v", request, err)
+		helper.Response(c, 1000, nil, err.Error())
+		return
+	}
+	err := service.TopicService.SetCallback(request.TopicId, request.Url, request.Method, request.Headers, request.Cookies)
+	if err != nil {
+		err = fmt.Errorf("app topic SetCallback: params %v error: %v", request, err)
+		helper.Response(c, 1001, nil, err.Error())
+		return
+	}
+	helper.Response(c, 200, nil, "")
+	return
 }
 
 func (t topic) Delete(c *gin.Context) {

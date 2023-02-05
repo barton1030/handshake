@@ -38,4 +38,5 @@ func topic(r *gin.Engine) {
 	topicGroup.GET("/delete", app.TopicController.Delete)
 	topicGroup.POST("/start", app.TopicController.Start)
 	topicGroup.POST("/stop", app.TopicController.Stop)
+	topicGroup.POST("/set/callback", app.TopicController.SetCallback)
 }

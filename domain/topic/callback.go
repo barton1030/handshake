@@ -7,6 +7,15 @@ type callback struct {
 	cookies map[string]interface{}
 }
 
+func NewCallBack(url, method string, cookies, headers map[string]interface{}) callback {
+	return callback{
+		url:     url,
+		method:  method,
+		headers: headers,
+		cookies: cookies,
+	}
+}
+
 func (c callback) Do(data map[string]interface{}) (res map[string]interface{}, err error) {
 	return
 }
