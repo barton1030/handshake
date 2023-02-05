@@ -155,8 +155,6 @@ func (c *controller) clearPipe() {
 	conduitUnit.closeErrorConduit(pipeName)
 	conduitUnit.closeFusingConduit(pipeName)
 	conduitUnit.closeStatisticsConduit(pipeName)
-	close(c.exitSignal)
-	close(c.fuseTerminationSignal)
 }
 
 // fuseTerminationProcessor 熔断接触逻辑
