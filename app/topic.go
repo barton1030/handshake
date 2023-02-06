@@ -19,7 +19,6 @@ type addTopicRequest struct {
 	MinConcurrency int    `json:"minConcurrency" form:"minConcurrency" binding:"required"`
 	MaxConcurrency int    `json:"maxConcurrency" form:"maxConcurrency" binding:"required"`
 	FuseSalt       int    `json:"fuseSalt" form:"fuseSalt" binding:"required"`
-	Creator        int    `json:"creator" form:"creator" binding:"required"`
 }
 
 type startTopicRequest struct {
@@ -75,7 +74,7 @@ func (t topic) Add(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	err := service.TopicService.Add(request.Operator, request.Name, request.MaxRetryCount, request.MaxConcurrency, request.MinConcurrency, request.FuseSalt, request.Creator)
+	err := service.TopicService.Add(request.Operator, request.Name, request.MaxRetryCount, request.MaxConcurrency, request.MinConcurrency, request.FuseSalt)
 	if err != nil {
 		err = fmt.Errorf("app topic Add: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())

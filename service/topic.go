@@ -11,7 +11,7 @@ type topic struct {
 
 var TopicService topic
 
-func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, creator int) (err error) {
+func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt int) (err error) {
 	user3, err := user2.List.UserId(operator)
 	if err != nil {
 		return
@@ -28,7 +28,7 @@ func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, max
 		err = errors.New("主题名重复，请注意！")
 		return
 	}
-	topic4 := topic2.NewTopic(name, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, creator)
+	topic4 := topic2.NewTopic(name, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, operator)
 	err = topic2.List.Add(topic4)
 	return
 }
