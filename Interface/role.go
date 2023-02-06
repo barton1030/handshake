@@ -3,25 +3,17 @@ package Interface
 import "time"
 
 type RoleListStorage interface {
-	Add(role2 DomainRole) (err error)
-	Edit(role2 DomainRole) (err error)
-	Delete(role2 DomainRole) (err error)
-	RoleById(roleId int) (RoleStorage, error)
-	RoleByName(roleName string) (RoleStorage, error)
-	List(offset, limit int) ([]RoleStorage, error)
+	Add(role2 Role) (err error)
+	Edit(role2 Role) (err error)
+	RoleById(roleId int) (Role, error)
+	RoleByName(roleName string) (Role, error)
+	List(offset, limit int) ([]Role, error)
 }
 
-type RoleStorage interface {
-	RoleId() int
-	RoleName() string
-	RolePermissionMap() map[string]bool
-	RoleCreator() int
-	RoleCreateTime() time.Time
-}
-
-type DomainRole interface {
+type Role interface {
 	Id() int
 	Name() string
+	Status() int
 	PermissionMap() map[string]bool
 	Creator() int
 	CreateTime() time.Time

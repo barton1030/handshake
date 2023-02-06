@@ -10,7 +10,7 @@ type list struct {
 	storage inter.RoleListStorage
 }
 
-var List = list{nextId: 1, storage: persistent.RoleDao}
+var List = list{nextId: 3, storage: persistent.RoleDao}
 
 func (l *list) Add(role2 role) (err error) {
 	role2.id = l.nextId
@@ -23,11 +23,6 @@ func (l *list) Add(role2 role) (err error) {
 
 func (l *list) Edit(role2 role) (err error) {
 	err = l.storage.Edit(&role2)
-	return err
-}
-
-func (l *list) Delete(role2 role) (err error) {
-	err = l.storage.Delete(&role2)
 	return err
 }
 
@@ -61,14 +56,14 @@ func (l *list) RoleByName(roleName string) (role2 role, err error) {
 	return
 }
 
-func (l *list) reconstruction(originRole inter.RoleStorage) (role2 role) {
-	role2.id = originRole.RoleId()
-	role2.name = originRole.RoleName()
-	role2.creator = originRole.RoleCreator()
-	role2.permissionMap = originRole.RolePermissionMap()
+func (l *list) reconstruction(originRole inter.Role) (role2 role) {
+	role2.id = originRole.Id()
+	role2.name = originRole.Name()
+	role2.creator = originRole.Creator()
+	role2.permissionMap = originRole.PermissionMap()
 	if role2.permissionMap == nil {
 		role2.permissionMap = make(map[string]bool)
 	}
-	role2.createTime = originRole.RoleCreateTime()
+	role2.createTime = originRole.CreateTime()
 	return
 }

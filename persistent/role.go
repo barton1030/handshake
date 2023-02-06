@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	inter "handshake/Interface"
 	"handshake/persistent/internal"
+	"strconv"
 	"time"
 )
 
@@ -15,37 +16,30 @@ var RoleDao = roleDao{
 	tableName: "hand_shake_role",
 }
 
-func (r roleDao) Add(role2 inter.DomainRole) (err error) {
+func (r roleDao) Add(role2 inter.Role) (err error) {
 	role3 := r.transformation(role2)
 	err = internal.DbConn().Table(r.tableName).Create(role3).Error
 	return err
 }
 
-func (r roleDao) Edit(role2 inter.DomainRole) (err error) {
+func (r roleDao) Edit(role2 inter.Role) (err error) {
 	role3 := r.transformation(role2)
-	err = internal.DbConn().Table(r.tableName).Model(&struct {
-		Id int
-	}{Id: role2.Id()}).Updates(role3).Error
+	whereRoleId := strconv.Itoa(role2.Id())
+	err = internal.DbConn().Table(r.tableName).Where("id = ?", whereRoleId).Updates(role3).Error
 	return err
 }
 
-func (r roleDao) Delete(role2 inter.DomainRole) (err error) {
-	err = internal.DbConn().Table(r.tableName).Delete(&struct {
-		Id int
-	}{Id: role2.Id()}).Limit(1).Error
-	return err
-}
-
-func (r roleDao) RoleById(roleId int) (inter.RoleStorage, error) {
+func (r roleDao) RoleById(roleId int) (inter.Role, error) {
 	role := storageRole{}
-	err := internal.DbConn().Table(r.tableName).First(&role, roleId).Error
+	whereRoleId := strconv.Itoa(roleId)
+	err := internal.DbConn().Table(r.tableName).Where("id = ?", whereRoleId).First(&role).Error
 	if err != nil && err.Error() == "record not found" {
 		err = nil
 	}
 	return role, err
 }
 
-func (r roleDao) RoleByName(roleName string) (inter.RoleStorage, error) {
+func (r roleDao) RoleByName(roleName string) (inter.Role, error) {
 	role := storageRole{}
 	err := internal.DbConn().Table(r.tableName).Where("name = ?", roleName).First(&role).Error
 
@@ -55,57 +49,63 @@ func (r roleDao) RoleByName(roleName string) (inter.RoleStorage, error) {
 	return role, err
 }
 
-func (r roleDao) List(offset, limit int) ([]inter.RoleStorage, error) {
+func (r roleDao) List(offset, limit int) ([]inter.Role, error) {
 	var roles []storageRole
 	err := internal.DbConn().Table(r.tableName).Offset(offset).Limit(limit).Find(&roles).Error
 	rolesLen := len(roles)
-	interRoleStorage := make([]inter.RoleStorage, rolesLen, rolesLen)
+	interRoleStorage := make([]inter.Role, rolesLen, rolesLen)
 	for key, value := range roles {
 		interRoleStorage[key] = value
 	}
 	return interRoleStorage, err
 }
 
-func (r roleDao) transformation(role2 inter.DomainRole) (role3 storageRole) {
-	role3.Id = role2.Id()
-	role3.Name = role2.Name()
-	role3.Creator = role2.Creator()
-	role3.CreateTime = role2.CreateTime()
+func (r roleDao) transformation(role2 inter.Role) (role3 storageRole) {
+	role3.SId = role2.Id()
+	role3.SStatus = role2.Status()
+	role3.SName = role2.Name()
+	role3.SCreator = role2.Creator()
+	role3.SCreateTime = role2.CreateTime()
 	permission := role2.PermissionMap()
 	permissionByteSlice, _ := json.Marshal(permission)
-	role3.PermissionMap = string(permissionByteSlice)
+	role3.SPermissionMap = string(permissionByteSlice)
 	return role3
 }
 
 type storageRole struct {
-	Id            int       `json:"id" gorm:"id"`
-	Name          string    `json:"name" gorm:"name"`
-	PermissionMap string    `json:"permission_map" gorm:"permission_map"`
-	Creator       int       `json:"creator" gorm:"creator"`
-	CreateTime    time.Time `json:"create_time" gorm:"create_time"`
+	SId            int       `json:"id" gorm:"column:id;primary_key"`
+	SStatus        int       `json:"status" gorm:"column:status"`
+	SName          string    `json:"name" gorm:"column:name"`
+	SPermissionMap string    `json:"permission_map" gorm:"column:permission_map"`
+	SCreator       int       `json:"creator" gorm:"column:creator"`
+	SCreateTime    time.Time `json:"create_time" gorm:"column:create_time"`
 }
 
-func (r storageRole) RoleId() int {
-	return r.Id
+func (r storageRole) Id() int {
+	return r.SId
 }
 
-func (r storageRole) RoleName() string {
-	return r.Name
+func (r storageRole) Name() string {
+	return r.SName
 }
 
-func (r storageRole) RolePermissionMap() map[string]bool {
+func (r storageRole) Status() int {
+	return r.SStatus
+}
+
+func (r storageRole) PermissionMap() map[string]bool {
 	permissionMap := make(map[string]bool)
-	if len(r.PermissionMap) < 0 {
+	if len(r.SPermissionMap) < 0 {
 		return permissionMap
 	}
-	json.Unmarshal([]byte(r.PermissionMap), &permissionMap)
+	json.Unmarshal([]byte(r.SPermissionMap), &permissionMap)
 	return permissionMap
 }
 
-func (r storageRole) RoleCreator() int {
-	return r.Creator
+func (r storageRole) Creator() int {
+	return r.SCreator
 }
 
-func (r storageRole) RoleCreateTime() time.Time {
-	return r.CreateTime
+func (r storageRole) CreateTime() time.Time {
+	return r.SCreateTime
 }

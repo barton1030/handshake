@@ -7,6 +7,7 @@ import (
 
 type role struct {
 	id             int
+	status         int
 	name           string
 	permissionMap  map[string]bool
 	permissionLock sync.Mutex
@@ -14,8 +15,14 @@ type role struct {
 	createTime     time.Time
 }
 
+const (
+	NormalStatus = 1
+	DeleteStatus = -1
+)
+
 func NewRole(name string, creator int) role {
 	return role{
+		status:     NormalStatus,
 		name:       name,
 		creator:    creator,
 		createTime: time.Now(),
@@ -44,6 +51,14 @@ func (r *role) Creator() int {
 
 func (r *role) CreateTime() time.Time {
 	return r.createTime
+}
+
+func (r *role) Status() int {
+	return r.status
+}
+
+func (r *role) Delete() {
+	r.status = DeleteStatus
 }
 
 func (r *role) SetPermission(permissionKey string, permissionValue bool) {
