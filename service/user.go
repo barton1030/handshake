@@ -11,7 +11,11 @@ type user struct {
 
 var User user
 
-func (u user) Add(name, phone, pwd string, roleId int) error {
+func (u user) Add(operator, roleId int, name, phone, pwd, uri string) (err error) {
+	err = permissionVerification(operator, uri)
+	if err != nil {
+		return err
+	}
 	role3, err := role2.List.RoleById(roleId)
 	if err != nil {
 		return err
@@ -22,46 +26,58 @@ func (u user) Add(name, phone, pwd string, roleId int) error {
 	}
 	domainUser := user2.NewUser(name, phone, pwd, roleId)
 	err = user2.List.Add(domainUser)
-	return err
+	return
 }
 
-func (u user) SetRoleId(userId, roleId int) error {
+func (u user) SetRoleId(operator, userId, roleId int, uri string) (err error) {
+	err = permissionVerification(operator, uri)
+	if err != nil {
+		return
+	}
 	role3, err := role2.List.RoleById(roleId)
 	if err != nil {
-		return err
+		return
 	}
 	if role3.Id() <= 0 {
 		err = errors.New("角色不存在，请确认")
-		return err
+		return
 	}
 	user3, err := user2.List.UserId(userId)
 	if err != nil {
-		return err
+		return
 	}
 	if user3.Id() <= 0 {
 		err = errors.New("用户不存在，请确认")
-		return err
+		return
 	}
 	user3.SetRole(roleId)
 	err = user2.List.Edit(user3)
-	return err
+	return
 }
 
-func (u user) Delete(userId int) error {
+func (u user) Delete(operator, userId int, uri string) (err error) {
+	err = permissionVerification(operator, uri)
+	if err != nil {
+		return
+	}
 	user3, err := user2.List.UserId(userId)
 	if err != nil {
-		return err
+		return
 	}
 	if user3.Id() <= 0 {
 		err = errors.New("用户不存在，请确认")
-		return err
+		return
 	}
 	user3.Delete()
 	err = user2.List.Edit(user3)
-	return err
+	return
 }
 
-func (u user) List(offset, limit int) (userList []map[string]interface{}, err error) {
+func (u user) List(operator, offset, limit int, uri string) (userList []map[string]interface{}, err error) {
+	err = permissionVerification(operator, uri)
+	if err != nil {
+		return
+	}
 	users, err := user2.List.List(offset, limit)
 	if err != nil {
 		return
@@ -77,10 +93,14 @@ func (u user) List(offset, limit int) (userList []map[string]interface{}, err er
 		user4["create_time"] = user3.CreateTime()
 		userList[index] = user4
 	}
-	return userList, err
+	return
 }
 
-func (u user) UserId(userId int) (user4 map[string]interface{}, err error) {
+func (u user) UserId(operator, userId int, uri string) (user4 map[string]interface{}, err error) {
+	err = permissionVerification(operator, uri)
+	if err != nil {
+		return
+	}
 	user3, err := user2.List.UserId(userId)
 	if err != nil {
 		return
@@ -91,5 +111,5 @@ func (u user) UserId(userId int) (user4 map[string]interface{}, err error) {
 	user4["phone"] = user3.Phone()
 	user4["role_id"] = user3.RoleId()
 	user4["create_time"] = user3.CreateTime()
-	return user4, err
+	return
 }

@@ -6,13 +6,13 @@ import (
 	user2 "handshake/domain/user"
 )
 
-func permissionVerification(userId int, uri string) (err error) {
-	user3, err := user2.List.UserId(userId)
+func permissionVerification(operator int, uri string) (err error) {
+	user3, err := user2.List.UserId(operator)
 	if err != nil {
 		return
 	}
 	if user3.Id() <= 0 {
-		err = errors.New("用户不存在，请确认")
+		err = errors.New("操作者不存在，请确认")
 		return
 	}
 	role3, err := role2.List.RoleById(user3.RoleId())
@@ -21,7 +21,7 @@ func permissionVerification(userId int, uri string) (err error) {
 	}
 	permission := role3.Permission(uri)
 	if !permission {
-		err = errors.New("无权限，请确认")
+		err = errors.New("操作者无权限，请确认")
 		return
 	}
 	return
