@@ -96,6 +96,9 @@ func (t *topic) Creator() int {
 }
 
 func (t *topic) Start() bool {
+	if t.status == DeleteStatus {
+		return false
+	}
 	if t.status == StartStatus {
 		return true
 	}
@@ -105,6 +108,9 @@ func (t *topic) Start() bool {
 }
 
 func (t *topic) Stop() bool {
+	if t.status == DeleteStatus {
+		return false
+	}
 	if t.status == StopStatus {
 		return true
 	}
