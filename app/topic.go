@@ -56,6 +56,10 @@ type editTopicRequest struct {
 	FuseSalt       int `json:"fuseSalt" form:"fuseSalt" binding:"required"`
 }
 
+type topicByIdRequest struct {
+	TopicId int `json:"topicId" form:"topicId" binding:"required"`
+}
+
 func (t topic) Add(c *gin.Context) {
 	request := addTopicRequest{}
 	if err := c.ShouldBind(&request); err != nil {
@@ -173,5 +177,23 @@ func (t topic) EditTopic(c *gin.Context) {
 		return
 	}
 	helper.Response(c, 200, nil, "")
+	return
+}
+
+// TopicById 编辑主题信息
+func (t topic) TopicById(c *gin.Context) {
+	request := topicByIdRequest{}
+	if err := c.ShouldBind(&request); err != nil {
+		err = fmt.Errorf("app topic TopicById: params %v error: %v", request, err)
+		helper.Response(c, 1000, nil, err.Error())
+		return
+	}
+	topic, err := service.TopicService.TopicById(request.TopicId)
+	if err != nil {
+		err = fmt.Errorf("app topic TopicById: params %v error: %v", request, err)
+		helper.Response(c, 1001, nil, err.Error())
+		return
+	}
+	helper.Response(c, 200, topic, "")
 	return
 }

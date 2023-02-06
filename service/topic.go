@@ -129,3 +129,38 @@ func (t topic) Edit(topicId, maxRetryCount, minConcurrency, maxConcurrency, fuse
 	err = topic2.List.Edit(topic3)
 	return err
 }
+
+func (t topic) TopicById(topicId int) (map[string]interface{}, error) {
+	topic4 := make(map[string]interface{})
+	topic3, err := topic2.List.TopicId(topicId)
+	if err != nil {
+		return topic4, err
+	}
+	if topic3.Id() <= 0 {
+		err = errors.New("主题不存在，请确认！")
+		return topic4, err
+	}
+
+	topic4["id"] = topic3.Id()
+	topic4["name"] = topic3.Name()
+	topic4["status"] = topic3.Status()
+	topic4["maxRetryCount"] = topic3.MaxRetryCount()
+	topic4["minConcurrency"] = topic3.MinConcurrency()
+	topic4["maxConcurrency"] = topic3.MaxConcurrency()
+	topic4["fuseSalt"] = topic3.FuseSalt()
+	alamHandler := topic3.AlarmHandler()
+	alarm := make(map[string]interface{})
+	alarm["url"] = alamHandler.Url()
+	alarm["method"] = alamHandler.Method()
+	alarm["recipients"] = alamHandler.Recipients()
+	topic4["alarm"] = alarm
+	callbackHandler := topic3.CallbackHandler()
+	callback := make(map[string]interface{})
+	callback["url"] = callbackHandler.Url()
+	callback["method"] = callbackHandler.Method()
+	callback["headers"] = callbackHandler.Headers()
+	callback["cookies"] = callbackHandler.Cookies()
+	topic4["callback"] = callback
+
+	return topic4, err
+}
