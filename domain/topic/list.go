@@ -37,7 +37,12 @@ func (l *list) TopicId(topicId int) (topic2 topic, err error) {
 	return
 }
 
-func (l *list) TopicName(topicName string) (topic topic, err error) {
+func (l *list) TopicName(topicName string) (topic3 topic, err error) {
+	topic2, err := l.storage.TopicByName(topicName)
+	if err != nil {
+		return
+	}
+	topic3 = l.reconstruction(topic2)
 	return
 }
 
