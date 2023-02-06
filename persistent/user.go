@@ -24,7 +24,7 @@ func (u userDao) Add(user inter.User) error {
 func (u userDao) Edit(user inter.User) error {
 	user2 := u.transformation(user)
 	whereUserId := strconv.Itoa(user2.Id())
-	err := internal.DbConn().Table(u.tableName).Where("user_id = ?", whereUserId).Updates(user2).Error
+	err := internal.DbConn().Table(u.tableName).Where("user_id = ?", whereUserId).Updates(user2).Limit(1).Error
 	return err
 }
 
@@ -58,6 +58,7 @@ func (u userDao) UserList(offset, limit int) ([]inter.User, error) {
 
 func (u userDao) transformation(user inter.User) (user2 storageUser) {
 	user2.UserId = user.Id()
+	user2.UserStatus = user.Status()
 	user2.UserName = user.Name()
 	user2.UserPhone = user.Phone()
 	user2.UserPwd = user.Pwd()
@@ -68,11 +69,12 @@ func (u userDao) transformation(user inter.User) (user2 storageUser) {
 
 type storageUser struct {
 	UserId         int       `json:"user_id" gorm:"column:user_id;primary_key"`
-	UserName       string    `json:"user_name" gorm:"user_name"`
-	UserPhone      string    `json:"user_phone" gorm:"user_phone"`
-	UserPwd        string    `json:"user_pwd" gorm:"user_pwd"`
-	UserRoleId     int       `json:"user_role_id" gorm:"user_role_id"`
-	UserCreateTime time.Time `json:"create_time" gorm:"create_time"`
+	UserStatus     int       `json:"user_status" gorm:"column:user_status"`
+	UserName       string    `json:"user_name" gorm:"column:user_name"`
+	UserPhone      string    `json:"user_phone" gorm:"column:user_phone"`
+	UserPwd        string    `json:"user_pwd" gorm:"column:user_pwd"`
+	UserRoleId     int       `json:"user_role_id" gorm:"column:user_role_id"`
+	UserCreateTime time.Time `json:"create_time" gorm:"column:create_time"`
 }
 
 func (u storageUser) Id() int {
@@ -97,4 +99,8 @@ func (u storageUser) CreateTime() time.Time {
 
 func (u storageUser) RoleId() int {
 	return u.UserRoleId
+}
+
+func (u storageUser) Status() int {
+	return u.UserStatus
 }

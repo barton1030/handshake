@@ -56,7 +56,8 @@ func (u user) Delete(userId int) error {
 		err = errors.New("用户不存在，请确认")
 		return err
 	}
-	err = user2.List.Delete(user3)
+	user3.Delete()
+	err = user2.List.Edit(user3)
 	return err
 }
 

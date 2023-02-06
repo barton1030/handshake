@@ -13,6 +13,7 @@ type StorageUserList interface {
 type User interface {
 	Id() int
 	Name() string
+	Status() int
 	Phone() string
 	Pwd() string
 	RoleId() int

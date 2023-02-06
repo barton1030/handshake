@@ -4,6 +4,7 @@ import "time"
 
 type user struct {
 	id         int
+	status     int
 	name       string
 	phone      string
 	roleId     int
@@ -11,8 +12,14 @@ type user struct {
 	createTime time.Time
 }
 
+const (
+	NormalStatus = 1
+	DeleteStatus = -1
+)
+
 func NewUser(name, phone, pwd string, roleId int) user {
 	return user{
+		status:     NormalStatus,
 		name:       name,
 		phone:      phone,
 		pwd:        pwd,
@@ -59,4 +66,12 @@ func (u *user) CreateTime() time.Time {
 
 func (u *user) Pwd() string {
 	return u.pwd
+}
+
+func (u *user) Status() int {
+	return u.status
+}
+
+func (u *user) Delete() {
+	u.status = DeleteStatus
 }

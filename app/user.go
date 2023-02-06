@@ -16,16 +16,16 @@ type userAddRequest struct {
 	Name   string `json:"name" form:"name" binding:"required"`
 	Phone  string `json:"phone" form:"name" binding:"required"`
 	Pwd    string `json:"pwd" form:"pwd" binding:"required"`
-	RoleId int    `json:"role_id" form:"role_id" binding:"required"`
+	RoleId int    `json:"roleId" form:"roleId" binding:"required"`
 }
 
 type setRoleIdRequest struct {
-	UserId int `json:"user_id" form:"user_id" binding:"required"`
-	RoleId int `json:"role_id" form:"role_id" binding:"required"`
+	UserId int `json:"userId" form:"userId" binding:"required"`
+	RoleId int `json:"roleId" form:"roleId" binding:"required"`
 }
 
 type deleteUserRequest struct {
-	UserId int `json:"user_id" form:"user_id" binding:"required"`
+	UserId int `json:"userId" form:"userId" binding:"required"`
 }
 
 type listRequest struct {
@@ -34,7 +34,7 @@ type listRequest struct {
 }
 
 type userIdRequest struct {
-	UserId int `json:"user_id" form:"user_id" binding:"required"`
+	UserId int `json:"userId" form:"userId" binding:"required"`
 }
 
 func (u user) Add(c *gin.Context) {
