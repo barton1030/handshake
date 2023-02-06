@@ -21,7 +21,6 @@ func (t topicDao) Add(topic inter.Topic) error {
 	return err
 }
 
-// Edit 解决一下子
 func (t topicDao) Edit(topic inter.Topic) error {
 	topic2 := t.transformation(topic)
 	err := internal.DbConn().Table(t.tableName).Model(&storageTopic{SId: topic2.SId}).Updates(topic2).Limit(1).Error

@@ -48,6 +48,14 @@ type setTopicAlarmRequest struct {
 	Recipients []interface{} `json:"recipients" form:"recipients" binding:"required"`
 }
 
+type editTopicRequest struct {
+	TopicId        int `json:"topicId" form:"topicId" binding:"required"`
+	MaxRetryCount  int `json:"maxRetryCount" form:"maxRetryCount" binding:"required"`
+	MinConcurrency int `json:"minConcurrency" form:"minConcurrency" binding:"required"`
+	MaxConcurrency int `json:"maxConcurrency" form:"maxConcurrency" binding:"required"`
+	FuseSalt       int `json:"fuseSalt" form:"fuseSalt" binding:"required"`
+}
+
 func (t topic) Add(c *gin.Context) {
 	request := addTopicRequest{}
 	if err := c.ShouldBind(&request); err != nil {
@@ -143,6 +151,24 @@ func (t topic) SetAlarm(c *gin.Context) {
 	err := service.TopicService.SetAlarm(request.TopicId, request.Url, request.Method, request.Recipients)
 	if err != nil {
 		err = fmt.Errorf("app topic SetAlarm: params %v error: %v", request, err)
+		helper.Response(c, 1001, nil, err.Error())
+		return
+	}
+	helper.Response(c, 200, nil, "")
+	return
+}
+
+// EditTopic 编辑主题信息
+func (t topic) EditTopic(c *gin.Context) {
+	request := editTopicRequest{}
+	if err := c.ShouldBind(&request); err != nil {
+		err = fmt.Errorf("app topic SetTopic: params %v error: %v", request, err)
+		helper.Response(c, 1000, nil, err.Error())
+		return
+	}
+	err := service.TopicService.Edit(request.TopicId, request.MaxRetryCount, request.MinConcurrency, request.MaxConcurrency, request.FuseSalt)
+	if err != nil {
+		err = fmt.Errorf("app topic SetTopic: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
 		return
 	}

@@ -57,16 +57,32 @@ func (t *topic) MinConcurrency() int {
 	return t.minConcurrency
 }
 
+func (t *topic) SetMinConcurrency(minConcurrency int) {
+	t.minConcurrency = minConcurrency
+}
+
 func (t *topic) MaxConcurrency() int {
 	return t.maxConcurrency
+}
+
+func (t *topic) SetMaxConcurrency(maxConcurrency int) {
+	t.maxConcurrency = maxConcurrency
 }
 
 func (t *topic) FuseSalt() int {
 	return t.fuseSalt
 }
 
+func (t *topic) SetFuseSalt(fuseSalt int) {
+	t.fuseSalt = fuseSalt
+}
+
 func (t *topic) MaxRetryCount() int {
 	return t.maxRetryCount
+}
+
+func (t *topic) SetMaxRetryCount(maxRetryCount int) {
+	t.maxRetryCount = maxRetryCount
 }
 
 func (t *topic) CallbackHandler() inter.Callback {
