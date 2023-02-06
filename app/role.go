@@ -18,18 +18,18 @@ type AddRequest struct {
 }
 
 type RoleByIdRequest struct {
-	RoleId int `json:"role_id" form:"role_id" binding:"required"`
+	RoleId int `json:"roleId" form:"roleId" binding:"required"`
 }
 
 type EditNameRequest struct {
-	RoleId int    `json:"role_id" form:"role_id" binding:"required"`
+	RoleId int    `json:"roleId" form:"roleId" binding:"required"`
 	Name   string `json:"name" form:"name" binding:"required"`
 }
 
 type SetPermissionRequest struct {
-	RoleId          int    `json:"role_id" form:"role_id" binding:"required"`
-	PermissionKey   string `json:"permission_key" form:"permission_key" binding:"required"`
-	PermissionValue bool   `json:"permission_value" form:"permission_value" binding:"required"`
+	RoleId          int    `json:"roleId" form:"roleId" binding:"required"`
+	PermissionKey   string `json:"permissionKey" form:"permissionKey" binding:"required"`
+	PermissionValue bool   `json:"permissionValue" form:"permissionValue" binding:"required"`
 }
 
 type ListRequest struct {
@@ -38,7 +38,7 @@ type ListRequest struct {
 }
 
 type DeleteRequest struct {
-	RoleId int `json:"role_id" form:"role_id" binding:"required"`
+	RoleId int `json:"roleId" form:"roleId" binding:"required"`
 }
 
 // Add 角色添加入口
