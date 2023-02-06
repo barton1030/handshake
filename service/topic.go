@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	topic2 "handshake/domain/topic"
+	user2 "handshake/domain/user"
 )
 
 type topic struct {
@@ -10,39 +11,63 @@ type topic struct {
 
 var TopicService topic
 
-func (t topic) Add(name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, creator int) error {
+func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, creator int) (err error) {
+	user3, err := user2.List.UserId(operator)
+	if err != nil {
+		return
+	}
+	if user3.Id() <= 0 {
+		err = errors.New("操作者用户不存在，请注意！")
+		return
+	}
 	topic3, err := topic2.List.TopicName(name)
 	if err != nil {
-		return err
+		return
 	}
 	if topic3.Id() > 0 {
 		err = errors.New("主题名重复，请注意！")
-		return err
+		return
 	}
 	topic4 := topic2.NewTopic(name, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, creator)
 	err = topic2.List.Add(topic4)
-	return err
+	return
 }
 
-func (t topic) Start(topicId int) error {
+func (t topic) Start(operator, topicId int) (err error) {
+	user3, err := user2.List.UserId(operator)
+	if err != nil {
+		return
+	}
+	if user3.Id() <= 0 {
+		err = errors.New("操作者用户不存在，请注意！")
+		return
+	}
 	topic3, err := topic2.List.TopicId(topicId)
 	if err != nil {
-		return err
+		return
 	}
 	if topic3.Id() <= 0 {
 		err = errors.New("主题不存在，请确认！")
-		return err
+		return
 	}
 	startResult := topic3.Start()
 	if !startResult {
 		err = errors.New("主题启动失败")
-		return err
+		return
 	}
 	err = topic2.List.Edit(topic3)
-	return err
+	return
 }
 
-func (t topic) Stop(topicId int) error {
+func (t topic) Stop(operator, topicId int) (err error) {
+	user3, err := user2.List.UserId(operator)
+	if err != nil {
+		return
+	}
+	if user3.Id() <= 0 {
+		err = errors.New("操作者用户不存在，请注意！")
+		return
+	}
 	topic3, err := topic2.List.TopicId(topicId)
 	if err != nil {
 		return err
@@ -60,7 +85,15 @@ func (t topic) Stop(topicId int) error {
 	return err
 }
 
-func (t topic) Delete(topicId int) error {
+func (t topic) Delete(operator, topicId int) (err error) {
+	user3, err := user2.List.UserId(operator)
+	if err != nil {
+		return
+	}
+	if user3.Id() <= 0 {
+		err = errors.New("操作者用户不存在，请注意！")
+		return
+	}
 	topic3, err := topic2.List.TopicId(topicId)
 	if err != nil {
 		return err
@@ -83,55 +116,87 @@ func (t topic) Delete(topicId int) error {
 	return err
 }
 
-func (t topic) SetCallback(topicId int, url, method string, headers, cookies map[string]interface{}) error {
+func (t topic) SetCallback(operator, topicId int, url, method string, headers, cookies map[string]interface{}) (err error) {
+	user3, err := user2.List.UserId(operator)
+	if err != nil {
+		return
+	}
+	if user3.Id() <= 0 {
+		err = errors.New("操作者用户不存在，请注意！")
+		return
+	}
 	topic3, err := topic2.List.TopicId(topicId)
 	if err != nil {
-		return err
+		return
 	}
 	if topic3.Id() <= 0 {
 		err = errors.New("主题不存在，请确认！")
-		return err
+		return
 	}
 	callback := topic2.NewCallBack(url, method, cookies, headers)
 	topic3.SetCallback(callback)
 	err = topic2.List.Edit(topic3)
-	return err
+	return
 }
 
-func (t topic) SetAlarm(topicId int, url, method string, recipients []interface{}) error {
+func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []interface{}) (err error) {
+	user3, err := user2.List.UserId(operator)
+	if err != nil {
+		return
+	}
+	if user3.Id() <= 0 {
+		err = errors.New("操作者用户不存在，请注意！")
+		return
+	}
 	topic3, err := topic2.List.TopicId(topicId)
 	if err != nil {
-		return err
+		return
 	}
 	if topic3.Id() <= 0 {
 		err = errors.New("主题不存在，请确认！")
-		return err
+		return
 	}
 	alarm := topic2.NewAlarm(url, method, recipients)
 	topic3.SetAlarm(alarm)
 	err = topic2.List.Edit(topic3)
-	return err
+	return
 }
 
-func (t topic) Edit(topicId, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt int) error {
+func (t topic) Edit(operator, topicId, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt int) (err error) {
+	user3, err := user2.List.UserId(operator)
+	if err != nil {
+		return
+	}
+	if user3.Id() <= 0 {
+		err = errors.New("操作者用户不存在，请注意！")
+		return
+	}
 	topic3, err := topic2.List.TopicId(topicId)
 	if err != nil {
-		return err
+		return
 	}
 	if topic3.Id() <= 0 {
 		err = errors.New("主题不存在，请确认！")
-		return err
+		return
 	}
 	topic3.SetFuseSalt(fuseSalt)
 	topic3.SetMaxRetryCount(maxRetryCount)
 	topic3.SetMinConcurrency(minConcurrency)
 	topic3.SetMaxConcurrency(maxConcurrency)
 	err = topic2.List.Edit(topic3)
-	return err
+	return
 }
 
-func (t topic) TopicById(topicId int) (map[string]interface{}, error) {
-	topic4 := make(map[string]interface{})
+func (t topic) TopicById(operator, topicId int) (topic4 map[string]interface{}, err error) {
+	user3, err := user2.List.UserId(operator)
+	if err != nil {
+		return
+	}
+	if user3.Id() <= 0 {
+		err = errors.New("操作者用户不存在，请注意！")
+		return
+	}
+	topic4 = make(map[string]interface{})
 	topic3, err := topic2.List.TopicId(topicId)
 	if err != nil {
 		return topic4, err
