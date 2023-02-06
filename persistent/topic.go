@@ -43,7 +43,7 @@ func (t topicDao) Edit(topic inter.Topic) error {
 func (t topicDao) TopicById(topicId int) (inter.Topic, error) {
 	topic := storageTopic{}
 	whereTopicId := strconv.Itoa(topicId)
-	err := internal.DbConn().Table(t.tableName).Where("s_id = ?", whereTopicId).First(&topic).Error
+	err := internal.DbConn().Table(t.tableName).Where("id = ?", whereTopicId).First(&topic).Error
 	if err != nil && err.Error() == "record not found" {
 		err = nil
 	}
@@ -89,16 +89,16 @@ func (t topicDao) transformation(topic inter.Topic) (topic2 storageTopic) {
 }
 
 type storageTopic struct {
-	SId             int    `json:"s_id" gorm:"column:s_id;primary_key" `
-	SName           string `json:"s_name" gorm:"column:s_name"`
-	SStatus         int    `json:"s_status" gorm:"column:s_status"`
-	SMaxRetryCount  int    `json:"s_max_retry_count" gorm:"column:s_max_retry_count"`
-	SMinConcurrency int    `json:"s_min_concurrency" gorm:"column:s_min_concurrency"`
-	SMaxConcurrency int    `json:"s_max_concurrency" gorm:"column:s_max_concurrency"`
-	SFuseSalt       int    `json:"s_fuse_salt" gorm:"column:s_fuse_salt"`
-	SAlarm          string `json:"s_alarm" gorm:"column:s_alarm"`
-	SCallback       string `json:"s_callback" gorm:"column:s_callback"`
-	SCreator        int    `json:"s_creator" gorm:"column:s_creator"`
+	SId             int    `json:"id" gorm:"column:id;primary_key" `
+	SName           string `json:"name" gorm:"column:name"`
+	SStatus         int    `json:"status" gorm:"column:status"`
+	SMaxRetryCount  int    `json:"max_retry_count" gorm:"column:max_retry_count"`
+	SMinConcurrency int    `json:"min_concurrency" gorm:"column:min_concurrency"`
+	SMaxConcurrency int    `json:"max_concurrency" gorm:"column:max_concurrency"`
+	SFuseSalt       int    `json:"fuse_salt" gorm:"column:fuse_salt"`
+	SAlarm          string `json:"alarm" gorm:"column:alarm"`
+	SCallback       string `json:"callback" gorm:"column:callback"`
+	SCreator        int    `json:"creator" gorm:"column:creator"`
 }
 
 func (t storageTopic) Id() int {
