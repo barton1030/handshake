@@ -88,10 +88,7 @@ func (a *actuator) implement() {
 		if err != nil {
 			continue
 		}
-		data, err := message.Data()
-		if err != nil {
-			continue
-		}
+		data := message.Data()
 		// 消息回调处理工具具柄
 		callback := a.topic.CallbackHandler()
 		res, err := callback.Do(data)

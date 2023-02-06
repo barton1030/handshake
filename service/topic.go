@@ -256,3 +256,30 @@ func (t topic) TopicById(operator, topicId int) (topic4 map[string]interface{}, 
 
 	return topic4, err
 }
+
+func (t topic) PushMessage(operator, topicId int, message map[string]interface{}) (err error) {
+	user3, err := user2.List.UserById(operator)
+	if err != nil {
+		return
+	}
+	if user3.Id() <= 0 {
+		err = errors.New("操作者用户不存在，请注意！")
+		return
+	}
+	topic3, err := topic2.List.TopicId(topicId)
+	if err != nil {
+		return
+	}
+	if topic3.Id() <= 0 {
+		err = errors.New("主题不存在，请确认！")
+		return
+	}
+	if topic3.Creator() != operator {
+		err = errors.New("操作人与主题创建者不一致，请确认！")
+		return
+	}
+	data := topic2.NewMessage(message)
+	queueHandler := topic3.MessageQueuingHandler()
+	err = queueHandler.Push(&data)
+	return
+}

@@ -33,11 +33,8 @@ func NewTopic(name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSa
 		minConcurrency: minConcurrency,
 		maxConcurrency: maxConcurrency,
 		fuseSalt:       fuseSalt,
-		queue: messageQueuing{
-			topicName: name,
-			storage:   make(map[int]interface{}),
-		},
-		creator: creator,
+		queue:          newMessageQueuing(name),
+		creator:        creator,
 	}
 }
 

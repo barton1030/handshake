@@ -89,7 +89,7 @@ func (t topicDao) transformation(topic inter.Topic) (topic2 storageTopic) {
 }
 
 type storageTopic struct {
-	SId             int    `json:"id" gorm:"column:id;primary_key" `
+	SId             int    `json:"id" gorm:"column:id;primary_key"`
 	SName           string `json:"name" gorm:"column:name"`
 	SStatus         int    `json:"status" gorm:"column:status"`
 	SMaxRetryCount  int    `json:"max_retry_count" gorm:"column:max_retry_count"`

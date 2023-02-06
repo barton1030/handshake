@@ -54,10 +54,9 @@ func (l *list) reconstruction(topic2 inter.Topic) (topic3 topic) {
 	topic3.minConcurrency = topic2.MinConcurrency()
 	topic3.maxConcurrency = topic2.MaxConcurrency()
 	topic3.fuseSalt = topic2.FuseSalt()
-	topic3.queue = messageQueuing{
-		topicName: topic2.Name(),
-		storage:   make(map[int]interface{}),
-	}
+	topic3.creator = topic2.Creator()
+	topic3.queue = newMessageQueuing(topic2.Name())
+	topic3.queue.init()
 	topic2AlamHandler := topic2.AlarmHandler()
 	topic3.alarm = alarm{
 		url:        topic2AlamHandler.Url(),

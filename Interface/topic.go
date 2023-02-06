@@ -1,5 +1,7 @@
 package Interface
 
+import "time"
+
 type StorageTopicList interface {
 	MaxPrimaryKeyId() (maxPrimaryKeyId int)
 	Add(topic Topic) error
@@ -37,6 +39,12 @@ type Alarm interface {
 	Recipients() []interface{}
 }
 
+type StorageQueueList interface {
+	MaxPrimaryKeyId(topicName string) (maxPrimaryKeyId int)
+	Add(topicName string, message Message) error
+	Edit(topicName string, message Message) error
+}
+
 type MessageQueuing interface {
 	Pop() (message Message, err error)
 	Push(message Message) (err error)
@@ -45,11 +53,13 @@ type MessageQueuing interface {
 }
 
 type Message interface {
-	Id() (id int)
-	Data() (data map[string]interface{}, err error)
-	RetryCount() (retryCont int)
+	Id() int
+	Status() int
+	Data() map[string]interface{}
+	RetryCount() int
 	IncrRetryCont()
 	Processable() (processable bool)
 	Success()
 	Fail()
+	CreateTime() time.Time
 }

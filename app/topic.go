@@ -67,6 +67,12 @@ type topicByIdRequest struct {
 	TopicId  int `json:"topicId" form:"topicId" binding:"required"`
 }
 
+type topicPushMessageRequest struct {
+	Operator int                    `json:"operator" form:"operator" binding:"required"`
+	TopicId  int                    `json:"topicId" form:"topicId" binding:"required"`
+	Message  map[string]interface{} `json:"message" form:"message" binding:"required"`
+}
+
 func (t topic) Add(c *gin.Context) {
 	request := addTopicRequest{}
 	if err := c.ShouldBind(&request); err != nil {
@@ -202,5 +208,23 @@ func (t topic) TopicById(c *gin.Context) {
 		return
 	}
 	helper.Response(c, 200, topic, "")
+	return
+}
+
+// PushMessage 推送消息
+func (t topic) PushMessage(c *gin.Context) {
+	request := topicPushMessageRequest{}
+	if err := c.ShouldBind(&request); err != nil {
+		err = fmt.Errorf("app topic PushMessage: params %v error: %v", request, err)
+		helper.Response(c, 1000, nil, err.Error())
+		return
+	}
+	err := service.TopicService.PushMessage(request.Operator, request.TopicId, request.Message)
+	if err != nil {
+		err = fmt.Errorf("app topic PushMessage: params %v error: %v", request, err)
+		helper.Response(c, 1001, nil, err.Error())
+		return
+	}
+	helper.Response(c, 200, nil, "")
 	return
 }
