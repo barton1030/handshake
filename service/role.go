@@ -10,8 +10,8 @@ type role struct {
 
 var RoleService role
 
-func (r role) Add(uri, name string, userId int) (err error) {
-	err = permissionVerification(userId, uri)
+func (r role) Add(operator int, name, uri string) (err error) {
+	err = permissionVerification(operator, uri)
 	if err != nil {
 		return
 	}
@@ -22,13 +22,13 @@ func (r role) Add(uri, name string, userId int) (err error) {
 	if err != nil {
 		return err
 	}
-	domainRole = role2.NewRole(name, userId)
+	domainRole = role2.NewRole(name, operator)
 	err = role2.List.Add(domainRole)
 	return err
 }
 
-func (r role) RoleById(userId, roleId int, uri string) (role3 map[string]interface{}, err error) {
-	err = permissionVerification(userId, uri)
+func (r role) RoleById(operator, roleId int, uri string) (role3 map[string]interface{}, err error) {
+	err = permissionVerification(operator, uri)
 	if err != nil {
 		return
 	}
@@ -45,8 +45,8 @@ func (r role) RoleById(userId, roleId int, uri string) (role3 map[string]interfa
 	return
 }
 
-func (r role) EditName(userId, roleId int, roleName, uri string) (err error) {
-	err = permissionVerification(userId, uri)
+func (r role) EditName(operator, roleId int, roleName, uri string) (err error) {
+	err = permissionVerification(operator, uri)
 	if err != nil {
 		return
 	}
@@ -59,8 +59,8 @@ func (r role) EditName(userId, roleId int, roleName, uri string) (err error) {
 	return
 }
 
-func (r role) SetPermission(userId, roleId int, permissionKey string, permissionValue bool, uri string) (err error) {
-	err = permissionVerification(userId, uri)
+func (r role) SetPermission(operator, roleId int, permissionKey string, permissionValue bool, uri string) (err error) {
+	err = permissionVerification(operator, uri)
 	if err != nil {
 		return
 	}
@@ -73,8 +73,8 @@ func (r role) SetPermission(userId, roleId int, permissionKey string, permission
 	return
 }
 
-func (r role) List(userId, offset, limit int, uri string) (roles []map[string]interface{}, err error) {
-	err = permissionVerification(userId, uri)
+func (r role) List(operator, offset, limit int, uri string) (roles []map[string]interface{}, err error) {
+	err = permissionVerification(operator, uri)
 	if err != nil {
 		return
 	}
@@ -97,8 +97,8 @@ func (r role) List(userId, offset, limit int, uri string) (roles []map[string]in
 	return
 }
 
-func (r role) Delete(userId, roleId int, uri string) (err error) {
-	err = permissionVerification(userId, uri)
+func (r role) Delete(operator, roleId int, uri string) (err error) {
+	err = permissionVerification(operator, uri)
 	if err != nil {
 		return
 	}

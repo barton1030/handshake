@@ -13,7 +13,7 @@ type user struct {
 var User user
 
 type userAddRequest struct {
-	Operator int    `json:"Operator" form:"Operator" binding:"required"`
+	Operator int    `json:"operator" form:"operator" binding:"required"`
 	Name     string `json:"name" form:"name" binding:"required"`
 	Phone    string `json:"phone" form:"name" binding:"required"`
 	Pwd      string `json:"pwd" form:"pwd" binding:"required"`
@@ -21,24 +21,24 @@ type userAddRequest struct {
 }
 
 type setRoleIdRequest struct {
-	Operator int `json:"Operator" form:"Operator" binding:"required"`
+	Operator int `json:"operator" form:"operator" binding:"required"`
 	UserId   int `json:"userId" form:"userId" binding:"required"`
 	RoleId   int `json:"roleId" form:"roleId" binding:"required"`
 }
 
 type deleteUserRequest struct {
-	Operator int `json:"Operator" form:"Operator" binding:"required"`
+	Operator int `json:"operator" form:"operator" binding:"required"`
 	UserId   int `json:"userId" form:"userId" binding:"required"`
 }
 
 type listRequest struct {
-	Operator int `json:"Operator" form:"Operator" binding:"required"`
+	Operator int `json:"operator" form:"operator" binding:"required"`
 	Offset   int `json:"offset" form:"offset"`
 	Limit    int `json:"limit" form:"limit" binding:"required"`
 }
 
 type userIdRequest struct {
-	Operator int `json:"Operator" form:"Operator" binding:"required"`
+	Operator int `json:"operator" form:"operator" binding:"required"`
 	UserId   int `json:"userId" form:"userId" binding:"required"`
 }
 
