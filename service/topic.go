@@ -50,6 +50,10 @@ func (t topic) Start(operator, topicId int) (err error) {
 		err = errors.New("主题不存在，请确认！")
 		return
 	}
+	if topic3.Creator() != operator {
+		err = errors.New("操作人与主题创建者不一致，请确认！")
+		return
+	}
 	startResult := topic3.Start()
 	if !startResult {
 		err = errors.New("主题启动失败")
@@ -76,6 +80,10 @@ func (t topic) Stop(operator, topicId int) (err error) {
 		err = errors.New("主题不存在，请确认！")
 		return err
 	}
+	if topic3.Creator() != operator {
+		err = errors.New("操作人与主题创建者不一致，请确认！")
+		return
+	}
 	stopResult := topic3.Stop()
 	if !stopResult {
 		err = errors.New("终止失败")
@@ -101,6 +109,10 @@ func (t topic) Delete(operator, topicId int) (err error) {
 	if topic3.Id() <= 0 {
 		err = errors.New("主题不存在，请确认！")
 		return err
+	}
+	if topic3.Creator() != operator {
+		err = errors.New("操作人与主题创建者不一致，请确认！")
+		return
 	}
 	inOperation := topic3.InOperation()
 	if inOperation {
@@ -133,6 +145,10 @@ func (t topic) SetCallback(operator, topicId int, url, method string, headers, c
 		err = errors.New("主题不存在，请确认！")
 		return
 	}
+	if topic3.Creator() != operator {
+		err = errors.New("操作人与主题创建者不一致，请确认！")
+		return
+	}
 	callback := topic2.NewCallBack(url, method, cookies, headers)
 	topic3.SetCallback(callback)
 	err = topic2.List.Edit(topic3)
@@ -156,6 +172,10 @@ func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []
 		err = errors.New("主题不存在，请确认！")
 		return
 	}
+	if topic3.Creator() != operator {
+		err = errors.New("操作人与主题创建者不一致，请确认！")
+		return
+	}
 	alarm := topic2.NewAlarm(url, method, recipients)
 	topic3.SetAlarm(alarm)
 	err = topic2.List.Edit(topic3)
@@ -177,6 +197,10 @@ func (t topic) Edit(operator, topicId, maxRetryCount, minConcurrency, maxConcurr
 	}
 	if topic3.Id() <= 0 {
 		err = errors.New("主题不存在，请确认！")
+		return
+	}
+	if topic3.Creator() != operator {
+		err = errors.New("操作人与主题创建者不一致，请确认！")
 		return
 	}
 	topic3.SetFuseSalt(fuseSalt)
@@ -205,7 +229,10 @@ func (t topic) TopicById(operator, topicId int) (topic4 map[string]interface{}, 
 		err = errors.New("主题不存在，请确认！")
 		return topic4, err
 	}
-
+	if topic3.Creator() != operator {
+		err = errors.New("操作人与主题创建者不一致，请确认！")
+		return
+	}
 	topic4["id"] = topic3.Id()
 	topic4["name"] = topic3.Name()
 	topic4["status"] = topic3.Status()
