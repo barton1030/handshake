@@ -15,6 +15,19 @@ var TopicDao = topicDao{
 	tableName: "hand_shake_topic",
 }
 
+func (t topicDao) MaxPrimaryKeyId() (maxPrimaryKeyId int) {
+	topic2 := storageTopic{}
+	err := internal.DbConn().Table(t.tableName).Last(&topic2).Error
+	if err != nil {
+		return
+	}
+	if topic2.Id() <= 0 {
+		return
+	}
+	maxPrimaryKeyId = topic2.Id()
+	return
+}
+
 func (t topicDao) Add(topic inter.Topic) error {
 	topic2 := t.transformation(topic)
 	err := internal.DbConn().Table(t.tableName).Create(&topic2).Error

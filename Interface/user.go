@@ -3,6 +3,7 @@ package Interface
 import "time"
 
 type StorageUserList interface {
+	MaxPrimaryKeyId() (maxPrimaryKeyId int)
 	Add(user User) error
 	Edit(user User) error
 	Delete(user User) error

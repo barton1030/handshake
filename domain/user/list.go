@@ -12,6 +12,11 @@ type list struct {
 
 var List = list{nextId: 1, storage: persistent.UserDao}
 
+func (l *list) Init() {
+	maxPrimaryKeyId := l.storage.MaxPrimaryKeyId()
+	l.nextId = maxPrimaryKeyId + 1
+}
+
 func (l *list) Add(user2 user) (err error) {
 	user2.id = l.nextId
 	err = l.storage.Add(&user2)

@@ -16,6 +16,19 @@ var RoleDao = roleDao{
 	tableName: "hand_shake_role",
 }
 
+func (r roleDao) MaxPrimaryKeyId() (maxPrimaryKeyId int) {
+	role3 := storageRole{}
+	err := internal.DbConn().Table(r.tableName).Last(&role3).Error
+	if err != nil {
+		return
+	}
+	if role3.Id() <= 0 {
+		return
+	}
+	maxPrimaryKeyId = role3.Id()
+	return
+}
+
 func (r roleDao) Add(role2 inter.Role) (err error) {
 	role3 := r.transformation(role2)
 	err = internal.DbConn().Table(r.tableName).Create(role3).Error

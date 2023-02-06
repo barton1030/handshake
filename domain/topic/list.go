@@ -12,6 +12,11 @@ type list struct {
 
 var List = list{nextId: 1, storage: persistent.TopicDao}
 
+func (l *list) Init() {
+	maxPrimaryKeyId := l.storage.MaxPrimaryKeyId()
+	l.nextId = maxPrimaryKeyId + 1
+}
+
 func (l *list) Add(topic2 topic) (err error) {
 	topic2.id = l.nextId
 	err = l.storage.Add(&topic2)

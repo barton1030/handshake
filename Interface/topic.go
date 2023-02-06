@@ -1,6 +1,7 @@
 package Interface
 
 type StorageTopicList interface {
+	MaxPrimaryKeyId() (maxPrimaryKeyId int)
 	Add(topic Topic) error
 	Edit(topic Topic) error
 	TopicById(topicId int) (Topic, error)

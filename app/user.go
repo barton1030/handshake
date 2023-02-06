@@ -15,7 +15,7 @@ var User user
 type userAddRequest struct {
 	Operator int    `json:"operator" form:"operator" binding:"required"`
 	Name     string `json:"name" form:"name" binding:"required"`
-	Phone    string `json:"phone" form:"name" binding:"required"`
+	Phone    string `json:"phone" form:"phone" binding:"required"`
 	Pwd      string `json:"pwd" form:"pwd" binding:"required"`
 	RoleId   int    `json:"roleId" form:"roleId" binding:"required"`
 }

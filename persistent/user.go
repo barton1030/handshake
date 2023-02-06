@@ -15,6 +15,19 @@ var UserDao = userDao{
 	tableName: "hand_shake_user",
 }
 
+func (u userDao) MaxPrimaryKeyId() (maxPrimaryKeyId int) {
+	user := storageUser{}
+	err := internal.DbConn().Table(u.tableName).Last(&user).Error
+	if err != nil {
+		return
+	}
+	if user.Id() <= 0 {
+		return
+	}
+	maxPrimaryKeyId = user.Id()
+	return
+}
+
 func (u userDao) Add(user inter.User) error {
 	user2 := u.transformation(user)
 	err := internal.DbConn().Table(u.tableName).Create(&user2).Error
@@ -24,7 +37,7 @@ func (u userDao) Add(user inter.User) error {
 func (u userDao) Edit(user inter.User) error {
 	user2 := u.transformation(user)
 	whereUserId := strconv.Itoa(user2.Id())
-	err := internal.DbConn().Table(u.tableName).Where("user_id = ?", whereUserId).Updates(user2).Limit(1).Error
+	err := internal.DbConn().Table(u.tableName).Where("id = ?", whereUserId).Updates(user2).Limit(1).Error
 	return err
 }
 
@@ -38,7 +51,7 @@ func (u userDao) Delete(user inter.User) error {
 func (u userDao) UserById(userId int) (inter.User, error) {
 	user := storageUser{}
 	whereUserId := strconv.Itoa(userId)
-	err := internal.DbConn().Table(u.tableName).Where("user_id = ?", whereUserId).First(&user).Error
+	err := internal.DbConn().Table(u.tableName).Where("id = ?", whereUserId).First(&user).Error
 	if err != nil && err.Error() == "record not found" {
 		err = nil
 	}
@@ -57,50 +70,50 @@ func (u userDao) UserList(offset, limit int) ([]inter.User, error) {
 }
 
 func (u userDao) transformation(user inter.User) (user2 storageUser) {
-	user2.UserId = user.Id()
-	user2.UserStatus = user.Status()
-	user2.UserName = user.Name()
-	user2.UserPhone = user.Phone()
-	user2.UserPwd = user.Pwd()
-	user2.UserRoleId = user.RoleId()
-	user2.UserCreateTime = user.CreateTime()
+	user2.SId = user.Id()
+	user2.SStatus = user.Status()
+	user2.SName = user.Name()
+	user2.SPhone = user.Phone()
+	user2.SPwd = user.Pwd()
+	user2.SRoleId = user.RoleId()
+	user2.SCreateTime = user.CreateTime()
 	return user2
 }
 
 type storageUser struct {
-	UserId         int       `json:"user_id" gorm:"column:user_id;primary_key"`
-	UserStatus     int       `json:"user_status" gorm:"column:user_status"`
-	UserName       string    `json:"user_name" gorm:"column:user_name"`
-	UserPhone      string    `json:"user_phone" gorm:"column:user_phone"`
-	UserPwd        string    `json:"user_pwd" gorm:"column:user_pwd"`
-	UserRoleId     int       `json:"user_role_id" gorm:"column:user_role_id"`
-	UserCreateTime time.Time `json:"create_time" gorm:"column:create_time"`
+	SId         int       `json:"user_id" gorm:"column:id;primary_key"`
+	SStatus     int       `json:"user_status" gorm:"column:status"`
+	SName       string    `json:"user_name" gorm:"column:name"`
+	SPhone      string    `json:"user_phone" gorm:"column:phone"`
+	SPwd        string    `json:"user_pwd" gorm:"column:pwd"`
+	SRoleId     int       `json:"user_role_id" gorm:"column:role_id"`
+	SCreateTime time.Time `json:"create_time" gorm:"column:create_time"`
 }
 
 func (u storageUser) Id() int {
-	return u.UserId
+	return u.SId
 }
 
 func (u storageUser) Name() string {
-	return u.UserName
+	return u.SName
 }
 
 func (u storageUser) Phone() string {
-	return u.UserPhone
+	return u.SPhone
 }
 
 func (u storageUser) Pwd() string {
-	return u.UserPwd
+	return u.SPwd
 }
 
 func (u storageUser) CreateTime() time.Time {
-	return u.UserCreateTime
+	return u.SCreateTime
 }
 
 func (u storageUser) RoleId() int {
-	return u.UserRoleId
+	return u.SRoleId
 }
 
 func (u storageUser) Status() int {
-	return u.UserStatus
+	return u.SStatus
 }

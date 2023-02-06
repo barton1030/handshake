@@ -10,7 +10,12 @@ type list struct {
 	storage inter.RoleListStorage
 }
 
-var List = list{nextId: 3, storage: persistent.RoleDao}
+var List = list{nextId: 1, storage: persistent.RoleDao}
+
+func (l *list) Init() {
+	maxPrimaryKeyId := l.storage.MaxPrimaryKeyId()
+	l.nextId = maxPrimaryKeyId + 1
+}
 
 func (l *list) Add(role2 role) (err error) {
 	role2.id = l.nextId
