@@ -9,7 +9,7 @@ import (
 type user struct {
 }
 
-var UserService user
+var User user
 
 func (u user) Add(name, phone, pwd string, roleId int) error {
 	role3, err := role2.List.RoleById(roleId)

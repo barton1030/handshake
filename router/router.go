@@ -26,10 +26,10 @@ func role(r *gin.Engine) {
 func user(r *gin.Engine) {
 	userGroup := r.Group("/user")
 	userGroup.POST("/add", app.User.Add)
-	userGroup.POST("/edit", app.User.SetRoleId)
+	userGroup.POST("/set/roleId", app.User.SetRoleId)
 	userGroup.GET("/delete", app.User.Delete)
 	userGroup.GET("/list", app.User.List)
-	userGroup.GET("/userId", app.User.UserId)
+	userGroup.GET("/byId", app.User.UserById)
 }
 
 func topic(r *gin.Engine) {
@@ -41,5 +41,5 @@ func topic(r *gin.Engine) {
 	topicGroup.POST("/set/callback", app.TopicController.SetCallback)
 	topicGroup.POST("/set/alarm", app.TopicController.SetAlarm)
 	topicGroup.POST("/edit", app.TopicController.EditTopic)
-	topicGroup.GET("/by/id", app.TopicController.TopicById)
+	topicGroup.GET("/byId", app.TopicController.TopicById)
 }

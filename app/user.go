@@ -7,10 +7,10 @@ import (
 	"handshake/service"
 )
 
-type userController struct {
+type user struct {
 }
 
-var User userController
+var User user
 
 type userAddRequest struct {
 	Name   string `json:"name" form:"name" binding:"required"`
@@ -37,7 +37,7 @@ type userIdRequest struct {
 	UserId int `json:"user_id" form:"user_id" binding:"required"`
 }
 
-func (u userController) Add(c *gin.Context) {
+func (u user) Add(c *gin.Context) {
 	request := userAddRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		err = fmt.Errorf("app user Add: params %v error: %v", request, err)
@@ -45,7 +45,7 @@ func (u userController) Add(c *gin.Context) {
 		return
 	}
 
-	err := service.UserService.Add(request.Name, request.Phone, request.Pwd, request.RoleId)
+	err := service.User.Add(request.Name, request.Phone, request.Pwd, request.RoleId)
 	if err != nil {
 		err = fmt.Errorf("app user Add: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -55,7 +55,7 @@ func (u userController) Add(c *gin.Context) {
 	return
 }
 
-func (u userController) SetRoleId(c *gin.Context) {
+func (u user) SetRoleId(c *gin.Context) {
 	request := setRoleIdRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		err = fmt.Errorf("app user SetRoleId: params %v error: %v", request, err)
@@ -63,7 +63,7 @@ func (u userController) SetRoleId(c *gin.Context) {
 		return
 	}
 
-	err := service.UserService.SetRoleId(request.UserId, request.RoleId)
+	err := service.User.SetRoleId(request.UserId, request.RoleId)
 	if err != nil {
 		err = fmt.Errorf("app user SetRoleId: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -73,7 +73,7 @@ func (u userController) SetRoleId(c *gin.Context) {
 	return
 }
 
-func (u userController) Delete(c *gin.Context) {
+func (u user) Delete(c *gin.Context) {
 	request := deleteUserRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		err = fmt.Errorf("app user Delete: params %v error: %v", request, err)
@@ -81,7 +81,7 @@ func (u userController) Delete(c *gin.Context) {
 		return
 	}
 
-	err := service.UserService.Delete(request.UserId)
+	err := service.User.Delete(request.UserId)
 	if err != nil {
 		err = fmt.Errorf("app user Delete: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -91,7 +91,7 @@ func (u userController) Delete(c *gin.Context) {
 	return
 }
 
-func (u userController) List(c *gin.Context) {
+func (u user) List(c *gin.Context) {
 	request := listRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		err = fmt.Errorf("app user List: params %v error: %v", request, err)
@@ -99,7 +99,7 @@ func (u userController) List(c *gin.Context) {
 		return
 	}
 
-	userList, err := service.UserService.List(request.Offset, request.Limit)
+	userList, err := service.User.List(request.Offset, request.Limit)
 	if err != nil {
 		err = fmt.Errorf("app user List: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -109,7 +109,7 @@ func (u userController) List(c *gin.Context) {
 	return
 }
 
-func (u userController) UserId(c *gin.Context) {
+func (u user) UserById(c *gin.Context) {
 	request := userIdRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		err = fmt.Errorf("app user UserId: params %v error: %v", request, err)
@@ -117,9 +117,10 @@ func (u userController) UserId(c *gin.Context) {
 		return
 	}
 
-	user, err := service.UserService.UserId(request.UserId)
+	user, err := service.User.UserId(request.UserId)
 	if err != nil {
-		err = fmt.Errorf("app user UserId: params %v error: %v", request, err)
+		err = fmt.Errorf("app user UserId: params %v error: %v",
+			request, err)
 		helper.Response(c, 1001, nil, err.Error())
 		return
 	}

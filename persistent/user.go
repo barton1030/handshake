@@ -3,6 +3,7 @@ package persistent
 import (
 	inter "handshake/Interface"
 	"handshake/persistent/internal"
+	"strconv"
 	"time"
 )
 
@@ -22,9 +23,8 @@ func (u userDao) Add(user inter.User) error {
 
 func (u userDao) Edit(user inter.User) error {
 	user2 := u.transformation(user)
-	err := internal.DbConn().Table(u.tableName).Model(&struct {
-		UserId int
-	}{UserId: user2.Id()}).Updates(user2).Error
+	whereUserId := strconv.Itoa(user2.Id())
+	err := internal.DbConn().Table(u.tableName).Where("user_id = ?", whereUserId).Updates(user2).Error
 	return err
 }
 
@@ -37,9 +37,8 @@ func (u userDao) Delete(user inter.User) error {
 
 func (u userDao) UserById(userId int) (inter.User, error) {
 	user := storageUser{}
-	err := internal.DbConn().Table(u.tableName).First(&user, struct {
-		UserId int
-	}{UserId: userId}).Error
+	whereUserId := strconv.Itoa(userId)
+	err := internal.DbConn().Table(u.tableName).Where("user_id = ?", whereUserId).First(&user).Error
 	if err != nil && err.Error() == "record not found" {
 		err = nil
 	}
@@ -68,7 +67,7 @@ func (u userDao) transformation(user inter.User) (user2 storageUser) {
 }
 
 type storageUser struct {
-	UserId         int       `json:"user_id" gorm:"user_id"`
+	UserId         int       `json:"user_id" gorm:"column:user_id;primary_key"`
 	UserName       string    `json:"user_name" gorm:"user_name"`
 	UserPhone      string    `json:"user_phone" gorm:"user_phone"`
 	UserPwd        string    `json:"user_pwd" gorm:"user_pwd"`
