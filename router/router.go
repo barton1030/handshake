@@ -16,9 +16,9 @@ func Router() *gin.Engine {
 func role(r *gin.Engine) {
 	roleGroup := r.Group("/role")
 	roleGroup.POST("/add", app.RoleController.Add)
-	roleGroup.GET("/id", app.RoleController.RoleById)
-	roleGroup.GET("/name/edit", app.RoleController.EditName)
-	roleGroup.GET("/permission/edit", app.RoleController.SetPermission)
+	roleGroup.GET("/byId", app.RoleController.RoleById)
+	roleGroup.POST("/set/name", app.RoleController.EditName)
+	roleGroup.POST("/set/permission/", app.RoleController.SetPermission)
 	roleGroup.GET("/list", app.RoleController.List)
 	roleGroup.GET("/delete", app.RoleController.Delete)
 }
