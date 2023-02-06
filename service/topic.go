@@ -12,7 +12,7 @@ type topic struct {
 var TopicService topic
 
 func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt int) (err error) {
-	user3, err := user2.List.UserId(operator)
+	user3, err := user2.List.UserById(operator)
 	if err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, max
 }
 
 func (t topic) Start(operator, topicId int) (err error) {
-	user3, err := user2.List.UserId(operator)
+	user3, err := user2.List.UserById(operator)
 	if err != nil {
 		return
 	}
@@ -64,7 +64,7 @@ func (t topic) Start(operator, topicId int) (err error) {
 }
 
 func (t topic) Stop(operator, topicId int) (err error) {
-	user3, err := user2.List.UserId(operator)
+	user3, err := user2.List.UserById(operator)
 	if err != nil {
 		return
 	}
@@ -94,7 +94,7 @@ func (t topic) Stop(operator, topicId int) (err error) {
 }
 
 func (t topic) Delete(operator, topicId int) (err error) {
-	user3, err := user2.List.UserId(operator)
+	user3, err := user2.List.UserById(operator)
 	if err != nil {
 		return
 	}
@@ -129,7 +129,7 @@ func (t topic) Delete(operator, topicId int) (err error) {
 }
 
 func (t topic) SetCallback(operator, topicId int, url, method string, headers, cookies map[string]interface{}) (err error) {
-	user3, err := user2.List.UserId(operator)
+	user3, err := user2.List.UserById(operator)
 	if err != nil {
 		return
 	}
@@ -156,7 +156,7 @@ func (t topic) SetCallback(operator, topicId int, url, method string, headers, c
 }
 
 func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []interface{}) (err error) {
-	user3, err := user2.List.UserId(operator)
+	user3, err := user2.List.UserById(operator)
 	if err != nil {
 		return
 	}
@@ -183,7 +183,7 @@ func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []
 }
 
 func (t topic) Edit(operator, topicId, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt int) (err error) {
-	user3, err := user2.List.UserId(operator)
+	user3, err := user2.List.UserById(operator)
 	if err != nil {
 		return
 	}
@@ -212,7 +212,7 @@ func (t topic) Edit(operator, topicId, maxRetryCount, minConcurrency, maxConcurr
 }
 
 func (t topic) TopicById(operator, topicId int) (topic4 map[string]interface{}, err error) {
-	user3, err := user2.List.UserId(operator)
+	user3, err := user2.List.UserById(operator)
 	if err != nil {
 		return
 	}

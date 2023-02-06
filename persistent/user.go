@@ -58,6 +58,15 @@ func (u userDao) UserById(userId int) (inter.User, error) {
 	return user, err
 }
 
+func (u userDao) UserByPhone(phone string) (inter.User, error) {
+	user := storageUser{}
+	err := internal.DbConn().Table(u.tableName).Where("phone = ?", phone).First(&user).Error
+	if err != nil && err.Error() == "record not found" {
+		err = nil
+	}
+	return user, err
+}
+
 func (u userDao) UserList(offset, limit int) ([]inter.User, error) {
 	var users []storageUser
 	err := internal.DbConn().Table(u.tableName).Offset(offset).Limit(limit).Find(&users).Error

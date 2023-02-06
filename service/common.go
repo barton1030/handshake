@@ -7,7 +7,7 @@ import (
 )
 
 func permissionVerification(operator int, uri string) (err error) {
-	user3, err := user2.List.UserId(operator)
+	user3, err := user2.List.UserById(operator)
 	if err != nil {
 		return
 	}
