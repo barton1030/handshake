@@ -10,7 +10,11 @@ type role struct {
 
 var RoleService role
 
-func (r role) Add(name string, creator int) (err error) {
+func (r role) Add(uri, name string, userId int) (err error) {
+	err = permissionVerification(userId, uri)
+	if err != nil {
+		return
+	}
 	domainRole, err := role2.List.RoleByName(name)
 	if domainRole.Id() > 0 {
 		err = errors.New("不要重复添加")
@@ -18,18 +22,20 @@ func (r role) Add(name string, creator int) (err error) {
 	if err != nil {
 		return err
 	}
-
-	domainRole = role2.NewRole(name, creator)
+	domainRole = role2.NewRole(name, userId)
 	err = role2.List.Add(domainRole)
 	return err
 }
 
-func (r role) RoleById(roleId int) (role3 map[string]interface{}, err error) {
+func (r role) RoleById(userId, roleId int, uri string) (role3 map[string]interface{}, err error) {
+	err = permissionVerification(userId, uri)
+	if err != nil {
+		return
+	}
 	domainRole, err := role2.List.RoleById(roleId)
 	if err != nil {
 		return
 	}
-
 	role3 = make(map[string]interface{})
 	role3["id"] = domainRole.Id()
 	role3["name"] = domainRole.Name()
@@ -39,7 +45,11 @@ func (r role) RoleById(roleId int) (role3 map[string]interface{}, err error) {
 	return
 }
 
-func (r role) EditName(roleId int, roleName string) (err error) {
+func (r role) EditName(userId, roleId int, roleName, uri string) (err error) {
+	err = permissionVerification(userId, uri)
+	if err != nil {
+		return
+	}
 	domainRole, err := role2.List.RoleById(roleId)
 	if err != nil {
 		return
@@ -49,7 +59,11 @@ func (r role) EditName(roleId int, roleName string) (err error) {
 	return
 }
 
-func (r role) SetPermission(roleId int, permissionKey string, permissionValue bool) (err error) {
+func (r role) SetPermission(userId, roleId int, permissionKey string, permissionValue bool, uri string) (err error) {
+	err = permissionVerification(userId, uri)
+	if err != nil {
+		return
+	}
 	domainRole, err := role2.List.RoleById(roleId)
 	if err != nil {
 		return
@@ -59,7 +73,11 @@ func (r role) SetPermission(roleId int, permissionKey string, permissionValue bo
 	return
 }
 
-func (r role) List(offset, limit int) (roles []map[string]interface{}, err error) {
+func (r role) List(userId, offset, limit int, uri string) (roles []map[string]interface{}, err error) {
+	err = permissionVerification(userId, uri)
+	if err != nil {
+		return
+	}
 	domainRoles, err := role2.List.List(offset, limit)
 	if err != nil {
 		return
@@ -79,7 +97,11 @@ func (r role) List(offset, limit int) (roles []map[string]interface{}, err error
 	return
 }
 
-func (r role) Delete(roleId int) (err error) {
+func (r role) Delete(userId, roleId int, uri string) (err error) {
+	err = permissionVerification(userId, uri)
+	if err != nil {
+		return
+	}
 	role3, err := role2.List.RoleById(roleId)
 	if err != nil {
 		return

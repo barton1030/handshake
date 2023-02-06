@@ -18,7 +18,7 @@ func role(r *gin.Engine) {
 	roleGroup.POST("/add", app.RoleController.Add)
 	roleGroup.GET("/byId", app.RoleController.RoleById)
 	roleGroup.POST("/set/name", app.RoleController.EditName)
-	roleGroup.POST("/set/permission/", app.RoleController.SetPermission)
+	roleGroup.POST("/set/permission", app.RoleController.SetPermission)
 	roleGroup.GET("/list", app.RoleController.List)
 	roleGroup.GET("/delete", app.RoleController.Delete)
 }

@@ -13,31 +13,36 @@ type roleController struct {
 var RoleController roleController
 
 type AddRequest struct {
-	Name    string `json:"name" form:"name" binding:"required"`
-	Creator int    `json:"creator" form:"creator" binding:"required"`
+	Name   string `json:"name" form:"name" binding:"required"`
+	UserId int    `json:"UserId" form:"UserId" binding:"required"`
 }
 
 type RoleByIdRequest struct {
+	UserId int `json:"UserId" form:"UserId" binding:"required"`
 	RoleId int `json:"roleId" form:"roleId" binding:"required"`
 }
 
 type EditNameRequest struct {
+	UserId int    `json:"UserId" form:"UserId" binding:"required"`
 	RoleId int    `json:"roleId" form:"roleId" binding:"required"`
 	Name   string `json:"name" form:"name" binding:"required"`
 }
 
 type SetPermissionRequest struct {
+	UserId          int    `json:"UserId" form:"UserId" binding:"required"`
 	RoleId          int    `json:"roleId" form:"roleId" binding:"required"`
 	PermissionKey   string `json:"permissionKey" form:"permissionKey" binding:"required"`
-	PermissionValue bool   `json:"permissionValue" form:"permissionValue" binding:"required"`
+	PermissionValue bool   `json:"permissionValue" form:"permissionValue"`
 }
 
 type ListRequest struct {
+	UserId int `json:"UserId" form:"UserId" binding:"required"`
 	Offset int `json:"offset" form:"offset"`
 	Limit  int `json:"limit" form:"limit" binding:"required"`
 }
 
 type DeleteRequest struct {
+	UserId int `json:"UserId" form:"UserId" binding:"required"`
 	RoleId int `json:"roleId" form:"roleId" binding:"required"`
 }
 
@@ -49,8 +54,8 @@ func (r roleController) Add(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-
-	err := service.RoleService.Add(request.Name, request.Creator)
+	uri := helper.ExtractRequestUri(c)
+	err := service.RoleService.Add(uri, request.Name, request.UserId)
 	if err != nil {
 		err = fmt.Errorf("app role Add: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -68,8 +73,8 @@ func (r roleController) RoleById(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-
-	role, err := service.RoleService.RoleById(request.RoleId)
+	uri := helper.ExtractRequestUri(c)
+	role, err := service.RoleService.RoleById(request.UserId, request.RoleId, uri)
 	if err != nil {
 		err = fmt.Errorf("app role RoleById: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -87,8 +92,8 @@ func (r roleController) EditName(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-
-	err := service.RoleService.EditName(request.RoleId, request.Name)
+	uri := helper.ExtractRequestUri(c)
+	err := service.RoleService.EditName(request.UserId, request.RoleId, request.Name, uri)
 	if err != nil {
 		err = fmt.Errorf("app role EditName: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -106,8 +111,8 @@ func (r roleController) SetPermission(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-
-	err := service.RoleService.SetPermission(request.RoleId, request.PermissionKey, request.PermissionValue)
+	uri := helper.ExtractRequestUri(c)
+	err := service.RoleService.SetPermission(request.UserId, request.RoleId, request.PermissionKey, request.PermissionValue, uri)
 	if err != nil {
 		err = fmt.Errorf("app role SetPermission: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -125,8 +130,8 @@ func (r roleController) List(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-
-	roles, err := service.RoleService.List(request.Offset, request.Limit)
+	uri := helper.ExtractRequestUri(c)
+	roles, err := service.RoleService.List(request.UserId, request.Offset, request.Limit, uri)
 	if err != nil {
 		err = fmt.Errorf("app role List: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -144,8 +149,8 @@ func (r roleController) Delete(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-
-	err := service.RoleService.Delete(request.RoleId)
+	uri := helper.ExtractRequestUri(c)
+	err := service.RoleService.Delete(request.UserId, request.RoleId, uri)
 	if err != nil {
 		err = fmt.Errorf("app role Delete: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
