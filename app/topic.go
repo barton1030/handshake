@@ -13,6 +13,7 @@ type topic struct {
 var TopicController topic
 
 type addTopicRequest struct {
+	Operator       int    `json:"operator" form:"operator" binding:"required"`
 	Name           string `json:"name" form:"name" binding:"required"`
 	MaxRetryCount  int    `json:"maxRetryCount" form:"maxRetryCount" binding:"required"`
 	MinConcurrency int    `json:"minConcurrency" form:"minConcurrency" binding:"required"`
@@ -22,26 +23,31 @@ type addTopicRequest struct {
 }
 
 type startTopicRequest struct {
-	TopicId int `json:"topicId" form:"topicId" binding:"required"`
+	Operator int `json:"operator" form:"operator" binding:"required"`
+	TopicId  int `json:"topicId" form:"topicId" binding:"required"`
 }
 
 type stopTopicRequest struct {
-	TopicId int `json:"topicId" form:"topicId" binding:"required"`
+	Operator int `json:"operator" form:"operator" binding:"required"`
+	TopicId  int `json:"topicId" form:"topicId" binding:"required"`
 }
 
 type deleteTopicRequest struct {
-	TopicId int `json:"topicId" form:"topicId" binding:"required"`
+	Operator int `json:"operator" form:"operator" binding:"required"`
+	TopicId  int `json:"topicId" form:"topicId" binding:"required"`
 }
 
 type setTopicCallbackRequest struct {
-	TopicId int                    `json:"topicId" form:"topicId" binding:"required"`
-	Url     string                 `json:"url" form:"url" binding:"required"`
-	Method  string                 `json:"method" form:"method" binding:"required"`
-	Headers map[string]interface{} `json:"headers" form:"headers" binding:"required"`
-	Cookies map[string]interface{} `json:"cookies" form:"cookies" binding:"required"`
+	Operator int                    `json:"operator" form:"operator" binding:"required"`
+	TopicId  int                    `json:"topicId" form:"topicId" binding:"required"`
+	Url      string                 `json:"url" form:"url" binding:"required"`
+	Method   string                 `json:"method" form:"method" binding:"required"`
+	Headers  map[string]interface{} `json:"headers" form:"headers" binding:"required"`
+	Cookies  map[string]interface{} `json:"cookies" form:"cookies" binding:"required"`
 }
 
 type setTopicAlarmRequest struct {
+	Operator   int           `json:"operator" form:"operator" binding:"required"`
 	TopicId    int           `json:"topicId" form:"topicId" binding:"required"`
 	Url        string        `json:"url" form:"url" binding:"required"`
 	Method     string        `json:"method" form:"method" binding:"required"`
@@ -49,6 +55,7 @@ type setTopicAlarmRequest struct {
 }
 
 type editTopicRequest struct {
+	Operator       int `json:"operator" form:"operator" binding:"required"`
 	TopicId        int `json:"topicId" form:"topicId" binding:"required"`
 	MaxRetryCount  int `json:"maxRetryCount" form:"maxRetryCount" binding:"required"`
 	MinConcurrency int `json:"minConcurrency" form:"minConcurrency" binding:"required"`
@@ -57,7 +64,8 @@ type editTopicRequest struct {
 }
 
 type topicByIdRequest struct {
-	TopicId int `json:"topicId" form:"topicId" binding:"required"`
+	Operator int `json:"operator" form:"operator" binding:"required"`
+	TopicId  int `json:"topicId" form:"topicId" binding:"required"`
 }
 
 func (t topic) Add(c *gin.Context) {
