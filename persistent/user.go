@@ -8,6 +8,7 @@ import (
 )
 
 type userDao struct {
+	base
 	tableName string
 }
 

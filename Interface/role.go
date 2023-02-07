@@ -3,6 +3,7 @@ package Interface
 import "time"
 
 type RoleListStorage interface {
+	Transaction
 	MaxPrimaryKeyId() (maxPrimaryKeyId int)
 	Add(role2 Role) (err error)
 	Edit(role2 Role) (err error)

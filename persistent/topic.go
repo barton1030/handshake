@@ -3,11 +3,11 @@ package persistent
 import (
 	"encoding/json"
 	inter "handshake/Interface"
-	"handshake/persistent/internal"
 	"strconv"
 )
 
 type topicDao struct {
+	base
 	tableName string
 }
 
@@ -17,7 +17,7 @@ var TopicDao = topicDao{
 
 func (t topicDao) MaxPrimaryKeyId() (maxPrimaryKeyId int) {
 	topic2 := storageTopic{}
-	err := internal.DbConn().Table(t.tableName).Last(&topic2).Error
+	err := t.DbConn().Table(t.tableName).Last(&topic2).Error
 	if err != nil {
 		return
 	}
@@ -30,20 +30,20 @@ func (t topicDao) MaxPrimaryKeyId() (maxPrimaryKeyId int) {
 
 func (t topicDao) Add(topic inter.Topic) error {
 	topic2 := t.transformation(topic)
-	err := internal.DbConn().Table(t.tableName).Create(&topic2).Error
+	err := t.DbConn().Table(t.tableName).Create(&topic2).Error
 	return err
 }
 
 func (t topicDao) Edit(topic inter.Topic) error {
 	topic2 := t.transformation(topic)
-	err := internal.DbConn().Table(t.tableName).Model(&storageTopic{SId: topic2.SId}).Updates(topic2).Limit(1).Error
+	err := t.DbConn().Table(t.tableName).Model(&storageTopic{SId: topic2.SId}).Updates(topic2).Limit(1).Error
 	return err
 }
 
 func (t topicDao) TopicById(topicId int) (inter.Topic, error) {
 	topic := storageTopic{}
 	whereTopicId := strconv.Itoa(topicId)
-	err := internal.DbConn().Table(t.tableName).Where("id = ?", whereTopicId).First(&topic).Error
+	err := t.DbConn().Table(t.tableName).Where("id = ?", whereTopicId).First(&topic).Error
 	if err != nil && err.Error() == "record not found" {
 		err = nil
 	}
@@ -52,7 +52,7 @@ func (t topicDao) TopicById(topicId int) (inter.Topic, error) {
 
 func (t topicDao) TopicByName(topicName string) (inter.Topic, error) {
 	topic := storageTopic{}
-	err := internal.DbConn().Table(t.tableName).Where("name = ?", topicName).First(&topic).Error
+	err := t.DbConn().Table(t.tableName).Where("name = ?", topicName).First(&topic).Error
 	if err != nil && err.Error() == "record not found" {
 		err = nil
 	}

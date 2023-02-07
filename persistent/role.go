@@ -3,12 +3,12 @@ package persistent
 import (
 	"encoding/json"
 	inter "handshake/Interface"
-	"handshake/persistent/internal"
 	"strconv"
 	"time"
 )
 
 type roleDao struct {
+	base
 	tableName string
 }
 
@@ -18,7 +18,7 @@ var RoleDao = roleDao{
 
 func (r roleDao) MaxPrimaryKeyId() (maxPrimaryKeyId int) {
 	role3 := storageRole{}
-	err := internal.DbConn().Table(r.tableName).Last(&role3).Error
+	err := r.DbConn().Table(r.tableName).Last(&role3).Error
 	if err != nil {
 		return
 	}
@@ -31,21 +31,21 @@ func (r roleDao) MaxPrimaryKeyId() (maxPrimaryKeyId int) {
 
 func (r roleDao) Add(role2 inter.Role) (err error) {
 	role3 := r.transformation(role2)
-	err = internal.DbConn().Table(r.tableName).Create(role3).Error
+	err = r.DbConn().Table(r.tableName).Create(role3).Error
 	return err
 }
 
 func (r roleDao) Edit(role2 inter.Role) (err error) {
 	role3 := r.transformation(role2)
 	whereRoleId := strconv.Itoa(role2.Id())
-	err = internal.DbConn().Table(r.tableName).Where("id = ?", whereRoleId).Updates(role3).Error
+	err = r.DbConn().Table(r.tableName).Where("id = ?", whereRoleId).Updates(role3).Error
 	return err
 }
 
 func (r roleDao) RoleById(roleId int) (inter.Role, error) {
 	role := storageRole{}
 	whereRoleId := strconv.Itoa(roleId)
-	err := internal.DbConn().Table(r.tableName).Where("id = ?", whereRoleId).First(&role).Error
+	err := r.DbConn().Table(r.tableName).Where("id = ?", whereRoleId).First(&role).Error
 	if err != nil && err.Error() == "record not found" {
 		err = nil
 	}
@@ -54,7 +54,7 @@ func (r roleDao) RoleById(roleId int) (inter.Role, error) {
 
 func (r roleDao) RoleByName(roleName string) (inter.Role, error) {
 	role := storageRole{}
-	err := internal.DbConn().Table(r.tableName).Where("name = ?", roleName).First(&role).Error
+	err := r.DbConn().Table(r.tableName).Where("name = ?", roleName).First(&role).Error
 
 	if err != nil && err.Error() == "record not found" {
 		err = nil
@@ -64,7 +64,7 @@ func (r roleDao) RoleByName(roleName string) (inter.Role, error) {
 
 func (r roleDao) List(offset, limit int) ([]inter.Role, error) {
 	var roles []storageRole
-	err := internal.DbConn().Table(r.tableName).Offset(offset).Limit(limit).Find(&roles).Error
+	err := r.DbConn().Table(r.tableName).Offset(offset).Limit(limit).Find(&roles).Error
 	rolesLen := len(roles)
 	interRoleStorage := make([]inter.Role, rolesLen, rolesLen)
 	for key, value := range roles {
