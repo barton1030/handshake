@@ -23,7 +23,7 @@ func CloseRedis() {
 	redisConn.Close()
 }
 
-func RedisConn() *redis.Conn {
+func RedisConn() redis.Conn {
 	conn := redisConn.Get()
-	return &conn
+	return conn
 }

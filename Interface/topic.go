@@ -43,6 +43,7 @@ type StorageQueueList interface {
 	MaxPrimaryKeyId(topicName string) (maxPrimaryKeyId int)
 	Add(topicName string, message Message) error
 	Edit(topicName string, message Message) error
+	NextPendingData(topicName string) (message Message, err error)
 }
 
 type MessageQueuing interface {

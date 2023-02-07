@@ -34,7 +34,31 @@ func (q queueDao) Add(topicName string, message inter.Message) (err error) {
 	tableName := q.tableName + topicName
 	message2 := q.transformation(message)
 	err = internal.DbConn().Table(tableName).Create(&message2).Error
+	if err != nil {
+		return err
+	}
+	messageJson, err := json.Marshal(message2)
+	if err != nil {
+		return err
+	}
+	_, err = internal.RedisConn().Do("LPUSH", tableName, string(messageJson))
 	return err
+}
+
+func (q queueDao) NextPendingData(topicName string) (message inter.Message, err error) {
+	tableName := q.tableName + topicName
+	resp, err := internal.RedisConn().Do("BRPOP", tableName, 1)
+	if err != nil {
+		return
+	}
+	message2 := storageMessage{}
+	if res, ok := resp.([]interface{}); ok {
+		if value, ok := res[1].([]byte); ok {
+			json.Unmarshal(value, &message2)
+		}
+	}
+	message = message2
+	return
 }
 
 func (q queueDao) Edit(topicName string, message inter.Message) error {
@@ -76,7 +100,7 @@ func (m storageMessage) RetryCount() int {
 }
 
 func (m storageMessage) IncrRetryCont() {
-
+	m.SRetry++
 }
 
 func (m storageMessage) Data() map[string]interface{} {

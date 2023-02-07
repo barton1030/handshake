@@ -28,10 +28,9 @@ func (m *messageQueuing) init() {
 }
 
 func (m *messageQueuing) Pop() (message inter.Message, err error) {
-	data := make(map[string]interface{})
-	data["name"] = "barton"
-	messageData := NewMessage(data)
-	message = &messageData
+	message2, err := m.storage.NextPendingData(m.topicName)
+	message3 := m.reconstruction(message2)
+	message = &message3
 	return
 }
 
@@ -51,5 +50,14 @@ func (m *messageQueuing) Finish(message inter.Message) (err error) {
 }
 
 func (m *messageQueuing) Count() (count int) {
+	return
+}
+
+func (m *messageQueuing) reconstruction(message3 inter.Message) (message2 message) {
+	message2.id = message3.Id()
+	message2.status = message3.Status()
+	message2.data = message3.Data()
+	message2.retry = message3.RetryCount()
+	message2.createTime = message3.CreateTime()
 	return
 }
