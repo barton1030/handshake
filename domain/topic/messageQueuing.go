@@ -46,10 +46,12 @@ func (m *messageQueuing) Push(message inter.Message) (err error) {
 }
 
 func (m *messageQueuing) Finish(message inter.Message) (err error) {
+	err = m.storage.Edit(m.topicName, message)
 	return
 }
 
 func (m *messageQueuing) Count() (count int) {
+	count, _ = m.storage.PendingDataCount(m.topicName)
 	return
 }
 

@@ -44,6 +44,7 @@ type StorageQueueList interface {
 	Add(topicName string, message Message) error
 	Edit(topicName string, message Message) error
 	NextPendingData(topicName string) (message Message, err error)
+	PendingDataCount(topicName string) (count int, err error)
 }
 
 type MessageQueuing interface {

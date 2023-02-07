@@ -61,6 +61,18 @@ func (q queueDao) NextPendingData(topicName string) (message inter.Message, err 
 	return
 }
 
+func (q queueDao) PendingDataCount(topicName string) (count int, err error) {
+	tableName := q.tableName + topicName
+	pendingDataCount, err := internal.RedisConn().Do("LLEN", tableName)
+	if err != nil {
+		return
+	}
+	if dataCount, ok := pendingDataCount.(int64); ok {
+		count = int(dataCount)
+	}
+	return
+}
+
 func (q queueDao) Edit(topicName string, message inter.Message) error {
 	tableName := q.tableName + topicName
 	message2 := q.transformation(message)
@@ -100,7 +112,7 @@ func (m storageMessage) RetryCount() int {
 }
 
 func (m storageMessage) IncrRetryCont() {
-	m.SRetry++
+
 }
 
 func (m storageMessage) Data() map[string]interface{} {
