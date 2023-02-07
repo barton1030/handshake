@@ -45,7 +45,7 @@ func (q queueDao) Add(topicName string, message inter.Message) (err error) {
 	return err
 }
 
-func (q queueDao) NextPendingData(topicName string) (message inter.Message, err error) {
+func (q queueDao) NextPendingData(topicName string, offset int) (message inter.Message, err error) {
 	tableName := q.tableName + topicName
 	resp, err := internal.RedisConn().Do("BRPOP", tableName, 1)
 	if err != nil {
@@ -56,6 +56,15 @@ func (q queueDao) NextPendingData(topicName string) (message inter.Message, err 
 		if value, ok := res[1].([]byte); ok {
 			json.Unmarshal(value, &message2)
 		}
+	}
+	if message2.Id() > 0 {
+		message = message2
+		return
+	}
+	whereId := strconv.Itoa(offset)
+	err = internal.DbConn().Table(tableName).Where("id = ?", whereId).First(&message2).Error
+	if err != nil {
+		return
 	}
 	message = message2
 	return

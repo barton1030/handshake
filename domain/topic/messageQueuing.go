@@ -1,6 +1,7 @@
 package topic
 
 import (
+	"fmt"
 	inter "handshake/Interface"
 	"handshake/persistent"
 )
@@ -8,6 +9,7 @@ import (
 type messageQueuing struct {
 	topicName string
 	nextId    int
+	offset    int
 	storage   inter.StorageQueueList
 }
 
@@ -28,9 +30,11 @@ func (m *messageQueuing) init() {
 }
 
 func (m *messageQueuing) Pop() (message inter.Message, err error) {
-	message2, err := m.storage.NextPendingData(m.topicName)
+	message2, err := m.storage.NextPendingData(m.topicName, m.offset)
 	message3 := m.reconstruction(message2)
 	message = &message3
+	m.offset = message3.id + 1
+	fmt.Println(m.offset)
 	return
 }
 
