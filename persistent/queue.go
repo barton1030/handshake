@@ -34,6 +34,7 @@ func (q queueDao) MaxPrimaryKeyId(topicName string) (maxPrimaryKeyId int) {
 func (q queueDao) Add(topicName string, message inter.Message) (err error) {
 	tableName := q.tableName + topicName
 	message2 := q.transformation(message)
+	// create方法返回了持久后自增主键
 	err = transactionController.dbConn(q.transactionId).Table(tableName).Create(&message2).Error
 	if err != nil {
 		return err
