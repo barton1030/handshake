@@ -5,30 +5,37 @@ import (
 	"handshake/persistent"
 )
 
-type list struct {
+type List struct {
 	nextId  int
 	storage inter.StorageTopicList
 }
 
-var List = list{nextId: 1, storage: persistent.TopicDao}
+var ListExample = List{nextId: 1, storage: persistent.TopicDao}
 
-func (l *list) Init() {
+func (l *List) Init() {
 	maxPrimaryKeyId := l.storage.MaxPrimaryKeyId()
 	l.nextId = maxPrimaryKeyId + 1
 }
 
-func (l *list) Add(topic2 topic) (err error) {
+func (l *List) SetStorage(storageInter inter.StorageTopicList) *List {
+	return &List{
+		nextId:  l.nextId,
+		storage: storageInter,
+	}
+}
+
+func (l *List) Add(topic2 topic) (err error) {
 	topic2.id = l.nextId
 	err = l.storage.Add(&topic2)
 	return
 }
 
-func (l *list) Edit(topic2 topic) (err error) {
+func (l *List) Edit(topic2 topic) (err error) {
 	err = l.storage.Edit(&topic2)
 	return
 }
 
-func (l *list) TopicId(topicId int) (topic2 topic, err error) {
+func (l *List) TopicId(topicId int) (topic2 topic, err error) {
 	storageTopic, err := l.storage.TopicById(topicId)
 	if err != nil {
 		return
@@ -37,7 +44,7 @@ func (l *list) TopicId(topicId int) (topic2 topic, err error) {
 	return
 }
 
-func (l *list) TopicName(topicName string) (topic3 topic, err error) {
+func (l *List) TopicName(topicName string) (topic3 topic, err error) {
 	topic2, err := l.storage.TopicByName(topicName)
 	if err != nil {
 		return
@@ -46,7 +53,7 @@ func (l *list) TopicName(topicName string) (topic3 topic, err error) {
 	return
 }
 
-func (l *list) reconstruction(topic2 inter.Topic) (topic3 topic) {
+func (l *List) reconstruction(topic2 inter.Topic) (topic3 topic) {
 	topic3.id = topic2.Id()
 	topic3.name = topic2.Name()
 	topic3.status = topic2.Status()

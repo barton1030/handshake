@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"handshake/domain"
 	role2 "handshake/domain/role"
 )
 
@@ -15,7 +16,7 @@ func (r role) Add(operator int, name, uri string) (err error) {
 	if err != nil {
 		return
 	}
-	domainRole, err := role2.List.RoleByName(name)
+	domainRole, err := domain.Manager.RoleList().RoleByName(name)
 	if domainRole.Id() > 0 {
 		err = errors.New("不要重复添加")
 	}
@@ -23,7 +24,7 @@ func (r role) Add(operator int, name, uri string) (err error) {
 		return err
 	}
 	domainRole = role2.NewRole(name, operator)
-	err = role2.List.Add(domainRole)
+	err = domain.Manager.RoleList().Add(domainRole)
 	return err
 }
 
@@ -32,7 +33,7 @@ func (r role) RoleById(operator, roleId int, uri string) (role3 map[string]inter
 	if err != nil {
 		return
 	}
-	domainRole, err := role2.List.RoleById(roleId)
+	domainRole, err := domain.Manager.RoleList().RoleById(roleId)
 	if err != nil {
 		return
 	}
@@ -50,12 +51,12 @@ func (r role) EditName(operator, roleId int, roleName, uri string) (err error) {
 	if err != nil {
 		return
 	}
-	domainRole, err := role2.List.RoleById(roleId)
+	domainRole, err := domain.Manager.RoleList().RoleById(roleId)
 	if err != nil {
 		return
 	}
 	domainRole.SetName(roleName)
-	err = role2.List.Edit(domainRole)
+	err = domain.Manager.RoleList().Edit(domainRole)
 	return
 }
 
@@ -64,12 +65,12 @@ func (r role) SetPermission(operator, roleId int, permissionKey string, permissi
 	if err != nil {
 		return
 	}
-	domainRole, err := role2.List.RoleById(roleId)
+	domainRole, err := domain.Manager.RoleList().RoleById(roleId)
 	if err != nil {
 		return
 	}
 	domainRole.SetPermission(permissionKey, permissionValue)
-	err = role2.List.Edit(domainRole)
+	err = domain.Manager.RoleList().Edit(domainRole)
 	return
 }
 
@@ -78,7 +79,7 @@ func (r role) List(operator, offset, limit int, uri string) (roles []map[string]
 	if err != nil {
 		return
 	}
-	domainRoles, err := role2.List.List(offset, limit)
+	domainRoles, err := domain.Manager.RoleList().List(offset, limit)
 	if err != nil {
 		return
 	}
@@ -102,7 +103,7 @@ func (r role) Delete(operator, roleId int, uri string) (err error) {
 	if err != nil {
 		return
 	}
-	role3, err := role2.List.RoleById(roleId)
+	role3, err := domain.Manager.RoleList().RoleById(roleId)
 	if err != nil {
 		return
 	}
@@ -111,6 +112,6 @@ func (r role) Delete(operator, roleId int, uri string) (err error) {
 		return
 	}
 	role3.Delete()
-	err = role2.List.Edit(role3)
+	err = domain.Manager.RoleList().Edit(role3)
 	return
 }

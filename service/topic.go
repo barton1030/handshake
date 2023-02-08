@@ -2,8 +2,8 @@ package service
 
 import (
 	"errors"
+	"handshake/domain"
 	topic2 "handshake/domain/topic"
-	user2 "handshake/domain/user"
 )
 
 type topic struct {
@@ -12,7 +12,7 @@ type topic struct {
 var TopicService topic
 
 func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt int) (err error) {
-	user3, err := user2.List.UserById(operator)
+	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
 	}
@@ -20,7 +20,7 @@ func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, max
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := topic2.List.TopicName(name)
+	topic3, err := domain.Manager.TopicList().TopicName(name)
 	if err != nil {
 		return
 	}
@@ -29,12 +29,12 @@ func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, max
 		return
 	}
 	topic4 := topic2.NewTopic(name, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, operator)
-	err = topic2.List.Add(topic4)
+	err = domain.Manager.TopicList().Add(topic4)
 	return
 }
 
 func (t topic) Start(operator, topicId int) (err error) {
-	user3, err := user2.List.UserById(operator)
+	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
 	}
@@ -42,7 +42,7 @@ func (t topic) Start(operator, topicId int) (err error) {
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := topic2.List.TopicId(topicId)
+	topic3, err := domain.Manager.TopicList().TopicId(topicId)
 	if err != nil {
 		return
 	}
@@ -59,12 +59,12 @@ func (t topic) Start(operator, topicId int) (err error) {
 		err = errors.New("主题启动失败")
 		return
 	}
-	err = topic2.List.Edit(topic3)
+	err = domain.Manager.TopicList().Edit(topic3)
 	return
 }
 
 func (t topic) Stop(operator, topicId int) (err error) {
-	user3, err := user2.List.UserById(operator)
+	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
 	}
@@ -72,7 +72,7 @@ func (t topic) Stop(operator, topicId int) (err error) {
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := topic2.List.TopicId(topicId)
+	topic3, err := domain.Manager.TopicList().TopicId(topicId)
 	if err != nil {
 		return err
 	}
@@ -89,12 +89,12 @@ func (t topic) Stop(operator, topicId int) (err error) {
 		err = errors.New("终止失败")
 		return err
 	}
-	err = topic2.List.Edit(topic3)
+	err = domain.Manager.TopicList().Edit(topic3)
 	return err
 }
 
 func (t topic) Delete(operator, topicId int) (err error) {
-	user3, err := user2.List.UserById(operator)
+	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
 	}
@@ -102,7 +102,7 @@ func (t topic) Delete(operator, topicId int) (err error) {
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := topic2.List.TopicId(topicId)
+	topic3, err := domain.Manager.TopicList().TopicId(topicId)
 	if err != nil {
 		return err
 	}
@@ -124,12 +124,12 @@ func (t topic) Delete(operator, topicId int) (err error) {
 		err = errors.New("废弃失败")
 		return err
 	}
-	err = topic2.List.Edit(topic3)
+	err = domain.Manager.TopicList().Edit(topic3)
 	return err
 }
 
 func (t topic) SetCallback(operator, topicId int, url, method string, headers, cookies map[string]interface{}) (err error) {
-	user3, err := user2.List.UserById(operator)
+	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
 	}
@@ -137,7 +137,7 @@ func (t topic) SetCallback(operator, topicId int, url, method string, headers, c
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := topic2.List.TopicId(topicId)
+	topic3, err := domain.Manager.TopicList().TopicId(topicId)
 	if err != nil {
 		return
 	}
@@ -151,12 +151,12 @@ func (t topic) SetCallback(operator, topicId int, url, method string, headers, c
 	}
 	callback := topic2.NewCallBack(url, method, cookies, headers)
 	topic3.SetCallback(callback)
-	err = topic2.List.Edit(topic3)
+	err = domain.Manager.TopicList().Edit(topic3)
 	return
 }
 
 func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []interface{}) (err error) {
-	user3, err := user2.List.UserById(operator)
+	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
 	}
@@ -164,7 +164,7 @@ func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := topic2.List.TopicId(topicId)
+	topic3, err := domain.Manager.TopicList().TopicId(topicId)
 	if err != nil {
 		return
 	}
@@ -178,12 +178,12 @@ func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []
 	}
 	alarm := topic2.NewAlarm(url, method, recipients)
 	topic3.SetAlarm(alarm)
-	err = topic2.List.Edit(topic3)
+	err = domain.Manager.TopicList().Edit(topic3)
 	return
 }
 
 func (t topic) Edit(operator, topicId, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt int) (err error) {
-	user3, err := user2.List.UserById(operator)
+	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
 	}
@@ -191,7 +191,7 @@ func (t topic) Edit(operator, topicId, maxRetryCount, minConcurrency, maxConcurr
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := topic2.List.TopicId(topicId)
+	topic3, err := domain.Manager.TopicList().TopicId(topicId)
 	if err != nil {
 		return
 	}
@@ -207,12 +207,12 @@ func (t topic) Edit(operator, topicId, maxRetryCount, minConcurrency, maxConcurr
 	topic3.SetMaxRetryCount(maxRetryCount)
 	topic3.SetMinConcurrency(minConcurrency)
 	topic3.SetMaxConcurrency(maxConcurrency)
-	err = topic2.List.Edit(topic3)
+	err = domain.Manager.TopicList().Edit(topic3)
 	return
 }
 
 func (t topic) TopicById(operator, topicId int) (topic4 map[string]interface{}, err error) {
-	user3, err := user2.List.UserById(operator)
+	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
 	}
@@ -221,7 +221,7 @@ func (t topic) TopicById(operator, topicId int) (topic4 map[string]interface{}, 
 		return
 	}
 	topic4 = make(map[string]interface{})
-	topic3, err := topic2.List.TopicId(topicId)
+	topic3, err := domain.Manager.TopicList().TopicId(topicId)
 	if err != nil {
 		return topic4, err
 	}
@@ -258,7 +258,7 @@ func (t topic) TopicById(operator, topicId int) (topic4 map[string]interface{}, 
 }
 
 func (t topic) PushMessage(operator, topicId int, message map[string]interface{}) (err error) {
-	user3, err := user2.List.UserById(operator)
+	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
 	}
@@ -266,7 +266,7 @@ func (t topic) PushMessage(operator, topicId int, message map[string]interface{}
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := topic2.List.TopicId(topicId)
+	topic3, err := domain.Manager.TopicList().TopicId(topicId)
 	if err != nil {
 		return
 	}

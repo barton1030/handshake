@@ -5,19 +5,26 @@ import (
 	"handshake/persistent"
 )
 
-type list struct {
+type List struct {
 	nextId  int
 	storage inter.StorageUserList
 }
 
-var List = list{nextId: 1, storage: persistent.UserDao}
+var ListExample = List{nextId: 1, storage: persistent.UserDao}
 
-func (l *list) Init() {
+func (l *List) Init() {
 	maxPrimaryKeyId := l.storage.MaxPrimaryKeyId()
 	l.nextId = maxPrimaryKeyId + 1
 }
 
-func (l *list) Add(user2 user) (err error) {
+func (l *List) SetStorage(storageInter inter.StorageUserList) *List {
+	return &List{
+		nextId:  l.nextId,
+		storage: storageInter,
+	}
+}
+
+func (l *List) Add(user2 user) (err error) {
 	user2.id = l.nextId
 	err = l.storage.Add(&user2)
 	if err != nil {
@@ -27,17 +34,17 @@ func (l *list) Add(user2 user) (err error) {
 	return err
 }
 
-func (l *list) Edit(user2 user) (err error) {
+func (l *List) Edit(user2 user) (err error) {
 	err = l.storage.Edit(&user2)
 	return err
 }
 
-func (l *list) Delete(user2 user) (err error) {
+func (l *List) Delete(user2 user) (err error) {
 	err = l.storage.Delete(&user2)
 	return err
 }
 
-func (l *list) UserById(userId int) (user2 user, err error) {
+func (l *List) UserById(userId int) (user2 user, err error) {
 	storageUser, err := l.storage.UserById(userId)
 	if err != nil {
 		return
@@ -46,7 +53,7 @@ func (l *list) UserById(userId int) (user2 user, err error) {
 	return
 }
 
-func (l *list) UserByPhone(phone string) (user2 user, err error) {
+func (l *List) UserByPhone(phone string) (user2 user, err error) {
 	storageUser, err := l.storage.UserByPhone(phone)
 	if err != nil {
 		return
@@ -55,7 +62,7 @@ func (l *list) UserByPhone(phone string) (user2 user, err error) {
 	return
 }
 
-func (l *list) List(offset, limit int) (userList []user, err error) {
+func (l *List) List(offset, limit int) (userList []user, err error) {
 	storageUserList, err := l.storage.UserList(offset, limit)
 	if err != nil {
 		return
@@ -72,7 +79,7 @@ func (l *list) List(offset, limit int) (userList []user, err error) {
 	return
 }
 
-func (l *list) reconstruction(user inter.User) (user2 user) {
+func (l *List) reconstruction(user inter.User) (user2 user) {
 	user2.id = user.Id()
 	user2.name = user.Name()
 	user2.phone = user.Phone()

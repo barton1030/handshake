@@ -3,7 +3,6 @@ package Interface
 import "time"
 
 type StorageTopicList interface {
-	Transaction
 	MaxPrimaryKeyId() (maxPrimaryKeyId int)
 	Add(topic Topic) error
 	Edit(topic Topic) error

@@ -5,19 +5,26 @@ import (
 	"handshake/persistent"
 )
 
-type list struct {
+type List struct {
 	nextId  int
-	storage inter.RoleListStorage
+	storage inter.StorageRoleList
 }
 
-var List = list{nextId: 1, storage: persistent.RoleDao}
+var ListExample = List{nextId: 1, storage: persistent.RoleDao}
 
-func (l *list) Init() {
+func (l *List) Init() {
 	maxPrimaryKeyId := l.storage.MaxPrimaryKeyId()
 	l.nextId = maxPrimaryKeyId + 1
 }
 
-func (l *list) Add(role2 role) (err error) {
+func (l *List) SetStorage(storageInter inter.StorageRoleList) *List {
+	return &List{
+		nextId:  l.nextId,
+		storage: storageInter,
+	}
+}
+
+func (l *List) Add(role2 role) (err error) {
 	role2.id = l.nextId
 	err = l.storage.Add(&role2)
 	if err == nil {
@@ -26,12 +33,12 @@ func (l *list) Add(role2 role) (err error) {
 	return err
 }
 
-func (l *list) Edit(role2 role) (err error) {
+func (l *List) Edit(role2 role) (err error) {
 	err = l.storage.Edit(&role2)
 	return err
 }
 
-func (l *list) List(offset, limit int) (roleList []role, err error) {
+func (l *List) List(offset, limit int) (roleList []role, err error) {
 	storageRoles, err := l.storage.List(offset, limit)
 	if err != nil {
 		return
@@ -43,7 +50,7 @@ func (l *list) List(offset, limit int) (roleList []role, err error) {
 	return
 }
 
-func (l *list) RoleById(roleId int) (role2 role, err error) {
+func (l *List) RoleById(roleId int) (role2 role, err error) {
 	storageRole, err := l.storage.RoleById(roleId)
 	if err != nil {
 		return
@@ -52,7 +59,7 @@ func (l *list) RoleById(roleId int) (role2 role, err error) {
 	return
 }
 
-func (l *list) RoleByName(roleName string) (role2 role, err error) {
+func (l *List) RoleByName(roleName string) (role2 role, err error) {
 	storageRole, err := l.storage.RoleByName(roleName)
 	if err != nil {
 		return
@@ -61,7 +68,7 @@ func (l *list) RoleByName(roleName string) (role2 role, err error) {
 	return
 }
 
-func (l *list) reconstruction(originRole inter.Role) (role2 role) {
+func (l *List) reconstruction(originRole inter.Role) (role2 role) {
 	role2.id = originRole.Id()
 	role2.name = originRole.Name()
 	role2.creator = originRole.Creator()

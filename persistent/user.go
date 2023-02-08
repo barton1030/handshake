@@ -2,14 +2,13 @@ package persistent
 
 import (
 	inter "handshake/Interface"
-	"handshake/persistent/internal"
 	"strconv"
 	"time"
 )
 
 type userDao struct {
-	base
-	tableName string
+	transactionId int
+	tableName     string
 }
 
 var UserDao = userDao{
@@ -18,7 +17,7 @@ var UserDao = userDao{
 
 func (u userDao) MaxPrimaryKeyId() (maxPrimaryKeyId int) {
 	user := storageUser{}
-	err := internal.DbConn().Table(u.tableName).Last(&user).Error
+	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Last(&user).Error
 	if err != nil {
 		return
 	}
@@ -31,19 +30,19 @@ func (u userDao) MaxPrimaryKeyId() (maxPrimaryKeyId int) {
 
 func (u userDao) Add(user inter.User) error {
 	user2 := u.transformation(user)
-	err := internal.DbConn().Table(u.tableName).Create(&user2).Error
+	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Create(&user2).Error
 	return err
 }
 
 func (u userDao) Edit(user inter.User) error {
 	user2 := u.transformation(user)
 	whereUserId := strconv.Itoa(user2.Id())
-	err := internal.DbConn().Table(u.tableName).Where("id = ?", whereUserId).Updates(user2).Limit(1).Error
+	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Where("id = ?", whereUserId).Updates(user2).Limit(1).Error
 	return err
 }
 
 func (u userDao) Delete(user inter.User) error {
-	err := internal.DbConn().Table(u.tableName).Delete(&struct {
+	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Delete(&struct {
 		UserId int
 	}{UserId: user.Id()}).Limit(1).Error
 	return err
@@ -52,7 +51,7 @@ func (u userDao) Delete(user inter.User) error {
 func (u userDao) UserById(userId int) (inter.User, error) {
 	user := storageUser{}
 	whereUserId := strconv.Itoa(userId)
-	err := internal.DbConn().Table(u.tableName).Where("id = ?", whereUserId).First(&user).Error
+	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Where("id = ?", whereUserId).First(&user).Error
 	if err != nil && err.Error() == "record not found" {
 		err = nil
 	}
@@ -61,7 +60,7 @@ func (u userDao) UserById(userId int) (inter.User, error) {
 
 func (u userDao) UserByPhone(phone string) (inter.User, error) {
 	user := storageUser{}
-	err := internal.DbConn().Table(u.tableName).Where("phone = ?", phone).First(&user).Error
+	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Where("phone = ?", phone).First(&user).Error
 	if err != nil && err.Error() == "record not found" {
 		err = nil
 	}
@@ -70,7 +69,7 @@ func (u userDao) UserByPhone(phone string) (inter.User, error) {
 
 func (u userDao) UserList(offset, limit int) ([]inter.User, error) {
 	var users []storageUser
-	err := internal.DbConn().Table(u.tableName).Offset(offset).Limit(limit).Find(&users).Error
+	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Offset(offset).Limit(limit).Find(&users).Error
 	rolesLen := len(users)
 	interUsers := make([]inter.User, rolesLen, rolesLen)
 	for key, value := range users {

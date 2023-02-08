@@ -2,12 +2,11 @@ package service
 
 import (
 	"errors"
-	role2 "handshake/domain/role"
-	user2 "handshake/domain/user"
+	"handshake/domain"
 )
 
 func permissionVerification(operator int, uri string) (err error) {
-	user3, err := user2.List.UserById(operator)
+	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
 	}
@@ -15,7 +14,7 @@ func permissionVerification(operator int, uri string) (err error) {
 		err = errors.New("操作者不存在，请确认")
 		return
 	}
-	role3, err := role2.List.RoleById(user3.RoleId())
+	role3, err := domain.Manager.RoleList().RoleById(user3.RoleId())
 	if err != nil {
 		return
 	}

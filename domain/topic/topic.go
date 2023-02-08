@@ -15,7 +15,7 @@ type topic struct {
 	fuseSalt       int
 	alarm          alarm
 	callback       callback
-	queue          messageQueuing
+	queue          MessageQueuing
 	creator        int
 }
 

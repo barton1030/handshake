@@ -7,7 +7,7 @@ import (
 )
 
 func Init() {
-	role.List.Init()
-	user2.List.Init()
-	topic2.List.Init()
+	role.ListExample.Init()
+	user2.ListExample.Init()
+	topic2.ListExample.Init()
 }

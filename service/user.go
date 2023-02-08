@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	role2 "handshake/domain/role"
+	"handshake/domain"
 	user2 "handshake/domain/user"
 )
 
@@ -16,7 +16,7 @@ func (u user) Add(operator, roleId int, name, phone, pwd, uri string) (err error
 	if err != nil {
 		return err
 	}
-	role3, err := role2.List.RoleById(roleId)
+	role3, err := domain.Manager.RoleList().RoleById(roleId)
 	if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func (u user) Add(operator, roleId int, name, phone, pwd, uri string) (err error
 		err = errors.New("角色不存在，请确认")
 		return err
 	}
-	user3, err := user2.List.UserByPhone(phone)
+	user3, err := domain.Manager.UserList().UserByPhone(phone)
 	if err != nil {
 		return
 	}
@@ -33,7 +33,7 @@ func (u user) Add(operator, roleId int, name, phone, pwd, uri string) (err error
 		return
 	}
 	domainUser := user2.NewUser(name, phone, pwd, roleId)
-	err = user2.List.Add(domainUser)
+	err = domain.Manager.UserList().Add(domainUser)
 	return
 }
 
@@ -42,7 +42,7 @@ func (u user) SetRoleId(operator, userId, roleId int, uri string) (err error) {
 	if err != nil {
 		return
 	}
-	role3, err := role2.List.RoleById(roleId)
+	role3, err := domain.Manager.RoleList().RoleById(roleId)
 	if err != nil {
 		return
 	}
@@ -50,7 +50,7 @@ func (u user) SetRoleId(operator, userId, roleId int, uri string) (err error) {
 		err = errors.New("角色不存在，请确认")
 		return
 	}
-	user3, err := user2.List.UserById(userId)
+	user3, err := domain.Manager.UserList().UserById(userId)
 	if err != nil {
 		return
 	}
@@ -59,7 +59,7 @@ func (u user) SetRoleId(operator, userId, roleId int, uri string) (err error) {
 		return
 	}
 	user3.SetRole(roleId)
-	err = user2.List.Edit(user3)
+	err = domain.Manager.UserList().Edit(user3)
 	return
 }
 
@@ -68,7 +68,7 @@ func (u user) Delete(operator, userId int, uri string) (err error) {
 	if err != nil {
 		return
 	}
-	user3, err := user2.List.UserById(userId)
+	user3, err := domain.Manager.UserList().UserById(userId)
 	if err != nil {
 		return
 	}
@@ -77,7 +77,7 @@ func (u user) Delete(operator, userId int, uri string) (err error) {
 		return
 	}
 	user3.Delete()
-	err = user2.List.Edit(user3)
+	err = domain.Manager.UserList().Edit(user3)
 	return
 }
 
@@ -86,7 +86,7 @@ func (u user) List(operator, offset, limit int, uri string) (userList []map[stri
 	if err != nil {
 		return
 	}
-	users, err := user2.List.List(offset, limit)
+	users, err := domain.Manager.UserList().List(offset, limit)
 	if err != nil {
 		return
 	}
@@ -109,7 +109,7 @@ func (u user) UserId(operator, userId int, uri string) (user4 map[string]interfa
 	if err != nil {
 		return
 	}
-	user3, err := user2.List.UserById(userId)
+	user3, err := domain.Manager.UserList().UserById(userId)
 	if err != nil {
 		return
 	}

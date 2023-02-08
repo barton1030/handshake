@@ -9,8 +9,8 @@ import (
 )
 
 type queueDao struct {
-	base
-	tableName string
+	transactionId int
+	tableName     string
 }
 
 var QueueDao = queueDao{
@@ -20,7 +20,7 @@ var QueueDao = queueDao{
 func (q queueDao) MaxPrimaryKeyId(topicName string) (maxPrimaryKeyId int) {
 	tableName := q.tableName + topicName
 	message2 := storageMessage{}
-	err := q.DbConn().Table(tableName).Last(&message2).Error
+	err := transactionController.dbConn(q.transactionId).Table(tableName).Last(&message2).Error
 	if err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func (q queueDao) MaxPrimaryKeyId(topicName string) (maxPrimaryKeyId int) {
 func (q queueDao) Add(topicName string, message inter.Message) (err error) {
 	tableName := q.tableName + topicName
 	message2 := q.transformation(message)
-	err = q.DbConn().Table(tableName).Create(&message2).Error
+	err = transactionController.dbConn(q.transactionId).Table(tableName).Create(&message2).Error
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func (q queueDao) NextPendingData(topicName string, offset int) (message inter.M
 		return
 	}
 	whereId := strconv.Itoa(offset)
-	err = q.DbConn().Table(tableName).Where("id = ?", whereId).First(&message2).Error
+	err = transactionController.dbConn(q.transactionId).Table(tableName).Where("id = ?", whereId).First(&message2).Error
 	if err != nil {
 		return
 	}
@@ -87,7 +87,7 @@ func (q queueDao) Edit(topicName string, message inter.Message) error {
 	tableName := q.tableName + topicName
 	message2 := q.transformation(message)
 	whereId := strconv.Itoa(message2.Id())
-	err := q.DbConn().Table(tableName).Where("id = ?", whereId).Updates(message2).Limit(1).Error
+	err := transactionController.dbConn(q.transactionId).Table(tableName).Where("id = ?", whereId).Updates(message2).Limit(1).Error
 	return err
 }
 
