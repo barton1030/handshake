@@ -6,31 +6,19 @@ import (
 )
 
 type List struct {
-	nextId  int
 	storage inter.StorageUserList
 }
 
-var ListExample = List{nextId: 1, storage: persistent.UserDao}
-
-func (l *List) Init() {
-	maxPrimaryKeyId := l.storage.MaxPrimaryKeyId()
-	l.nextId = maxPrimaryKeyId + 1
-}
+var ListExample = List{storage: persistent.UserDao}
 
 func (l *List) SetStorage(storageInter inter.StorageUserList) *List {
 	return &List{
-		nextId:  l.nextId,
 		storage: storageInter,
 	}
 }
 
 func (l *List) Add(user2 user) (err error) {
-	user2.id = l.nextId
 	err = l.storage.Add(&user2)
-	if err != nil {
-		return err
-	}
-	l.nextId++
 	return err
 }
 

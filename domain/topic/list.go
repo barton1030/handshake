@@ -6,26 +6,18 @@ import (
 )
 
 type List struct {
-	nextId  int
 	storage inter.StorageTopicList
 }
 
-var ListExample = List{nextId: 1, storage: persistent.TopicDao}
-
-func (l *List) Init() {
-	maxPrimaryKeyId := l.storage.MaxPrimaryKeyId()
-	l.nextId = maxPrimaryKeyId + 1
-}
+var ListExample = List{storage: persistent.TopicDao}
 
 func (l *List) SetStorage(storageInter inter.StorageTopicList) *List {
 	return &List{
-		nextId:  l.nextId,
 		storage: storageInter,
 	}
 }
 
 func (l *List) Add(topic2 topic) (err error) {
-	topic2.id = l.nextId
 	err = l.storage.Add(&topic2)
 	return
 }
@@ -63,7 +55,6 @@ func (l *List) reconstruction(topic2 inter.Topic) (topic3 topic) {
 	topic3.fuseSalt = topic2.FuseSalt()
 	topic3.creator = topic2.Creator()
 	topic3.queue = newMessageQueuing(topic2.Name())
-	topic3.queue.init()
 	topic2AlamHandler := topic2.AlarmHandler()
 	topic3.alarm = alarm{
 		url:        topic2AlamHandler.Url(),
