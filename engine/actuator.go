@@ -83,6 +83,7 @@ func (a *actuator) implement() {
 			a.exitSignal <- 1
 			return
 		}
+
 		// 消息队列具柄
 		message, err := a.topic.MessageQueuingHandler().Pop()
 		if err != nil || message == nil || message.Id() <= 0 {
@@ -94,24 +95,39 @@ func (a *actuator) implement() {
 			continue
 		}
 		message.IncrRetryCont()
-		data := message.Data()
-		res, err := a.topic.CallbackHandler().Do(data)
+
+		res, err := a.topic.CallbackHandler().Do(message.Data())
 		if err != nil {
+			a.errorPipe <- 1
 			a.alarm(err.Error(), message.Id())
-			err = a.handleFail(message)
+			maxRetryCount := a.topic.MaxRetryCount()
+			retryCount := message.RetryCount()
+			if retryCount >= maxRetryCount {
+				message.Fail()
+				err = a.topic.MessageQueuingHandler().Push(message)
+			} else {
+				err = a.topic.MessageQueuingHandler().Finish(message)
+			}
 			if err != nil {
 				a.alarm(err.Error(), message.Id())
 			}
-			a.errorPipe <- 1
 			continue
 		}
-		if code, ok := res["code"]; ok && code != 200 {
-			a.alarm(res["err"], message.Id())
-			err = a.handleFail(message)
+
+		if code, ok := res["code"].(int); ok && code != 200 {
+			a.errorPipe <- 1
+			a.alarm(err.Error(), message.Id())
+			maxRetryCount := a.topic.MaxRetryCount()
+			retryCount := message.RetryCount()
+			if retryCount >= maxRetryCount {
+				message.Fail()
+				err = a.topic.MessageQueuingHandler().Push(message)
+			} else {
+				err = a.topic.MessageQueuingHandler().Finish(message)
+			}
 			if err != nil {
 				a.alarm(err.Error(), message.Id())
 			}
-			a.errorPipe <- 1
 			continue
 		}
 		message.Success()
@@ -129,17 +145,4 @@ func (a *actuator) alarm(err interface{}, messageId int) {
 	information["messageId"] = messageId
 	information["err"] = err
 	alarm.Do(information)
-}
-
-func (a *actuator) handleFail(message inter.Message) (err error) {
-	maxRetryCount := a.topic.MaxRetryCount()
-	retryCount := message.RetryCount()
-	messageQueuing := a.topic.MessageQueuingHandler()
-	if retryCount < maxRetryCount {
-		err = messageQueuing.Push(message)
-		return
-	}
-	message.Fail()
-	err = messageQueuing.Finish(message)
-	return
 }
