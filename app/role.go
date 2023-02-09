@@ -74,13 +74,13 @@ func (r role) RoleById(c *gin.Context) {
 		return
 	}
 	uri := helper.ExtractRequestUri(c)
-	role, err := service.Role.RoleById(request.Operator, request.RoleId, uri)
+	role2, err := service.Role.RoleById(request.Operator, request.RoleId, uri)
 	if err != nil {
 		err = fmt.Errorf("app role RoleById: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
 		return
 	}
-	helper.Response(c, 200, role, "")
+	helper.Response(c, 200, role2, "")
 	return
 }
 

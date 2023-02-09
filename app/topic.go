@@ -201,13 +201,13 @@ func (t topic) TopicById(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	topic, err := service.Topic.TopicById(request.Operator, request.TopicId)
+	topic2, err := service.Topic.TopicById(request.Operator, request.TopicId)
 	if err != nil {
 		err = fmt.Errorf("app topic TopicById: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
 		return
 	}
-	helper.Response(c, 200, topic, "")
+	helper.Response(c, 200, topic2, "")
 	return
 }
 
