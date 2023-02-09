@@ -10,7 +10,7 @@ import (
 type topic struct {
 }
 
-var TopicController topic
+var Topic topic
 
 type addTopicRequest struct {
 	Operator       int    `json:"operator" form:"operator" binding:"required"`

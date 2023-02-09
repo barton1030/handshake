@@ -15,12 +15,12 @@ func Router() *gin.Engine {
 
 func role(r *gin.Engine) {
 	roleGroup := r.Group("/role")
-	roleGroup.POST("/add", app.RoleController.Add)
-	roleGroup.GET("/byId", app.RoleController.RoleById)
-	roleGroup.POST("/set/name", app.RoleController.EditName)
-	roleGroup.POST("/set/permission", app.RoleController.SetPermission)
-	roleGroup.GET("/list", app.RoleController.List)
-	roleGroup.GET("/delete", app.RoleController.Delete)
+	roleGroup.POST("/add", app.Role.Add)
+	roleGroup.GET("/byId", app.Role.RoleById)
+	roleGroup.POST("/set/name", app.Role.EditName)
+	roleGroup.POST("/set/permission", app.Role.SetPermission)
+	roleGroup.GET("/list", app.Role.List)
+	roleGroup.GET("/delete", app.Role.Delete)
 }
 
 func user(r *gin.Engine) {
@@ -34,13 +34,13 @@ func user(r *gin.Engine) {
 
 func topic(r *gin.Engine) {
 	topicGroup := r.Group("/topic")
-	topicGroup.POST("/add", app.TopicController.Add)
-	topicGroup.GET("/delete", app.TopicController.Delete)
-	topicGroup.POST("/start", app.TopicController.Start)
-	topicGroup.POST("/stop", app.TopicController.Stop)
-	topicGroup.POST("/set/callback", app.TopicController.SetCallback)
-	topicGroup.POST("/set/alarm", app.TopicController.SetAlarm)
-	topicGroup.POST("/edit", app.TopicController.EditTopic)
-	topicGroup.GET("/byId", app.TopicController.TopicById)
-	topicGroup.POST("/push/message", app.TopicController.PushMessage)
+	topicGroup.POST("/add", app.Topic.Add)
+	topicGroup.GET("/delete", app.Topic.Delete)
+	topicGroup.POST("/start", app.Topic.Start)
+	topicGroup.POST("/stop", app.Topic.Stop)
+	topicGroup.POST("/set/callback", app.Topic.SetCallback)
+	topicGroup.POST("/set/alarm", app.Topic.SetAlarm)
+	topicGroup.POST("/edit", app.Topic.EditTopic)
+	topicGroup.GET("/byId", app.Topic.TopicById)
+	topicGroup.POST("/push/message", app.Topic.PushMessage)
 }

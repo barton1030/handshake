@@ -7,10 +7,10 @@ import (
 	"handshake/service"
 )
 
-type roleController struct {
+type role struct {
 }
 
-var RoleController roleController
+var Role role
 
 type AddRequest struct {
 	Name     string `json:"name" form:"name" binding:"required"`
@@ -47,7 +47,7 @@ type DeleteRequest struct {
 }
 
 // Add 角色添加入口
-func (r roleController) Add(c *gin.Context) {
+func (r role) Add(c *gin.Context) {
 	request := AddRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		err = fmt.Errorf("app role Add: params %v error: %v", request, err)
@@ -66,7 +66,7 @@ func (r roleController) Add(c *gin.Context) {
 }
 
 // RoleById 通过角色id获取角色信息
-func (r roleController) RoleById(c *gin.Context) {
+func (r role) RoleById(c *gin.Context) {
 	request := RoleByIdRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		err = fmt.Errorf("app role RoleById: params %v error: %v", request, err)
@@ -85,7 +85,7 @@ func (r roleController) RoleById(c *gin.Context) {
 }
 
 // EditName 编辑角色名称
-func (r roleController) EditName(c *gin.Context) {
+func (r role) EditName(c *gin.Context) {
 	request := EditNameRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		err = fmt.Errorf("app role EditName: params %v error: %v", request, err)
@@ -104,7 +104,7 @@ func (r roleController) EditName(c *gin.Context) {
 }
 
 // SetPermission 设置角色相关权限
-func (r roleController) SetPermission(c *gin.Context) {
+func (r role) SetPermission(c *gin.Context) {
 	request := SetPermissionRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		err = fmt.Errorf("app role SetPermission: params %v error: %v", request, err)
@@ -123,7 +123,7 @@ func (r roleController) SetPermission(c *gin.Context) {
 }
 
 // List 角色列表
-func (r roleController) List(c *gin.Context) {
+func (r role) List(c *gin.Context) {
 	request := ListRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		err = fmt.Errorf("app role List: params %v error: %v", request, err)
@@ -142,7 +142,7 @@ func (r roleController) List(c *gin.Context) {
 }
 
 // Delete 删除角色
-func (r roleController) Delete(c *gin.Context) {
+func (r role) Delete(c *gin.Context) {
 	request := DeleteRequest{}
 	if err := c.ShouldBind(&request); err != nil {
 		err = fmt.Errorf("app role Delete: params %v error: %v", request, err)
