@@ -2,6 +2,7 @@ package helper
 
 import (
 	"github.com/gin-gonic/gin"
+	"strconv"
 	"strings"
 )
 
@@ -23,4 +24,37 @@ func ExtractRequestUri(c *gin.Context) string {
 		return ""
 	}
 	return uriSlice[0]
+}
+
+func TransformationToString(origin interface{}) string {
+	target, ok := origin.(string)
+	if ok {
+		return target
+	}
+	MedianInt, ok := origin.(int)
+	if ok {
+		target = strconv.Itoa(MedianInt)
+		return target
+	}
+	MedianInt64, ok := origin.(int64)
+	if ok {
+		target = strconv.Itoa(int(MedianInt64))
+		return target
+	}
+	MedianInt8, ok := origin.(int8)
+	if ok {
+		target = strconv.Itoa(int(MedianInt8))
+		return target
+	}
+	MedianInt32, ok := origin.(int32)
+	if ok {
+		target = strconv.Itoa(int(MedianInt32))
+		return target
+	}
+	MedianBool, ok := origin.(bool)
+	if ok {
+		target = strconv.FormatBool(MedianBool)
+		return target
+	}
+	return target
 }
