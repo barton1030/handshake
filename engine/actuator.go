@@ -125,8 +125,7 @@ func (a *actuator) alarm(err interface{}, messageId int) {
 	information["topic"] = a.topic.Name()
 	information["messageId"] = messageId
 	information["err"] = err
-	recipients := a.topic.AlarmHandler().Recipients()
-	alarm.Do(information, recipients)
+	alarm.Do(information)
 }
 
 func (a *actuator) handleFail(message inter.Message) (err error) {

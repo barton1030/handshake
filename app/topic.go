@@ -41,16 +41,19 @@ type setTopicCallbackRequest struct {
 	TopicId  int                    `json:"topicId" form:"topicId" binding:"required"`
 	Url      string                 `json:"url" form:"url" binding:"required"`
 	Method   string                 `json:"method" form:"method" binding:"required"`
-	Headers  map[string]interface{} `json:"headers" form:"headers" binding:"required"`
-	Cookies  map[string]interface{} `json:"cookies" form:"cookies" binding:"required"`
+	Headers  map[string]interface{} `json:"headers" form:"headers"`
+	Cookies  map[string]interface{} `json:"cookies" form:"cookies"`
 }
 
 type setTopicAlarmRequest struct {
-	Operator   int           `json:"operator" form:"operator" binding:"required"`
-	TopicId    int           `json:"topicId" form:"topicId" binding:"required"`
-	Url        string        `json:"url" form:"url" binding:"required"`
-	Method     string        `json:"method" form:"method" binding:"required"`
-	Recipients []interface{} `json:"recipients" form:"recipients" binding:"required"`
+	Operator           int                    `json:"operator" form:"operator" binding:"required"`
+	TopicId            int                    `json:"topicId" form:"topicId" binding:"required"`
+	Url                string                 `json:"url" form:"url" binding:"required"`
+	Method             string                 `json:"method" form:"method" binding:"required"`
+	Headers            map[string]interface{} `json:"headers" form:"headers"`
+	Cookies            map[string]interface{} `json:"cookies" form:"cookies"`
+	TemplateParameters map[string]interface{} `json:"templateParameters" form:"templateParameters"`
+	Recipients         []interface{}          `json:"recipients" form:"recipients" binding:"required"`
 }
 
 type editTopicRequest struct {
@@ -165,7 +168,7 @@ func (t topic) SetAlarm(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	err := service.Topic.SetAlarm(request.Operator, request.TopicId, request.Url, request.Method, request.Recipients)
+	err := service.Topic.SetAlarm(request.Operator, request.TopicId, request.Url, request.Method, request.Recipients, request.Headers, request.Cookies, request.TemplateParameters)
 	if err != nil {
 		err = fmt.Errorf("app topic SetAlarm: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())

@@ -1,5 +1,7 @@
 package topic
 
+import "handshake/helper"
+
 type callback struct {
 	url     string
 	method  string
@@ -17,6 +19,7 @@ func NewCallBack(url, method string, cookies, headers map[string]interface{}) ca
 }
 
 func (c callback) Do(data map[string]interface{}) (res map[string]interface{}, err error) {
+	res, err = helper.R.HttpRequest(c.url, c.method, c.headers, c.cookies, data)
 	return
 }
 

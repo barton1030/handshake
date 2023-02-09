@@ -65,7 +65,8 @@ func (q queueDao) NextPendingData(topicName string, offset int) (message inter.M
 	}
 	whereId := strconv.Itoa(offset)
 	err = transactionController.dbConn(q.transactionId).Table(tableName).Where("id = ?", whereId).First(&message2).Error
-	if err != nil {
+	if err != nil && err.Error() == "record not found" {
+		err = nil
 		return
 	}
 	message = message2

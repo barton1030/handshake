@@ -33,10 +33,13 @@ type Callback interface {
 }
 
 type Alarm interface {
-	Do(information map[string]interface{}, recipients []interface{}) (res map[string]interface{}, err error)
+	Do(information map[string]interface{}) (res map[string]interface{}, err error)
 	Url() string
 	Method() string
+	Cookies() map[string]interface{}
+	Headers() map[string]interface{}
 	Recipients() []interface{}
+	TemplateParameters() map[string]interface{}
 }
 
 type StorageQueueList interface {

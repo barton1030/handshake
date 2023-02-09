@@ -57,9 +57,12 @@ func (l *List) reconstruction(topic2 inter.Topic) (topic3 topic) {
 	topic3.queue = newMessageQueuing(topic2.Name())
 	topic2AlamHandler := topic2.AlarmHandler()
 	topic3.alarm = alarm{
-		url:        topic2AlamHandler.Url(),
-		method:     topic2AlamHandler.Method(),
-		recipients: topic2AlamHandler.Recipients(),
+		url:                topic2AlamHandler.Url(),
+		method:             topic2AlamHandler.Method(),
+		recipients:         topic2AlamHandler.Recipients(),
+		cookies:            topic2AlamHandler.Cookies(),
+		headers:            topic2AlamHandler.Headers(),
+		templateParameters: topic2AlamHandler.TemplateParameters(),
 	}
 	topic2CallbackHandler := topic2.CallbackHandler()
 	topic3.callback = callback{

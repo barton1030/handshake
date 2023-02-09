@@ -155,7 +155,7 @@ func (t topic) SetCallback(operator, topicId int, url, method string, headers, c
 	return
 }
 
-func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []interface{}) (err error) {
+func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []interface{}, headers, cookies, templateParameters map[string]interface{}) (err error) {
 	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
@@ -176,7 +176,7 @@ func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []
 		err = errors.New("操作人与主题创建者不一致，请确认！")
 		return
 	}
-	alarm := topic2.NewAlarm(url, method, recipients)
+	alarm := topic2.NewAlarm(url, method, recipients, headers, cookies, templateParameters)
 	topic3.SetAlarm(alarm)
 	err = domain.Manager.TopicList().Edit(topic3)
 	return
@@ -245,6 +245,9 @@ func (t topic) TopicById(operator, topicId int) (topic4 map[string]interface{}, 
 	alarm["url"] = alamHandler.Url()
 	alarm["method"] = alamHandler.Method()
 	alarm["recipients"] = alamHandler.Recipients()
+	alarm["headers"] = alamHandler.Headers()
+	alarm["cookies"] = alamHandler.Cookies()
+	alarm["templateParameters"] = alamHandler.TemplateParameters()
 	topic4["alarm"] = alarm
 	callbackHandler := topic3.CallbackHandler()
 	callback := make(map[string]interface{})
