@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	inter "handshake/Interface"
 	"time"
 )
@@ -68,6 +69,8 @@ func (a *actuator) suspend() {
 
 func (a *actuator) implement() {
 	for {
+		fmt.Println(a.topic, "执行器：", a.id)
+		time.Sleep(2 * time.Second)
 		if a.status == ActuatorInitStatus {
 			a.startSignal <- 1
 			a.status = ActuatorRunStatus

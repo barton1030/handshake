@@ -146,3 +146,11 @@ func (t *topic) Abandonment() bool {
 	t.status = DeleteStatus
 	return true
 }
+
+func (t *topic) Init() bool {
+	if t.status != StartStatus {
+		return true
+	}
+	engine.ManagerUnit.RegisterTopic(t)
+	return true
+}

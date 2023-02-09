@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/fvbock/endless"
 	"handshake/conf"
+	"handshake/domain"
 	"handshake/persistent"
 	"handshake/router"
 	"strconv"
@@ -14,6 +15,7 @@ func main() {
 	context.Background()
 	persistent.Init()
 	defer persistent.Close()
+	go domain.Init()
 	r := router.Router()
 	addr := structure()
 	endless.ListenAndServe(addr, r)

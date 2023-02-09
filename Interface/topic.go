@@ -8,6 +8,7 @@ type StorageTopicList interface {
 	Edit(topic Topic) error
 	TopicById(topicId int) (Topic, error)
 	TopicByName(topicName string) (Topic, error)
+	TopicList(offset, limit int) ([]Topic, error)
 }
 
 type Topic interface {

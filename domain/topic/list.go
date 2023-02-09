@@ -45,6 +45,23 @@ func (l *List) TopicName(topicName string) (topic3 topic, err error) {
 	return
 }
 
+func (l *List) List(offset, limit int) (topicList []topic, err error) {
+	storageTopicList, err := l.storage.TopicList(offset, limit)
+	if err != nil {
+		return
+	}
+	if len(storageTopicList) <= 0 {
+		return
+	}
+
+	for _, storageTopic := range storageTopicList {
+		topic2 := l.reconstruction(storageTopic)
+		topicList = append(topicList, topic2)
+	}
+
+	return
+}
+
 func (l *List) reconstruction(topic2 inter.Topic) (topic3 topic) {
 	topic3.id = topic2.Id()
 	topic3.name = topic2.Name()
