@@ -9,7 +9,7 @@ import (
 type role struct {
 }
 
-var RoleService role
+var Role role
 
 func (r role) Add(operator int, name, uri string) (err error) {
 	err = permissionVerification(operator, uri)

@@ -80,7 +80,7 @@ func (t topic) Add(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	err := service.TopicService.Add(request.Operator, request.Name, request.MaxRetryCount, request.MaxConcurrency, request.MinConcurrency, request.FuseSalt)
+	err := service.Topic.Add(request.Operator, request.Name, request.MaxRetryCount, request.MaxConcurrency, request.MinConcurrency, request.FuseSalt)
 	if err != nil {
 		err = fmt.Errorf("app topic Add: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -97,7 +97,7 @@ func (t topic) SetCallback(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	err := service.TopicService.SetCallback(request.Operator, request.TopicId, request.Url, request.Method, request.Headers, request.Cookies)
+	err := service.Topic.SetCallback(request.Operator, request.TopicId, request.Url, request.Method, request.Headers, request.Cookies)
 	if err != nil {
 		err = fmt.Errorf("app topic SetCallback: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -114,7 +114,7 @@ func (t topic) Delete(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	err := service.TopicService.Delete(request.Operator, request.TopicId)
+	err := service.Topic.Delete(request.Operator, request.TopicId)
 	if err != nil {
 		err = fmt.Errorf("app topic Delete: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -131,7 +131,7 @@ func (t topic) Start(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	err := service.TopicService.Start(request.Operator, request.TopicId)
+	err := service.Topic.Start(request.Operator, request.TopicId)
 	if err != nil {
 		err = fmt.Errorf("app topic Start: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -148,7 +148,7 @@ func (t topic) Stop(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	err := service.TopicService.Stop(request.Operator, request.TopicId)
+	err := service.Topic.Stop(request.Operator, request.TopicId)
 	if err != nil {
 		err = fmt.Errorf("app topic Stop: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -165,7 +165,7 @@ func (t topic) SetAlarm(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	err := service.TopicService.SetAlarm(request.Operator, request.TopicId, request.Url, request.Method, request.Recipients)
+	err := service.Topic.SetAlarm(request.Operator, request.TopicId, request.Url, request.Method, request.Recipients)
 	if err != nil {
 		err = fmt.Errorf("app topic SetAlarm: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -183,7 +183,7 @@ func (t topic) EditTopic(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	err := service.TopicService.Edit(request.Operator, request.TopicId, request.MaxRetryCount, request.MinConcurrency, request.MaxConcurrency, request.FuseSalt)
+	err := service.Topic.Edit(request.Operator, request.TopicId, request.MaxRetryCount, request.MinConcurrency, request.MaxConcurrency, request.FuseSalt)
 	if err != nil {
 		err = fmt.Errorf("app topic SetTopic: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -201,7 +201,7 @@ func (t topic) TopicById(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	topic, err := service.TopicService.TopicById(request.Operator, request.TopicId)
+	topic, err := service.Topic.TopicById(request.Operator, request.TopicId)
 	if err != nil {
 		err = fmt.Errorf("app topic TopicById: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -219,7 +219,7 @@ func (t topic) PushMessage(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	err := service.TopicService.PushMessage(request.Operator, request.TopicId, request.Message)
+	err := service.Topic.PushMessage(request.Operator, request.TopicId, request.Message)
 	if err != nil {
 		err = fmt.Errorf("app topic PushMessage: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())

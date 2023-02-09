@@ -9,7 +9,7 @@ import (
 type topic struct {
 }
 
-var TopicService topic
+var Topic topic
 
 func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt int) (err error) {
 	user3, err := domain.Manager.UserList().UserById(operator)
