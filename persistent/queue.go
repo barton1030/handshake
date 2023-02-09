@@ -34,6 +34,12 @@ func (q queueDao) MaxPrimaryKeyId(topicName string) (maxPrimaryKeyId int) {
 func (q queueDao) Add(topicName string, message inter.Message) (err error) {
 	tableName := q.tableName + topicName
 	message2 := q.transformation(message)
+	// 只推redis
+	if message2.Id() > 0 {
+		err = q.OnlyAdd(topicName, message2)
+		return err
+	}
+
 	// create方法返回了持久后自增主键
 	err = transactionController.dbConn(q.transactionId).Table(tableName).Create(&message2).Error
 	if err != nil {
@@ -43,13 +49,29 @@ func (q queueDao) Add(topicName string, message inter.Message) (err error) {
 	if err != nil {
 		return err
 	}
-	_, err = internal.RedisConn().Do("LPUSH", tableName, string(messageJson))
+	redisConn := internal.RedisConn().Get()
+	defer redisConn.Close()
+	_, err = redisConn.Do("LPUSH", tableName, string(messageJson))
+	return err
+}
+
+func (q queueDao) OnlyAdd(topicName string, message storageMessage) (err error) {
+	tableName := q.tableName + topicName
+	messageJson, err := json.Marshal(message)
+	if err != nil {
+		return err
+	}
+	redisConn := internal.RedisConn().Get()
+	defer redisConn.Close()
+	_, err = redisConn.Do("LPUSH", tableName, string(messageJson))
 	return err
 }
 
 func (q queueDao) NextPendingData(topicName string, offset int) (message inter.Message, err error) {
+	redisConn := internal.RedisConn().Get()
+	defer redisConn.Close()
 	tableName := q.tableName + topicName
-	resp, err := internal.RedisConn().Do("BRPOP", tableName, 1)
+	resp, err := redisConn.Do("BRPOP", tableName, 1)
 	if err != nil {
 		return
 	}
@@ -74,8 +96,10 @@ func (q queueDao) NextPendingData(topicName string, offset int) (message inter.M
 }
 
 func (q queueDao) PendingDataCount(topicName string) (count int, err error) {
+	redisConn := internal.RedisConn().Get()
+	defer redisConn.Close()
 	tableName := q.tableName + topicName
-	pendingDataCount, err := internal.RedisConn().Do("LLEN", tableName)
+	pendingDataCount, err := redisConn.Do("LLEN", tableName)
 	if err != nil {
 		return
 	}

@@ -15,5 +15,5 @@ host = "127.0.0.1"
 port = 4203
 user = "root"
 password = ""
-init_conn = 10
-max_conn = 40
+init_conn = 30
+max_conn = 120

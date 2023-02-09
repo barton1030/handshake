@@ -45,6 +45,9 @@ func (m *message) Data() map[string]interface{} {
 }
 
 func (m *message) Processable() (processable bool) {
+	if m.status == initStatus {
+		processable = true
+	}
 	return
 }
 

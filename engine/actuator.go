@@ -2,6 +2,7 @@ package engine
 
 import (
 	inter "handshake/Interface"
+	"time"
 )
 
 const (
@@ -83,16 +84,18 @@ func (a *actuator) implement() {
 			return
 		}
 		// 消息队列具柄
-		messageQueuing := a.topic.MessageQueuingHandler()
-		message, err := messageQueuing.Pop()
-		if err != nil {
+		message, err := a.topic.MessageQueuingHandler().Pop()
+		if err != nil || message == nil || message.Id() <= 0 {
+			time.Sleep(2 * time.Second)
 			continue
 		}
-		data := message.Data()
-		// 消息回调处理工具具柄
-		callback := a.topic.CallbackHandler()
-		res, err := callback.Do(data)
+		toProcess := message.Processable()
+		if !toProcess {
+			continue
+		}
 		message.IncrRetryCont()
+		data := message.Data()
+		res, err := a.topic.CallbackHandler().Do(data)
 		if err != nil {
 			a.alarm(err.Error(), message.Id())
 			err = a.handleFail(message)
@@ -102,7 +105,7 @@ func (a *actuator) implement() {
 			a.errorPipe <- 1
 			continue
 		}
-		if code, ok := res["code"]; ok && code != 0 {
+		if code, ok := res["code"]; ok && code != 200 {
 			a.alarm(res["err"], message.Id())
 			err = a.handleFail(message)
 			if err != nil {
@@ -112,7 +115,7 @@ func (a *actuator) implement() {
 			continue
 		}
 		message.Success()
-		err = messageQueuing.Finish(message)
+		err = a.topic.MessageQueuingHandler().Finish(message)
 		if err != nil {
 			a.alarm(err.Error(), message.Id())
 		}
