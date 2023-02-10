@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"fmt"
 	inter "handshake/Interface"
 	"time"
 )
@@ -69,8 +68,6 @@ func (a *actuator) suspend() {
 
 func (a *actuator) implement() {
 	for {
-		fmt.Println(a.topic, "执行器：", a.id)
-		time.Sleep(2 * time.Second)
 		if a.status == ActuatorInitStatus {
 			a.startSignal <- 1
 			a.status = ActuatorRunStatus
@@ -107,9 +104,9 @@ func (a *actuator) implement() {
 			retryCount := message.RetryCount()
 			if retryCount >= maxRetryCount {
 				message.Fail()
-				err = a.topic.MessageQueuingHandler().Push(message)
-			} else {
 				err = a.topic.MessageQueuingHandler().Finish(message)
+			} else {
+				err = a.topic.MessageQueuingHandler().Push(message)
 			}
 			if err != nil {
 				a.alarm(err.Error(), message.Id())
@@ -124,9 +121,9 @@ func (a *actuator) implement() {
 			retryCount := message.RetryCount()
 			if retryCount >= maxRetryCount {
 				message.Fail()
-				err = a.topic.MessageQueuingHandler().Push(message)
-			} else {
 				err = a.topic.MessageQueuingHandler().Finish(message)
+			} else {
+				err = a.topic.MessageQueuingHandler().Push(message)
 			}
 			if err != nil {
 				a.alarm(err.Error(), message.Id())

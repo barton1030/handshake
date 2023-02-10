@@ -1,12 +1,14 @@
 package router
 
 import (
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"handshake/app"
 )
 
 func Router() *gin.Engine {
 	root := gin.Default()
+	pprof.Register(root)
 	role(root)
 	user(root)
 	topic(root)
