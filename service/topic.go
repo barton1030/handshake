@@ -28,8 +28,14 @@ func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, max
 		err = errors.New("主题名重复，请注意！")
 		return
 	}
+	begin := domain.Manager.Begin()
 	topic4 := topic2.NewTopic(name, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, operator)
-	err = domain.Manager.TopicList().Add(topic4)
+	err = begin.TopicList().Add(topic4)
+	if err != nil {
+		err = begin.Rollback()
+	} else {
+		err = begin.Commit()
+	}
 	return
 }
 

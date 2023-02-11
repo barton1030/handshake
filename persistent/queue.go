@@ -5,6 +5,7 @@ import (
 	inter "handshake/Interface"
 	"handshake/persistent/internal"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -15,6 +16,21 @@ type queueDao struct {
 
 var QueueDao = queueDao{
 	tableName: "hand_shake_queue_",
+}
+
+func (q queueDao) createTable(topicName string) (err error) {
+	createTableSql := "CREATE TABLE `hand_shake_queue_?` (" +
+		" `id` int NOT NULL AUTO_INCREMENT," +
+		"  `status` smallint NOT NULL DEFAULT '1'," +
+		"  `data` varchar(750) NOT NULL DEFAULT ''," +
+		"  `retry` smallint NOT NULL DEFAULT '0'," +
+		"  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+		"  PRIMARY KEY (`id`)," +
+		"  KEY `cTime` (`create_time`,`status`) USING BTREE" +
+		") ENGINE=InnoDB AUTO_INCREMENT=652 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+	createTableSql = strings.Replace(createTableSql, "?", topicName, 1)
+	err = transactionController.dbConn(q.transactionId).Exec(createTableSql).Error
+	return err
 }
 
 func (q queueDao) MaxPrimaryKeyId(topicName string) (maxPrimaryKeyId int) {

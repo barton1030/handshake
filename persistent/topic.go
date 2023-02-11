@@ -31,6 +31,12 @@ func (t topicDao) MaxPrimaryKeyId() (maxPrimaryKeyId int) {
 func (t topicDao) Add(topic inter.Topic) error {
 	topic2 := t.transformation(topic)
 	err := transactionController.dbConn(t.transactionId).Table(t.tableName).Create(&topic2).Error
+	if err != nil {
+		return err
+	}
+	queue := QueueDao
+	queue.transactionId = t.transactionId
+	err = queue.createTable(topic.Name())
 	return err
 }
 
