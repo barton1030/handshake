@@ -108,6 +108,13 @@ func (t *topic) Creator() int {
 	return t.creator
 }
 
+func (t *topic) DiscardOrNot() bool {
+	if t.status != DeleteStatus {
+		return false
+	}
+	return true
+}
+
 func (t *topic) Start() bool {
 	if t.status == DeleteStatus {
 		return false
@@ -116,8 +123,15 @@ func (t *topic) Start() bool {
 		return true
 	}
 	t.status = StartStatus
-	engine.ManagerUnit.RegisterTopic(t)
 	return true
+}
+
+func (t *topic) StartUp() bool {
+	if t.status != StartStatus {
+		return false
+	}
+	startResult := engine.ManagerUnit.RegisterTopic(t)
+	return startResult
 }
 
 func (t *topic) Stop() bool {
@@ -128,8 +142,15 @@ func (t *topic) Stop() bool {
 		return true
 	}
 	t.status = StopStatus
-	engine.ManagerUnit.CancelTopic(t)
 	return true
+}
+
+func (t *topic) StopUp() bool {
+	if t.status != StopStatus {
+		return false
+	}
+	stopResult := engine.ManagerUnit.CancelTopic(t)
+	return stopResult
 }
 
 func (t *topic) InOperation() bool {
@@ -144,13 +165,5 @@ func (t *topic) Abandonment() bool {
 		return false
 	}
 	t.status = DeleteStatus
-	return true
-}
-
-func (t *topic) Init() bool {
-	if t.status != StartStatus {
-		return true
-	}
-	engine.ManagerUnit.RegisterTopic(t)
 	return true
 }

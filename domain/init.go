@@ -21,7 +21,7 @@ func Init() {
 		}
 		for _, topic := range topicList {
 			currentTopic := topic
-			currentTopic.Init()
+			currentTopic.StartUp()
 		}
 		offset += limit
 		limit += limit

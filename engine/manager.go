@@ -14,32 +14,34 @@ type manager struct {
 
 var ManagerUnit = manager{controllerCollection: make(map[string]*controller)}
 
-func (m *manager) RegisterTopic(topic inter.Topic) {
+func (m *manager) RegisterTopic(topic inter.Topic) bool {
 	topicName := topic.Name()
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	if _, ok := m.controllerCollection[topicName]; ok {
-		return
+		return true
 	}
 	topicController := newController(topic)
 	startResult := topicController.start()
 	if !startResult {
-		return
+		return false
 	}
 	m.controllerCollection[topicName] = topicController
+	return true
 }
 
-func (m *manager) CancelTopic(topic inter.Topic) {
+func (m *manager) CancelTopic(topic inter.Topic) bool {
 	topicName := topic.Name()
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	topicController, ok := m.controllerCollection[topicName]
 	if !ok {
-		return
+		return true
 	}
 	stopResult := topicController.stop()
 	if !stopResult {
-		return
+		return false
 	}
 	delete(m.controllerCollection, topicName)
+	return true
 }

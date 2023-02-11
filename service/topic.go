@@ -56,6 +56,10 @@ func (t topic) Start(operator, topicId int) (err error) {
 		err = errors.New("主题不存在，请确认！")
 		return
 	}
+	if topic3.DiscardOrNot() {
+		err = errors.New("当前主题已废弃, 请注意！")
+		return
+	}
 	if topic3.Creator() != operator {
 		err = errors.New("操作人与主题创建者不一致，请确认！")
 		return
@@ -65,7 +69,18 @@ func (t topic) Start(operator, topicId int) (err error) {
 		err = errors.New("主题启动失败")
 		return
 	}
-	err = domain.Manager.TopicList().Edit(topic3)
+	begin := domain.Manager.Begin()
+	err = begin.TopicList().Edit(topic3)
+	if err != nil {
+		err = begin.Rollback()
+		return err
+	}
+	startUpResult := topic3.StartUp()
+	if !startUpResult {
+		err = begin.Rollback()
+		return
+	}
+	err = begin.Commit()
 	return
 }
 
@@ -86,6 +101,10 @@ func (t topic) Stop(operator, topicId int) (err error) {
 		err = errors.New("主题不存在，请确认！")
 		return err
 	}
+	if topic3.DiscardOrNot() {
+		err = errors.New("当前主题已废弃, 请注意！")
+		return
+	}
 	if topic3.Creator() != operator {
 		err = errors.New("操作人与主题创建者不一致，请确认！")
 		return
@@ -95,7 +114,18 @@ func (t topic) Stop(operator, topicId int) (err error) {
 		err = errors.New("终止失败")
 		return err
 	}
-	err = domain.Manager.TopicList().Edit(topic3)
+	begin := domain.Manager.Begin()
+	err = begin.TopicList().Edit(topic3)
+	if err == nil {
+		err = begin.Rollback()
+		return err
+	}
+	stopUpResult := topic3.StopUp()
+	if !stopUpResult {
+		err = begin.Rollback()
+		return
+	}
+	err = begin.Commit()
 	return err
 }
 
