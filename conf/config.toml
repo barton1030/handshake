@@ -12,7 +12,7 @@ init_conn = 20
 max_conn = 200
 [redis]
 host = "127.0.0.1"
-port = 4203
+port = 6379
 user = "root"
 password = ""
 init_conn = 30

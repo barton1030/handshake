@@ -90,7 +90,8 @@ func (c *controller) monitor() {
 		case <-c.errorPipe:
 			c.errorPipeProcessor()
 		case <-c.statisticsPipe:
-		case <-time.After(5 * time.Second):
+		case <-time.After(5 * time.Minute):
+			//fmt.Println(c.topic.Name(), time.Now().Format("2006-01-02 15:04:05"))
 			c.queueCountProcessor()
 		case <-c.fuseTerminationSignal:
 			c.fuseTerminationProcessor()
@@ -138,7 +139,7 @@ func (c *controller) errorPipeProcessor() {
 			err := recover()
 			fmt.Println(err)
 		}()
-		time.Sleep(10 * time.Second)
+		time.Sleep(5 * time.Minute)
 		c.fuseTerminationSignal <- 1
 	}()
 }
@@ -151,7 +152,7 @@ func (c *controller) queueCountProcessor() {
 	// 统计队列数量并通过分析计算所需任务数量
 	taskNum := c.queueCountAnalysis()
 	if taskNum <= c.topic.MinConcurrency() {
-		return
+		taskNum = c.topic.MinConcurrency()
 	}
 	c.actuatorSnapIn(taskNum)
 }

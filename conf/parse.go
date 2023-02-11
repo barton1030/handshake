@@ -44,6 +44,30 @@ type Redis struct {
 	MaxConn  int    `toml:"max_conn"`
 }
 
+func (r Redis) RedisHost() string {
+	return r.Host
+}
+
+func (r Redis) RedisPort() int {
+	return r.Port
+}
+
+func (r Redis) RedisUser() string {
+	return r.User
+}
+
+func (r Redis) RedisUserPwd() string {
+	return r.Pwd
+}
+
+func (r Redis) RedisInitConn() int {
+	return r.InitConn
+}
+
+func (r Redis) RedisMaxConn() int {
+	return r.MaxConn
+}
+
 func ServerConf() (serverConf Server) {
 	return c.ServerConfig
 }

@@ -116,7 +116,7 @@ func (t topic) Stop(operator, topicId int) (err error) {
 		return err
 	}
 	err = begin.TopicList().Edit(topic3)
-	if err == nil {
+	if err != nil {
 		err = begin.Rollback()
 		return err
 	}
