@@ -9,6 +9,7 @@ type StorageTopicList interface {
 	TopicById(topicId int) (Topic, error)
 	TopicByName(topicName string) (Topic, error)
 	TopicList(startId, limit int) ([]Topic, error)
+	ClapHisLockTopicByIdAdd(topicId int) (Topic, error)
 }
 
 type Topic interface {

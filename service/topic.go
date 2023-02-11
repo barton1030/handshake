@@ -48,7 +48,8 @@ func (t topic) Start(operator, topicId int) (err error) {
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := domain.Manager.TopicList().TopicId(topicId)
+	begin := domain.Manager.Begin()
+	topic3, err := begin.TopicList().ClapHisLockTopicByIdAdd(topicId)
 	if err != nil {
 		return
 	}
@@ -69,7 +70,6 @@ func (t topic) Start(operator, topicId int) (err error) {
 		err = errors.New("主题启动失败")
 		return
 	}
-	begin := domain.Manager.Begin()
 	err = begin.TopicList().Edit(topic3)
 	if err != nil {
 		err = begin.Rollback()
@@ -93,7 +93,8 @@ func (t topic) Stop(operator, topicId int) (err error) {
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := domain.Manager.TopicList().TopicId(topicId)
+	begin := domain.Manager.Begin()
+	topic3, err := begin.TopicList().ClapHisLockTopicByIdAdd(topicId)
 	if err != nil {
 		return err
 	}
@@ -114,7 +115,6 @@ func (t topic) Stop(operator, topicId int) (err error) {
 		err = errors.New("终止失败")
 		return err
 	}
-	begin := domain.Manager.Begin()
 	err = begin.TopicList().Edit(topic3)
 	if err == nil {
 		err = begin.Rollback()

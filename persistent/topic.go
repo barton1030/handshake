@@ -77,6 +77,16 @@ func (t topicDao) TopicList(startId, limit int) ([]inter.Topic, error) {
 	return interTopics, err
 }
 
+func (t topicDao) ClapHisLockTopicByIdAdd(topicId int) (inter.Topic, error) {
+	topic := storageTopic{}
+	whereTopicId := strconv.Itoa(topicId)
+	err := transactionController.dbConn(t.transactionId).Set("gorm:query_option", "FOR UPDATE").Table(t.tableName).Where("id = ?", whereTopicId).First(&topic).Error
+	if err != nil && err.Error() == "record not found" {
+		err = nil
+	}
+	return topic, err
+}
+
 func (t topicDao) transformation(topic inter.Topic) (topic2 storageTopic) {
 	topic2.SId = topic.Id()
 	topic2.SName = topic.Name()
