@@ -75,6 +75,12 @@ type topicByNameRequest struct {
 	TopicName string `json:"topicName" form:"topicName" binding:"required"`
 }
 
+type topicListRequest struct {
+	Operator int `json:"operator" form:"operator" binding:"required"`
+	StartId  int `json:"startId" form:"startId"`
+	Limit    int `json:"limit" form:"limit" binding:"required"`
+}
+
 type topicPushMessageRequest struct {
 	Operator int                    `json:"operator" form:"operator" binding:"required"`
 	TopicId  int                    `json:"topicId" form:"topicId" binding:"required"`
@@ -223,13 +229,31 @@ func (t topic) TopicById(c *gin.Context) {
 func (t topic) TopicByName(c *gin.Context) {
 	request := topicByNameRequest{}
 	if err := c.ShouldBind(&request); err != nil {
-		err = fmt.Errorf("app topic TopicById: params %v error: %v", request, err)
+		err = fmt.Errorf("app topic TopicByName: params %v error: %v", request, err)
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
 	topic2, err := service.Topic.TopicByName(request.Operator, request.TopicName)
 	if err != nil {
-		err = fmt.Errorf("app topic TopicById: params %v error: %v", request, err)
+		err = fmt.Errorf("app topic TopicByName: params %v error: %v", request, err)
+		helper.Response(c, 1001, nil, err.Error())
+		return
+	}
+	helper.Response(c, 200, topic2, "")
+	return
+}
+
+// TopicList 主题列表
+func (t topic) TopicList(c *gin.Context) {
+	request := topicListRequest{}
+	if err := c.ShouldBind(&request); err != nil {
+		err = fmt.Errorf("app topic TopicList: params %v error: %v", request, err)
+		helper.Response(c, 1000, nil, err.Error())
+		return
+	}
+	topic2, err := service.Topic.TopicList(request.Operator, request.StartId, request.Limit)
+	if err != nil {
+		err = fmt.Errorf("app topic TopicList: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
 		return
 	}

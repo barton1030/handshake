@@ -45,5 +45,6 @@ func topic(r *gin.Engine) {
 	topicGroup.POST("/edit", app.Topic.EditTopic)
 	topicGroup.GET("/byId", app.Topic.TopicById)
 	topicGroup.GET("/byName", app.Topic.TopicByName)
+	topicGroup.GET("/list", app.Topic.TopicList)
 	topicGroup.POST("/push/message", app.Topic.PushMessage)
 }

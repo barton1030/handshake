@@ -81,7 +81,7 @@ func (u user) Delete(operator, userId int, uri string) (err error) {
 	return
 }
 
-func (u user) List(operator, offset, limit int, uri string) (userList []map[string]interface{}, err error) {
+func (u user) List(operator, offset, limit int, uri string) (list []map[string]interface{}, err error) {
 	err = permissionVerification(operator, uri)
 	if err != nil {
 		return
@@ -91,7 +91,7 @@ func (u user) List(operator, offset, limit int, uri string) (userList []map[stri
 		return
 	}
 	userNum := len(users)
-	userList = make([]map[string]interface{}, userNum, userNum)
+	list = make([]map[string]interface{}, userNum, userNum)
 	for index, user3 := range users {
 		user4 := make(map[string]interface{})
 		user4["id"] = user3.Id()
@@ -99,7 +99,7 @@ func (u user) List(operator, offset, limit int, uri string) (userList []map[stri
 		user4["phone"] = user3.Phone()
 		user4["role_id"] = user3.RoleId()
 		user4["create_time"] = user3.CreateTime()
-		userList[index] = user4
+		list[index] = user4
 	}
 	return
 }

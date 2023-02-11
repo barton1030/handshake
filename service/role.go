@@ -74,7 +74,7 @@ func (r role) SetPermission(operator, roleId int, permissionKey string, permissi
 	return
 }
 
-func (r role) List(operator, offset, limit int, uri string) (roles []map[string]interface{}, err error) {
+func (r role) List(operator, offset, limit int, uri string) (list []map[string]interface{}, err error) {
 	err = permissionVerification(operator, uri)
 	if err != nil {
 		return
@@ -93,7 +93,7 @@ func (r role) List(operator, offset, limit int, uri string) (roles []map[string]
 		role3["creator"] = domainRole.Creator()
 		role3["create_time"] = domainRole.CreateTime()
 		role3["permission"] = domainRole.PermissionMap()
-		roles = append(roles, role3)
+		list = append(list, role3)
 	}
 	return
 }
