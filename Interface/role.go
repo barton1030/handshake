@@ -8,7 +8,7 @@ type StorageRoleList interface {
 	Edit(role2 Role) (err error)
 	RoleById(roleId int) (Role, error)
 	RoleByName(roleName string) (Role, error)
-	List(offset, limit int) ([]Role, error)
+	List(startId, limit int) ([]Role, error)
 }
 
 type Role interface {

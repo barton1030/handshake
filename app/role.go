@@ -37,7 +37,7 @@ type SetPermissionRequest struct {
 
 type ListRequest struct {
 	Operator int `json:"operator" form:"operator" binding:"required"`
-	Offset   int `json:"offset" form:"offset"`
+	StartId  int `json:"startId" form:"startId"`
 	Limit    int `json:"limit" form:"limit" binding:"required"`
 }
 
@@ -131,7 +131,7 @@ func (r role) List(c *gin.Context) {
 		return
 	}
 	uri := helper.ExtractRequestUri(c)
-	roles, err := service.Role.List(request.Operator, request.Offset, request.Limit, uri)
+	roles, err := service.Role.List(request.Operator, request.StartId, request.Limit, uri)
 	if err != nil {
 		err = fmt.Errorf("app role List: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())

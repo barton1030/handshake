@@ -62,9 +62,10 @@ func (r roleDao) RoleByName(roleName string) (inter.Role, error) {
 	return role, err
 }
 
-func (r roleDao) List(offset, limit int) ([]inter.Role, error) {
+func (r roleDao) List(startId, limit int) ([]inter.Role, error) {
 	var roles []storageRole
-	err := transactionController.dbConn(r.transactionId).Table(r.tableName).Offset(offset).Limit(limit).Find(&roles).Error
+	whereStartId := strconv.Itoa(startId)
+	err := transactionController.dbConn(r.transactionId).Table(r.tableName).Where("id > ?", whereStartId).Limit(limit).Find(&roles).Error
 	rolesLen := len(roles)
 	interRoleStorage := make([]inter.Role, rolesLen, rolesLen)
 	for key, value := range roles {

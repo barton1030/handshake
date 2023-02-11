@@ -33,7 +33,7 @@ type deleteUserRequest struct {
 
 type listRequest struct {
 	Operator int `json:"operator" form:"operator" binding:"required"`
-	Offset   int `json:"offset" form:"offset"`
+	StartId  int `json:"startId" form:"startId"`
 	Limit    int `json:"limit" form:"limit" binding:"required"`
 }
 
@@ -104,7 +104,7 @@ func (u user) List(c *gin.Context) {
 		return
 	}
 	uri := helper.ExtractRequestUri(c)
-	userList, err := service.User.List(request.Operator, request.Offset, request.Limit, uri)
+	userList, err := service.User.List(request.Operator, request.StartId, request.Limit, uri)
 	if err != nil {
 		err = fmt.Errorf("app user List: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())

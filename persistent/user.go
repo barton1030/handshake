@@ -67,9 +67,10 @@ func (u userDao) UserByPhone(phone string) (inter.User, error) {
 	return user, err
 }
 
-func (u userDao) UserList(offset, limit int) ([]inter.User, error) {
+func (u userDao) UserList(startId, limit int) ([]inter.User, error) {
 	var users []storageUser
-	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Offset(offset).Limit(limit).Find(&users).Error
+	whereStartId := strconv.Itoa(startId)
+	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Where("id > ?", whereStartId).Limit(limit).Find(&users).Error
 	rolesLen := len(users)
 	interUsers := make([]inter.User, rolesLen, rolesLen)
 	for key, value := range users {

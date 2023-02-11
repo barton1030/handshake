@@ -38,8 +38,8 @@ func (l *List) Edit(role2 role) (err error) {
 	return err
 }
 
-func (l *List) List(offset, limit int) (roleList []role, err error) {
-	storageRoles, err := l.storage.List(offset, limit)
+func (l *List) List(startId, limit int) (roleList []role, err error) {
+	storageRoles, err := l.storage.List(startId, limit)
 	if err != nil {
 		return
 	}

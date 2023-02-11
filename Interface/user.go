@@ -9,7 +9,7 @@ type StorageUserList interface {
 	Delete(user User) error
 	UserById(userId int) (User, error)
 	UserByPhone(phone string) (User, error)
-	UserList(offset, limit int) ([]User, error)
+	UserList(startId, limit int) ([]User, error)
 }
 
 type User interface {

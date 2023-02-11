@@ -45,8 +45,8 @@ func (l *List) TopicName(topicName string) (topic3 topic, err error) {
 	return
 }
 
-func (l *List) List(offset, limit int) (topicList []topic, err error) {
-	storageTopicList, err := l.storage.TopicList(offset, limit)
+func (l *List) List(startId, limit int) (topicList []topic, err error) {
+	storageTopicList, err := l.storage.TopicList(startId, limit)
 	if err != nil {
 		return
 	}

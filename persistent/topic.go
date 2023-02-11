@@ -59,9 +59,10 @@ func (t topicDao) TopicByName(topicName string) (inter.Topic, error) {
 	return topic, err
 }
 
-func (t topicDao) TopicList(offset, limit int) ([]inter.Topic, error) {
+func (t topicDao) TopicList(startId, limit int) ([]inter.Topic, error) {
 	var users []storageTopic
-	err := transactionController.dbConn(t.transactionId).Table(t.tableName).Offset(offset).Limit(limit).Find(&users).Error
+	whereStartId := strconv.Itoa(startId)
+	err := transactionController.dbConn(t.transactionId).Table(t.tableName).Where("id > ?", whereStartId).Limit(limit).Find(&users).Error
 	rolesLen := len(users)
 	interTopics := make([]inter.Topic, rolesLen, rolesLen)
 	for key, value := range users {

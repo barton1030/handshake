@@ -50,8 +50,8 @@ func (l *List) UserByPhone(phone string) (user2 user, err error) {
 	return
 }
 
-func (l *List) List(offset, limit int) (userList []user, err error) {
-	storageUserList, err := l.storage.UserList(offset, limit)
+func (l *List) List(startId, limit int) (userList []user, err error) {
+	storageUserList, err := l.storage.UserList(startId, limit)
 	if err != nil {
 		return
 	}
