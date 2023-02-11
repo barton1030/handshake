@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"errors"
 	inter "handshake/Interface"
 	"handshake/conduit"
 	"time"
@@ -99,6 +100,18 @@ func (a *actuator) implement() {
 
 		res, err := a.topic.CallbackHandler().Do(message.Data())
 		if err != nil {
+		} else if resCode, ok := res["code"]; ok {
+			if code, ok := resCode.(float64); ok && int(code) != 0 {
+				err = errors.New(res["error"].(string))
+			}
+		}
+		if err == nil {
+			message.Success()
+			err = a.topic.MessageQueuingHandler().Finish(message)
+			if err != nil {
+				a.alarm(err.Error(), message.Id())
+			}
+		} else {
 			a.errorPipe <- 1
 			a.alarm(err.Error(), message.Id())
 			maxRetryCount := a.topic.MaxRetryCount()
@@ -112,29 +125,6 @@ func (a *actuator) implement() {
 			if err != nil {
 				a.alarm(err.Error(), message.Id())
 			}
-			continue
-		}
-
-		if code, ok := res["code"].(int); ok && code != 200 {
-			a.errorPipe <- 1
-			a.alarm(err.Error(), message.Id())
-			maxRetryCount := a.topic.MaxRetryCount()
-			retryCount := message.RetryCount()
-			if retryCount >= maxRetryCount {
-				message.Fail()
-				err = a.topic.MessageQueuingHandler().Finish(message)
-			} else {
-				err = a.topic.MessageQueuingHandler().Push(message)
-			}
-			if err != nil {
-				a.alarm(err.Error(), message.Id())
-			}
-			continue
-		}
-		message.Success()
-		err = a.topic.MessageQueuingHandler().Finish(message)
-		if err != nil {
-			a.alarm(err.Error(), message.Id())
 		}
 	}
 }
