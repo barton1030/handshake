@@ -57,10 +57,6 @@ func (q queueDao) Add(topicName string, message inter.Message) (err error) {
 
 func (q queueDao) OnlyAdd(topicName string, message storageMessage) (err error) {
 	tableName := q.tableName + topicName
-	err = q.Edit(topicName, message)
-	if err != nil {
-		return
-	}
 	messageJson, err := json.Marshal(message)
 	if err != nil {
 		return err
@@ -71,7 +67,7 @@ func (q queueDao) OnlyAdd(topicName string, message storageMessage) (err error) 
 	return err
 }
 
-func (q queueDao) NextPendingData(topicName string, offset int) (message inter.Message, err error) {
+func (q queueDao) NextPendingData(topicName string) (message inter.Message, err error) {
 	redisConn := internal.RedisConn().Get()
 	defer redisConn.Close()
 	tableName := q.tableName + topicName
@@ -85,16 +81,6 @@ func (q queueDao) NextPendingData(topicName string, offset int) (message inter.M
 			json.Unmarshal(value, &message2)
 		}
 	}
-	//if message2.Id() > 0 {
-	//	message = message2
-	//	return
-	//}
-	//whereId := strconv.Itoa(offset)
-	//err = transactionController.dbConn(q.transactionId).Table(tableName).Where("id = ?", whereId).First(&message2).Error
-	//if err != nil && err.Error() == "record not found" {
-	//	err = nil
-	//	return
-	//}
 	message = message2
 	return
 }

@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	inter "handshake/Interface"
+	"handshake/conduit"
 	"sync"
 	"time"
 )
@@ -43,9 +44,9 @@ type errorCounter struct {
 func newController(topic inter.Topic) *controller {
 	pipeName := topic.Name()
 	pipeCap := topic.MaxConcurrency()
-	errorPipe := conduitUnit.setUpErrorConduit(pipeName, pipeCap)
-	fusingPipe := conduitUnit.setUpFusingConduit(pipeName, pipeCap)
-	statisticsPipe := conduitUnit.setUpStatisticsConduit(pipeName, pipeCap)
+	errorPipe := conduit.Manager.SetUpErrorConduit(pipeName, pipeCap)
+	fusingPipe := conduit.Manager.SetUpFusingConduit(pipeName, pipeCap)
+	statisticsPipe := conduit.Manager.SetUpStatisticsConduit(pipeName, pipeCap)
 	return &controller{
 		topic:                    topic,
 		status:                   ControllerInitStatus,
@@ -158,9 +159,9 @@ func (c *controller) queueCountProcessor() {
 // clearPipe 关闭不同执行体和自身通信管道或channel
 func (c *controller) clearPipe() {
 	pipeName := c.topic.Name()
-	conduitUnit.closeErrorConduit(pipeName)
-	conduitUnit.closeFusingConduit(pipeName)
-	conduitUnit.closeStatisticsConduit(pipeName)
+	conduit.Manager.CloseErrorConduit(pipeName)
+	conduit.Manager.CloseFusingConduit(pipeName)
+	conduit.Manager.CloseStatisticsConduit(pipeName)
 }
 
 // fuseTerminationProcessor 熔断接触逻辑

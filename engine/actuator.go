@@ -2,6 +2,7 @@ package engine
 
 import (
 	inter "handshake/Interface"
+	"handshake/conduit"
 	"time"
 )
 
@@ -27,9 +28,9 @@ type actuator struct {
 
 func newActuator(actuatorId int, topic inter.Topic) *actuator {
 	pipeName := topic.Name()
-	errorPipe := conduitUnit.errorConduitByName(pipeName)
-	fusingPipe := conduitUnit.fusingConduitByName(pipeName)
-	statisticsPipe := conduitUnit.statisticsConduitByName(pipeName)
+	errorPipe := conduit.Manager.ErrorConduitByName(pipeName)
+	fusingPipe := conduit.Manager.FusingConduitByName(pipeName)
+	statisticsPipe := conduit.Manager.StatisticsConduitByName(pipeName)
 	return &actuator{
 		id:             actuatorId,
 		status:         ActuatorInitStatus,

@@ -1,4 +1,4 @@
-package engine
+package conduit
 
 import (
 	"sync"
@@ -14,13 +14,13 @@ type conduit struct {
 	fusingLock     sync.Mutex
 }
 
-var conduitUnit = conduit{
+var Manager = conduit{
 	error:      make(map[string]chan int),
 	statistics: make(map[string]chan int),
 	fusing:     make(map[string]chan int),
 }
 
-func (c *conduit) setUpErrorConduit(name string, conduitCap int) (errorConduit chan int) {
+func (c *conduit) SetUpErrorConduit(name string, conduitCap int) (errorConduit chan int) {
 	c.errorLock.Lock()
 	defer c.errorLock.Unlock()
 	if _, ok := c.error[name]; ok {
@@ -31,7 +31,7 @@ func (c *conduit) setUpErrorConduit(name string, conduitCap int) (errorConduit c
 	return
 }
 
-func (c *conduit) closeErrorConduit(name string) {
+func (c *conduit) CloseErrorConduit(name string) {
 	c.errorLock.Lock()
 	defer c.errorLock.Unlock()
 	if _, ok := c.error[name]; !ok {
@@ -42,7 +42,7 @@ func (c *conduit) closeErrorConduit(name string) {
 	return
 }
 
-func (c *conduit) setUpStatisticsConduit(name string, conduitCap int) (statisticsConduit chan int) {
+func (c *conduit) SetUpStatisticsConduit(name string, conduitCap int) (statisticsConduit chan int) {
 	c.statisticsLock.Lock()
 	defer c.statisticsLock.Unlock()
 	if _, ok := c.statistics[name]; ok {
@@ -53,7 +53,7 @@ func (c *conduit) setUpStatisticsConduit(name string, conduitCap int) (statistic
 	return
 }
 
-func (c *conduit) closeStatisticsConduit(name string) {
+func (c *conduit) CloseStatisticsConduit(name string) {
 	c.statisticsLock.Lock()
 	defer c.statisticsLock.Unlock()
 	if _, ok := c.statistics[name]; !ok {
@@ -64,7 +64,7 @@ func (c *conduit) closeStatisticsConduit(name string) {
 	return
 }
 
-func (c *conduit) setUpFusingConduit(name string, conduitCap int) (fusingConduit chan int) {
+func (c *conduit) SetUpFusingConduit(name string, conduitCap int) (fusingConduit chan int) {
 	c.fusingLock.Lock()
 	defer c.fusingLock.Unlock()
 	if _, ok := c.fusing[name]; ok {
@@ -75,7 +75,7 @@ func (c *conduit) setUpFusingConduit(name string, conduitCap int) (fusingConduit
 	return
 }
 
-func (c *conduit) closeFusingConduit(name string) {
+func (c *conduit) CloseFusingConduit(name string) {
 	c.fusingLock.Lock()
 	defer c.fusingLock.Unlock()
 	if _, ok := c.fusing[name]; !ok {
@@ -86,21 +86,21 @@ func (c *conduit) closeFusingConduit(name string) {
 	return
 }
 
-func (c *conduit) errorConduitByName(name string) (errorConduit chan int) {
+func (c *conduit) ErrorConduitByName(name string) (errorConduit chan int) {
 	if cErrorConduit, ok := c.error[name]; ok {
 		errorConduit = cErrorConduit
 	}
 	return
 }
 
-func (c *conduit) statisticsConduitByName(name string) (statisticsConduit chan int) {
+func (c *conduit) StatisticsConduitByName(name string) (statisticsConduit chan int) {
 	if cStatisticsConduit, ok := c.error[name]; ok {
 		statisticsConduit = cStatisticsConduit
 	}
 	return
 }
 
-func (c *conduit) fusingConduitByName(name string) (fusingConduit chan int) {
+func (c *conduit) FusingConduitByName(name string) (fusingConduit chan int) {
 	if cFusingConduit, ok := c.error[name]; ok {
 		fusingConduit = cFusingConduit
 	}

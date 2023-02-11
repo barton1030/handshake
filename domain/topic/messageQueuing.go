@@ -4,11 +4,11 @@ import (
 	inter "handshake/Interface"
 	"handshake/persistent"
 	"sync"
+	"time"
 )
 
 type MessageQueuing struct {
 	topicName string
-	offset    int
 	storage   inter.StorageQueueList
 	lock      sync.Mutex
 }
@@ -17,27 +17,22 @@ func newMessageQueuing(topicName string) MessageQueuing {
 	return MessageQueuing{
 		topicName: topicName,
 		storage:   persistent.QueueDao,
-		offset:    1,
 	}
 }
 
 func (m *MessageQueuing) SetStorage(storageInter inter.StorageQueueList) *MessageQueuing {
 	return &MessageQueuing{
 		topicName: m.topicName,
-		offset:    m.offset,
 		storage:   storageInter,
 	}
 }
 
 func (m *MessageQueuing) Pop() (message inter.Message, err error) {
-	message2, err := m.storage.NextPendingData(m.topicName, m.offset)
+	message2, err := m.storage.NextPendingData(m.topicName)
 	if err != nil {
 		return nil, err
 	}
 	message3 := m.reconstruction(message2)
-	if message3.Id() > 0 {
-		m.offset = message3.id + 1
-	}
 	message = &message3
 	return
 }
@@ -67,4 +62,33 @@ func (m *MessageQueuing) reconstruction(message3 inter.Message) (message2 messag
 	message2.retry = message3.RetryCount()
 	message2.createTime = message3.CreateTime()
 	return
+}
+
+// 触发器暂时不再嵌入到队列对象中
+type trigger struct {
+	lastTriggerTime time.Time
+	triggerTime     time.Time
+	topicName       string
+	lock            sync.Mutex
+}
+
+func (t *trigger) Send(triggerTime time.Time) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+	nextExecutionTime := t.lastTriggerTime.Add(5 * time.Minute)
+	if !triggerTime.After(nextExecutionTime) {
+		return
+	}
+}
+
+func (t *trigger) LastTriggerTime() time.Time {
+	return t.lastTriggerTime
+}
+
+func (t *trigger) TopicName() string {
+	return t.topicName
+}
+
+func (t *trigger) TriggerTime() time.Time {
+	return t.triggerTime
 }
