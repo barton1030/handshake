@@ -70,6 +70,11 @@ type topicByIdRequest struct {
 	TopicId  int `json:"topicId" form:"topicId" binding:"required"`
 }
 
+type topicByNameRequest struct {
+	Operator  int    `json:"operator" form:"operator" binding:"required"`
+	TopicName string `json:"topicName" form:"topicName" binding:"required"`
+}
+
 type topicPushMessageRequest struct {
 	Operator int                    `json:"operator" form:"operator" binding:"required"`
 	TopicId  int                    `json:"topicId" form:"topicId" binding:"required"`
@@ -196,7 +201,7 @@ func (t topic) EditTopic(c *gin.Context) {
 	return
 }
 
-// TopicById 编辑主题信息
+// TopicById 通过主题id获取主题信息
 func (t topic) TopicById(c *gin.Context) {
 	request := topicByIdRequest{}
 	if err := c.ShouldBind(&request); err != nil {
@@ -205,6 +210,24 @@ func (t topic) TopicById(c *gin.Context) {
 		return
 	}
 	topic2, err := service.Topic.TopicById(request.Operator, request.TopicId)
+	if err != nil {
+		err = fmt.Errorf("app topic TopicById: params %v error: %v", request, err)
+		helper.Response(c, 1001, nil, err.Error())
+		return
+	}
+	helper.Response(c, 200, topic2, "")
+	return
+}
+
+// TopicByName 通过主题名称获取主题信息
+func (t topic) TopicByName(c *gin.Context) {
+	request := topicByNameRequest{}
+	if err := c.ShouldBind(&request); err != nil {
+		err = fmt.Errorf("app topic TopicById: params %v error: %v", request, err)
+		helper.Response(c, 1000, nil, err.Error())
+		return
+	}
+	topic2, err := service.Topic.TopicByName(request.Operator, request.TopicName)
 	if err != nil {
 		err = fmt.Errorf("app topic TopicById: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())

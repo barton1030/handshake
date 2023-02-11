@@ -44,5 +44,6 @@ func topic(r *gin.Engine) {
 	topicGroup.POST("/set/alarm", app.Topic.SetAlarm)
 	topicGroup.POST("/edit", app.Topic.EditTopic)
 	topicGroup.GET("/byId", app.Topic.TopicById)
+	topicGroup.GET("/byName", app.Topic.TopicByName)
 	topicGroup.POST("/push/message", app.Topic.PushMessage)
 }

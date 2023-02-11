@@ -121,7 +121,7 @@ func (t topic) Delete(operator, topicId int) (err error) {
 	}
 	abandonmentResult := topic3.Abandonment()
 	if !abandonmentResult {
-		err = errors.New("废弃失败")
+		err = errors.New("废弃失败, 请确认主题是否已停止！")
 		return err
 	}
 	err = domain.Manager.TopicList().Edit(topic3)
@@ -222,6 +222,55 @@ func (t topic) TopicById(operator, topicId int) (topic4 map[string]interface{}, 
 	}
 	topic4 = make(map[string]interface{})
 	topic3, err := domain.Manager.TopicList().TopicId(topicId)
+	if err != nil {
+		return topic4, err
+	}
+	if topic3.Id() <= 0 {
+		err = errors.New("主题不存在，请确认！")
+		return topic4, err
+	}
+	if topic3.Creator() != operator {
+		err = errors.New("操作人与主题创建者不一致，请确认！")
+		return
+	}
+	topic4["id"] = topic3.Id()
+	topic4["name"] = topic3.Name()
+	topic4["status"] = topic3.Status()
+	topic4["maxRetryCount"] = topic3.MaxRetryCount()
+	topic4["minConcurrency"] = topic3.MinConcurrency()
+	topic4["maxConcurrency"] = topic3.MaxConcurrency()
+	topic4["fuseSalt"] = topic3.FuseSalt()
+	alamHandler := topic3.AlarmHandler()
+	alarm := make(map[string]interface{})
+	alarm["url"] = alamHandler.Url()
+	alarm["method"] = alamHandler.Method()
+	alarm["recipients"] = alamHandler.Recipients()
+	alarm["headers"] = alamHandler.Headers()
+	alarm["cookies"] = alamHandler.Cookies()
+	alarm["templateParameters"] = alamHandler.TemplateParameters()
+	topic4["alarm"] = alarm
+	callbackHandler := topic3.CallbackHandler()
+	callback := make(map[string]interface{})
+	callback["url"] = callbackHandler.Url()
+	callback["method"] = callbackHandler.Method()
+	callback["headers"] = callbackHandler.Headers()
+	callback["cookies"] = callbackHandler.Cookies()
+	topic4["callback"] = callback
+
+	return topic4, err
+}
+
+func (t topic) TopicByName(operator int, topicName string) (topic4 map[string]interface{}, err error) {
+	user3, err := domain.Manager.UserList().UserById(operator)
+	if err != nil {
+		return
+	}
+	if user3.Id() <= 0 {
+		err = errors.New("操作者用户不存在，请注意！")
+		return
+	}
+	topic4 = make(map[string]interface{})
+	topic3, err := domain.Manager.TopicList().TopicName(topicName)
 	if err != nil {
 		return topic4, err
 	}
