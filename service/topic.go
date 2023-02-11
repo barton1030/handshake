@@ -229,10 +229,6 @@ func (t topic) TopicById(operator, topicId int) (topic4 map[string]interface{}, 
 		err = errors.New("主题不存在，请确认！")
 		return topic4, err
 	}
-	if topic3.Creator() != operator {
-		err = errors.New("操作人与主题创建者不一致，请确认！")
-		return
-	}
 	topic4["id"] = topic3.Id()
 	topic4["name"] = topic3.Name()
 	topic4["status"] = topic3.Status()
@@ -277,10 +273,6 @@ func (t topic) TopicByName(operator int, topicName string) (topic4 map[string]in
 	if topic3.Id() <= 0 {
 		err = errors.New("主题不存在，请确认！")
 		return topic4, err
-	}
-	if topic3.Creator() != operator {
-		err = errors.New("操作人与主题创建者不一致，请确认！")
-		return
 	}
 	topic4["id"] = topic3.Id()
 	topic4["name"] = topic3.Name()
