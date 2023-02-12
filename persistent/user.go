@@ -98,6 +98,12 @@ func (u userDao) UserList(startId, limit int) ([]inter.User, error) {
 	return interUsers, err
 }
 
+func (u userDao) UserCountByRoleId(roleId int) (counter int, err error) {
+	whereRoleId := strconv.Itoa(roleId)
+	err = transactionController.dbConn(u.transactionId).Table(u.tableName).Where("role_id = ?", whereRoleId).Count(&counter).Error
+	return
+}
+
 func (u userDao) transformation(user inter.User) (user2 storageUser) {
 	user2.SId = user.Id()
 	user2.SStatus = user.Status()

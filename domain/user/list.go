@@ -85,6 +85,11 @@ func (l *List) List(startId, limit int) (userList []user, err error) {
 	return
 }
 
+func (l *List) UserCountByRoleId(roleId int) (counter int, err error) {
+	counter, err = l.storage.UserCountByRoleId(roleId)
+	return
+}
+
 func (l *List) reconstruction(user inter.User) (user2 user) {
 	user2.id = user.Id()
 	user2.name = user.Name()

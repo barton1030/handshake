@@ -16,7 +16,7 @@ type userAddRequest struct {
 	Operator int    `json:"operator" form:"operator" binding:"required"`
 	Name     string `json:"name" form:"name" binding:"required"`
 	Phone    string `json:"phone" form:"phone" binding:"required"`
-	Pwd      string `json:"pwd" form:"pwd" binding:"required"`
+	Pwd      string `json:"pwd" form:"pwd"`
 	RoleId   int    `json:"roleId" form:"roleId" binding:"required"`
 }
 
@@ -49,7 +49,7 @@ func (u user) Add(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	
+
 	err := service.User.Add(request.Operator, request.RoleId, request.Name, request.Phone, request.Pwd)
 	if err != nil {
 		err = fmt.Errorf("app user Add: params %v error: %v", request, err)

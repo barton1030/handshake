@@ -48,8 +48,9 @@ CREATE TABLE `hand_shake_user` (
 `role_id` int NOT NULL DEFAULT '0',
 `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY (`id`) USING BTREE,
-KEY `phone` (`phone`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+KEY `phone` (`phone`) USING BTREE,
+KEY `roleId` (`role_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -107,3 +108,6 @@ insert into hand_shake_user (`status`, `name`, phone, pwd, role_id) VALUES (1, "
    domain/topic/callback.go
 
 6、编译启动、通过topic/start
+
+7、注意事项：
+   回调api返回，必须包含code和error字段，code为0表示业务逻辑正常处理，error表示业务处理处理失败后的错误信息。

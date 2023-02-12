@@ -48,6 +48,10 @@ func (r role) RoleById(operator, roleId int) (role4 map[string]interface{}, err 
 	if err != nil {
 		return
 	}
+	if role3.Id() <= 0 {
+		err = errors.New("角色不存在，请注意")
+		return
+	}
 	role4 = r.reconstruction(&role3)
 	return
 }
@@ -136,7 +140,7 @@ func (r role) List(operator, offset, limit int) (list []map[string]interface{}, 
 
 func (r role) Delete(operator, roleId int) (err error) {
 	begin := domain.Manager.Begin()
-	role3, err := begin.RoleList().RoleById(roleId)
+	role3, err := begin.RoleList().ClapHisLockRoleById(roleId)
 	if err != nil {
 		_ = begin.Rollback()
 		return
@@ -144,6 +148,16 @@ func (r role) Delete(operator, roleId int) (err error) {
 	if role3.Id() <= 0 {
 		_ = begin.Rollback()
 		err = errors.New("角色不存在")
+		return
+	}
+	counter, err := begin.UserList().UserCountByRoleId(roleId)
+	if err != nil {
+		_ = begin.Rollback()
+		return
+	}
+	if counter > 0 {
+		_ = begin.Rollback()
+		err = errors.New("该角色已与具体用户绑定不可删除, 请注意")
 		return
 	}
 	role3.Delete()
