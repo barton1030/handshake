@@ -17,6 +17,7 @@ func PermissionVerification(c *gin.Context) {
 		err = fmt.Errorf("middleware PermissionVerification: params %v error: %v", request, err)
 		helper.Response(c, 908, nil, err.Error())
 		c.Abort()
+		return
 	}
 	uri := helper.ExtractRequestUri(c)
 	err := service.PermissionVerification(request.Operator, uri)
@@ -24,6 +25,7 @@ func PermissionVerification(c *gin.Context) {
 		err = fmt.Errorf("middleware PermissionVerification: params %v error: %v", request, err)
 		helper.Response(c, 909, nil, err.Error())
 		c.Abort()
+		return
 	}
 }
 
@@ -33,11 +35,13 @@ func VerifyUserStatus(c *gin.Context) {
 		err = fmt.Errorf("middleware VerifyUserStatus: params %v error: %v", request, err)
 		helper.Response(c, 908, nil, err.Error())
 		c.Abort()
+		return
 	}
 	err := service.UserStatusVerification(request.Operator)
 	if err != nil {
 		err = fmt.Errorf("middleware VerifyUserStatus: params %v error: %v", request, err)
 		helper.Response(c, 909, nil, err.Error())
 		c.Abort()
+		return
 	}
 }
