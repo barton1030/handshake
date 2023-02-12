@@ -178,7 +178,7 @@ func (r role) Delete(operator, roleId int, uri string) (err error) {
 	}
 	roleLogData := r.reconstruction(&role3)
 	roleLog := log.NewLog(roleLogData, role3.Id(), operator, time.Now())
-	err = domain.Manager.LogList().AddRoleLog(roleLog)
+	err = begin.LogList().AddRoleLog(roleLog)
 	if err != nil {
 		_ = begin.Rollback()
 		return err

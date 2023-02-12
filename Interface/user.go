@@ -10,6 +10,8 @@ type StorageUserList interface {
 	UserById(userId int) (User, error)
 	UserByPhone(phone string) (User, error)
 	UserList(startId, limit int) ([]User, error)
+	ClapHisLockUserById(userId int) (User, error)
+	ClapHisLockUserByPhone(phone string) (User, error)
 }
 
 type User interface {

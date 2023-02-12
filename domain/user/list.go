@@ -41,8 +41,26 @@ func (l *List) UserById(userId int) (user2 user, err error) {
 	return
 }
 
+func (l *List) ClapHisLockUserById(userId int) (user2 user, err error) {
+	storageUser, err := l.storage.ClapHisLockUserById(userId)
+	if err != nil {
+		return
+	}
+	user2 = l.reconstruction(storageUser)
+	return
+}
+
 func (l *List) UserByPhone(phone string) (user2 user, err error) {
 	storageUser, err := l.storage.UserByPhone(phone)
+	if err != nil {
+		return
+	}
+	user2 = l.reconstruction(storageUser)
+	return
+}
+
+func (l *List) ClapHisLockUserByPhone(phone string) (user2 user, err error) {
+	storageUser, err := l.storage.ClapHisLockUserByPhone(phone)
 	if err != nil {
 		return
 	}

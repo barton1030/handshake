@@ -48,10 +48,29 @@ func (u userDao) Delete(user inter.User) error {
 	return err
 }
 
+func (u userDao) ClapHisLockUserById(userId int) (inter.User, error) {
+	user := storageUser{}
+	whereUserId := strconv.Itoa(userId)
+	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Where("id = ?", whereUserId).First(&user).Error
+	if err != nil && err.Error() == "record not found" {
+		err = nil
+	}
+	return user, err
+}
+
 func (u userDao) UserById(userId int) (inter.User, error) {
 	user := storageUser{}
 	whereUserId := strconv.Itoa(userId)
 	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Where("id = ?", whereUserId).First(&user).Error
+	if err != nil && err.Error() == "record not found" {
+		err = nil
+	}
+	return user, err
+}
+
+func (u userDao) ClapHisLockUserByPhone(phone string) (inter.User, error) {
+	user := storageUser{}
+	err := transactionController.dbConn(u.transactionId).Table(u.tableName).Where("phone = ?", phone).First(&user).Error
 	if err != nil && err.Error() == "record not found" {
 		err = nil
 	}
