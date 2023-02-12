@@ -145,6 +145,10 @@ func (u user) UserId(operator, userId int) (user4 map[string]interface{}, err er
 	if err != nil {
 		return
 	}
+	if user3.Id() <= 0 {
+		err = errors.New("用户不存在，请注意")
+		return
+	}
 	user4 = u.reconstruction(&user3)
 	return
 }
