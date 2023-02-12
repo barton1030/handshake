@@ -45,8 +45,17 @@ func (l *List) TopicName(topicName string) (topic3 topic, err error) {
 	return
 }
 
-func (l *List) ClapHisLockTopicByIdAdd(topicId int) (topic2 topic, err error) {
-	storageTopic, err := l.storage.ClapHisLockTopicByIdAdd(topicId)
+func (l *List) ClapHisLockTopicByName(topicName string) (topic2 topic, err error) {
+	storageTopic, err := l.storage.ClapHisLockTopicByName(topicName)
+	if err != nil {
+		return
+	}
+	topic2 = l.reconstruction(storageTopic)
+	return
+}
+
+func (l *List) ClapHisLockTopicById(topicId int) (topic2 topic, err error) {
+	storageTopic, err := l.storage.ClapHisLockTopicById(topicId)
 	if err != nil {
 		return
 	}

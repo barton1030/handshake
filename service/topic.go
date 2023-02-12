@@ -22,15 +22,17 @@ func (t topic) Add(operator int, name string, maxRetryCount, minConcurrency, max
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := domain.Manager.TopicList().TopicName(name)
+	begin := domain.Manager.Begin()
+	topic3, err := begin.TopicList().ClapHisLockTopicByName(name)
 	if err != nil {
+		_ = begin.Rollback()
 		return
 	}
 	if topic3.Id() > 0 {
+		_ = begin.Rollback()
 		err = errors.New("主题名重复，请注意！")
 		return
 	}
-	begin := domain.Manager.Begin()
 	topic4 := topic2.NewTopic(name, maxRetryCount, minConcurrency, maxConcurrency, fuseSalt, operator)
 	err = begin.TopicList().Add(topic4)
 	if err != nil {
@@ -59,7 +61,7 @@ func (t topic) Start(operator, topicId int) (err error) {
 		return
 	}
 	begin := domain.Manager.Begin()
-	topic3, err := begin.TopicList().ClapHisLockTopicByIdAdd(topicId)
+	topic3, err := begin.TopicList().ClapHisLockTopicById(topicId)
 	if err != nil {
 		_ = begin.Rollback()
 		return
@@ -116,7 +118,7 @@ func (t topic) Stop(operator, topicId int) (err error) {
 		return
 	}
 	begin := domain.Manager.Begin()
-	topic3, err := begin.TopicList().ClapHisLockTopicByIdAdd(topicId)
+	topic3, err := begin.TopicList().ClapHisLockTopicById(topicId)
 	if err != nil {
 		return err
 	}
@@ -172,7 +174,7 @@ func (t topic) Delete(operator, topicId int) (err error) {
 		return
 	}
 	begin := domain.Manager.Begin()
-	topic3, err := begin.TopicList().ClapHisLockTopicByIdAdd(topicId)
+	topic3, err := begin.TopicList().ClapHisLockTopicById(topicId)
 	if err != nil {
 		_ = begin.Rollback()
 		return err
@@ -225,7 +227,7 @@ func (t topic) SetCallback(operator, topicId int, url, method string, headers, c
 		return
 	}
 	begin := domain.Manager.Begin()
-	topic3, err := begin.TopicList().ClapHisLockTopicByIdAdd(topicId)
+	topic3, err := begin.TopicList().ClapHisLockTopicById(topicId)
 	if err != nil {
 		_ = begin.Rollback()
 		return
@@ -268,7 +270,7 @@ func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []
 		return
 	}
 	begin := domain.Manager.Begin()
-	topic3, err := begin.TopicList().ClapHisLockTopicByIdAdd(topicId)
+	topic3, err := begin.TopicList().ClapHisLockTopicById(topicId)
 	if err != nil {
 		_ = begin.Rollback()
 		return
@@ -311,7 +313,7 @@ func (t topic) Edit(operator, topicId, maxRetryCount, minConcurrency, maxConcurr
 		return
 	}
 	begin := domain.Manager.Begin()
-	topic3, err := begin.TopicList().ClapHisLockTopicByIdAdd(topicId)
+	topic3, err := begin.TopicList().ClapHisLockTopicById(topicId)
 	if err != nil {
 		_ = begin.Rollback()
 		return
