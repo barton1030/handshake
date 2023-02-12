@@ -6,6 +6,7 @@ import (
 	"handshake/domain"
 	"handshake/domain/log"
 	role2 "handshake/domain/role"
+	"time"
 )
 
 type role struct {
@@ -18,21 +19,31 @@ func (r role) Add(operator int, name, uri string) (err error) {
 	if err != nil {
 		return
 	}
-	role3, err := domain.Manager.RoleList().RoleByName(name)
-	if role3.Id() > 0 {
-		err = errors.New("不要重复添加")
-	}
+	begin := domain.Manager.Begin()
+	role3, err := begin.RoleList().ClapHisLockRoleByName(name)
 	if err != nil {
+		_ = begin.Rollback()
+		return err
+	}
+	if role3.Id() > 0 {
+		_ = begin.Rollback()
+		err = errors.New("不要重复添加")
 		return err
 	}
 	role4 := role2.NewRole(name, operator)
-	err = domain.Manager.RoleList().Add(role4)
+	err = begin.RoleList().Add(role4)
 	if err != nil {
+		_ = begin.Rollback()
 		return err
 	}
 	roleLogData := r.reconstruction(&role4)
-	roleLog := log.NewLog(roleLogData, role4.Id(), operator, role4.CreateTime())
-	err = domain.Manager.LogList().AddRoleLog(roleLog)
+	roleLog := log.NewLog(roleLogData, role4.Id(), operator, time.Now())
+	err = begin.LogList().AddRoleLog(roleLog)
+	if err != nil {
+		_ = begin.Rollback()
+		return err
+	}
+	err = begin.Commit()
 	return err
 }
 
@@ -54,25 +65,41 @@ func (r role) EditName(operator, roleId int, roleName, uri string) (err error) {
 	if err != nil {
 		return
 	}
-	role3, err := domain.Manager.RoleList().RoleByName(roleName)
-	if role3.Id() > 0 {
-		err = errors.New("不要重复添加")
-	}
+	begin := domain.Manager.Begin()
+	role3, err := begin.RoleList().ClapHisLockRoleByName(roleName)
 	if err != nil {
+		_ = begin.Rollback()
 		return err
 	}
-	role3, err = domain.Manager.RoleList().RoleById(roleId)
+	if role3.Id() > 0 {
+		_ = begin.Rollback()
+		err = errors.New("不要重复添加")
+		return err
+	}
+	role3, err = begin.RoleList().ClapHisLockRoleById(roleId)
 	if err != nil {
+		_ = begin.Rollback()
 		return
 	}
+	if role3.Id() <= 0 {
+		_ = begin.Rollback()
+		err = errors.New("角色不存在，请注意！")
+		return err
+	}
 	role3.SetName(roleName)
-	err = domain.Manager.RoleList().Edit(role3)
+	err = begin.RoleList().Edit(role3)
 	if err != nil {
+		_ = begin.Rollback()
 		return err
 	}
 	roleLogData := r.reconstruction(&role3)
-	roleLog := log.NewLog(roleLogData, role3.Id(), operator, role3.CreateTime())
-	err = domain.Manager.LogList().AddRoleLog(roleLog)
+	roleLog := log.NewLog(roleLogData, role3.Id(), operator, time.Now())
+	err = begin.LogList().AddRoleLog(roleLog)
+	if err != nil {
+		_ = begin.Rollback()
+		return err
+	}
+	err = begin.Commit()
 	return
 }
 
@@ -81,18 +108,31 @@ func (r role) SetPermission(operator, roleId int, permissionKey string, permissi
 	if err != nil {
 		return
 	}
-	role3, err := domain.Manager.RoleList().RoleById(roleId)
+	begin := domain.Manager.Begin()
+	role3, err := begin.RoleList().ClapHisLockRoleById(roleId)
 	if err != nil {
+		_ = begin.Rollback()
 		return
 	}
+	if role3.Id() <= 0 {
+		_ = begin.Rollback()
+		err = errors.New("角色不存在，请注意！")
+		return err
+	}
 	role3.SetPermission(permissionKey, permissionValue)
-	err = domain.Manager.RoleList().Edit(role3)
+	err = begin.RoleList().Edit(role3)
 	if err != nil {
+		_ = begin.Rollback()
 		return err
 	}
 	roleLogData := r.reconstruction(&role3)
-	roleLog := log.NewLog(roleLogData, role3.Id(), operator, role3.CreateTime())
-	err = domain.Manager.LogList().AddRoleLog(roleLog)
+	roleLog := log.NewLog(roleLogData, role3.Id(), operator, time.Now())
+	err = begin.LogList().AddRoleLog(roleLog)
+	if err != nil {
+		_ = begin.Rollback()
+		return err
+	}
+	err = begin.Commit()
 	return
 }
 
@@ -119,22 +159,31 @@ func (r role) Delete(operator, roleId int, uri string) (err error) {
 	if err != nil {
 		return
 	}
-	role3, err := domain.Manager.RoleList().RoleById(roleId)
+	begin := domain.Manager.Begin()
+	role3, err := begin.RoleList().RoleById(roleId)
 	if err != nil {
+		_ = begin.Rollback()
 		return
 	}
 	if role3.Id() <= 0 {
+		_ = begin.Rollback()
 		err = errors.New("角色不存在")
 		return
 	}
 	role3.Delete()
-	err = domain.Manager.RoleList().Edit(role3)
+	err = begin.RoleList().Edit(role3)
 	if err != nil {
+		_ = begin.Rollback()
 		return err
 	}
 	roleLogData := r.reconstruction(&role3)
-	roleLog := log.NewLog(roleLogData, role3.Id(), operator, role3.CreateTime())
+	roleLog := log.NewLog(roleLogData, role3.Id(), operator, time.Now())
 	err = domain.Manager.LogList().AddRoleLog(roleLog)
+	if err != nil {
+		_ = begin.Rollback()
+		return err
+	}
+	err = begin.Commit()
 	return
 }
 

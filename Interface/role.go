@@ -9,6 +9,8 @@ type StorageRoleList interface {
 	RoleById(roleId int) (Role, error)
 	RoleByName(roleName string) (Role, error)
 	List(startId, limit int) ([]Role, error)
+	ClapHisLockRoleById(roleId int) (Role, error)
+	ClapHisLockRoleByName(roleName string) (Role, error)
 }
 
 type Role interface {

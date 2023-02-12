@@ -57,6 +57,24 @@ func (l *List) RoleByName(roleName string) (role2 role, err error) {
 	return
 }
 
+func (l *List) ClapHisLockRoleByName(roleName string) (role2 role, err error) {
+	storageRole, err := l.storage.ClapHisLockRoleByName(roleName)
+	if err != nil {
+		return
+	}
+	role2 = l.reconstruction(storageRole)
+	return
+}
+
+func (l *List) ClapHisLockRoleById(roleId int) (role2 role, err error) {
+	storageRole, err := l.storage.ClapHisLockRoleById(roleId)
+	if err != nil {
+		return
+	}
+	role2 = l.reconstruction(storageRole)
+	return
+}
+
 func (l *List) reconstruction(originRole inter.Role) (role2 role) {
 	role2.id = originRole.Id()
 	role2.name = originRole.Name()

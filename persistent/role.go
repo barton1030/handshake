@@ -52,9 +52,29 @@ func (r roleDao) RoleById(roleId int) (inter.Role, error) {
 	return role, err
 }
 
+func (r roleDao) ClapHisLockRoleById(roleId int) (inter.Role, error) {
+	role := storageRole{}
+	whereRoleId := strconv.Itoa(roleId)
+	err := transactionController.dbConn(r.transactionId).Table(r.tableName).Set("gorm:query_option", "FOR UPDATE").Where("id = ?", whereRoleId).First(&role).Error
+	if err != nil && err.Error() == "record not found" {
+		err = nil
+	}
+	return role, err
+}
+
 func (r roleDao) RoleByName(roleName string) (inter.Role, error) {
 	role := storageRole{}
 	err := transactionController.dbConn(r.transactionId).Table(r.tableName).Where("name = ?", roleName).First(&role).Error
+
+	if err != nil && err.Error() == "record not found" {
+		err = nil
+	}
+	return role, err
+}
+
+func (r roleDao) ClapHisLockRoleByName(roleName string) (inter.Role, error) {
+	role := storageRole{}
+	err := transactionController.dbConn(r.transactionId).Table(r.tableName).Set("gorm:query_option", "FOR UPDATE").Where("name = ?", roleName).First(&role).Error
 
 	if err != nil && err.Error() == "record not found" {
 		err = nil
