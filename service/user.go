@@ -65,6 +65,11 @@ func (u user) SetRoleId(operator, userId, roleId int) (err error) {
 		err = errors.New("角色不存在，请确认")
 		return
 	}
+	if role3.DeleteOrNot() {
+		_ = begin.Rollback()
+		err = errors.New("角色已废弃，请确认")
+		return
+	}
 	user3, err := begin.UserList().ClapHisLockUserById(userId)
 	if err != nil {
 		_ = begin.Rollback()

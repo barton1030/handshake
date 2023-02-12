@@ -61,6 +61,13 @@ func (r *role) Delete() {
 	r.status = DeleteStatus
 }
 
+func (r *role) DeleteOrNot() bool {
+	if r.status == DeleteStatus {
+		return true
+	}
+	return false
+}
+
 func (r *role) SetPermission(permissionKey string, permissionValue bool) {
 	r.permissionLock.Lock()
 	defer r.permissionLock.Unlock()
