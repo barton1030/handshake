@@ -31,7 +31,7 @@ func (r roleDao) MaxPrimaryKeyId() (maxPrimaryKeyId int) {
 
 func (r roleDao) Add(role2 inter.Role) (err error) {
 	role3 := r.transformation(role2)
-	err = transactionController.dbConn(r.transactionId).Table(r.tableName).Create(role3).Error
+	err = transactionController.dbConn(r.transactionId).Table(r.tableName).Create(&role3).Error
 	return err
 }
 

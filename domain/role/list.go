@@ -6,30 +6,19 @@ import (
 )
 
 type List struct {
-	nextId  int
 	storage inter.StorageRoleList
 }
 
-var ListExample = List{nextId: 1, storage: persistent.RoleDao}
-
-func (l *List) Init() {
-	maxPrimaryKeyId := l.storage.MaxPrimaryKeyId()
-	l.nextId = maxPrimaryKeyId + 1
-}
+var ListExample = List{storage: persistent.RoleDao}
 
 func (l *List) SetStorage(storageInter inter.StorageRoleList) *List {
 	return &List{
-		nextId:  l.nextId,
 		storage: storageInter,
 	}
 }
 
 func (l *List) Add(role2 role) (err error) {
-	role2.id = l.nextId
 	err = l.storage.Add(&role2)
-	if err == nil {
-		l.nextId++
-	}
 	return err
 }
 

@@ -51,33 +51,38 @@ func (t topic) Start(operator, topicId int) (err error) {
 	begin := domain.Manager.Begin()
 	topic3, err := begin.TopicList().ClapHisLockTopicByIdAdd(topicId)
 	if err != nil {
+		_ = begin.Rollback()
 		return
 	}
 	if topic3.Id() <= 0 {
+		_ = begin.Rollback()
 		err = errors.New("主题不存在，请确认！")
 		return
 	}
 	if topic3.DiscardOrNot() {
+		_ = begin.Rollback()
 		err = errors.New("当前主题已废弃, 请注意！")
 		return
 	}
 	if topic3.Creator() != operator {
+		_ = begin.Rollback()
 		err = errors.New("操作人与主题创建者不一致，请确认！")
 		return
 	}
 	startResult := topic3.Start()
 	if !startResult {
+		_ = begin.Rollback()
 		err = errors.New("主题启动失败")
 		return
 	}
 	err = begin.TopicList().Edit(topic3)
 	if err != nil {
-		err = begin.Rollback()
+		_ = begin.Rollback()
 		return err
 	}
 	startUpResult := topic3.StartUp()
 	if !startUpResult {
-		err = begin.Rollback()
+		_ = begin.Rollback()
 		return
 	}
 	err = begin.Commit()
@@ -99,30 +104,34 @@ func (t topic) Stop(operator, topicId int) (err error) {
 		return err
 	}
 	if topic3.Id() <= 0 {
+		_ = begin.Rollback()
 		err = errors.New("主题不存在，请确认！")
 		return err
 	}
 	if topic3.DiscardOrNot() {
+		_ = begin.Rollback()
 		err = errors.New("当前主题已废弃, 请注意！")
 		return
 	}
 	if topic3.Creator() != operator {
+		_ = begin.Rollback()
 		err = errors.New("操作人与主题创建者不一致，请确认！")
 		return
 	}
 	stopResult := topic3.Stop()
 	if !stopResult {
+		_ = begin.Rollback()
 		err = errors.New("终止失败")
 		return err
 	}
 	err = begin.TopicList().Edit(topic3)
 	if err != nil {
-		err = begin.Rollback()
+		_ = begin.Rollback()
 		return err
 	}
 	stopUpResult := topic3.StopUp()
 	if !stopUpResult {
-		err = begin.Rollback()
+		_ = begin.Rollback()
 		return
 	}
 	err = begin.Commit()
@@ -138,29 +147,40 @@ func (t topic) Delete(operator, topicId int) (err error) {
 		err = errors.New("操作者用户不存在，请注意！")
 		return
 	}
-	topic3, err := domain.Manager.TopicList().TopicId(topicId)
+	begin := domain.Manager.Begin()
+	topic3, err := begin.TopicList().ClapHisLockTopicByIdAdd(topicId)
 	if err != nil {
+		_ = begin.Rollback()
 		return err
 	}
 	if topic3.Id() <= 0 {
+		_ = begin.Rollback()
 		err = errors.New("主题不存在，请确认！")
 		return err
 	}
 	if topic3.Creator() != operator {
+		_ = begin.Rollback()
 		err = errors.New("操作人与主题创建者不一致，请确认！")
 		return
 	}
 	inOperation := topic3.InOperation()
 	if inOperation {
+		_ = begin.Rollback()
 		err = errors.New("主题运行中，请保证主题为停止态时执行删除操作！")
 		return err
 	}
 	abandonmentResult := topic3.Abandonment()
 	if !abandonmentResult {
+		_ = begin.Rollback()
 		err = errors.New("废弃失败, 请确认主题是否已停止！")
 		return err
 	}
-	err = domain.Manager.TopicList().Edit(topic3)
+	err = begin.TopicList().Edit(topic3)
+	if err != nil {
+		_ = begin.Rollback()
+		return err
+	}
+	err = begin.Commit()
 	return err
 }
 

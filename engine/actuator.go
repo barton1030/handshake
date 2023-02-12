@@ -85,7 +85,6 @@ func (a *actuator) implement() {
 			a.exitSignal <- 1
 			return
 		}
-
 		// 消息队列具柄
 		message, err := a.topic.MessageQueuingHandler().Pop()
 		if err != nil || message == nil || message.Id() <= 0 {

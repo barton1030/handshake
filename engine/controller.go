@@ -91,7 +91,7 @@ func (c *controller) monitor() {
 			c.errorPipeProcessor()
 		case <-c.statisticsPipe:
 		case <-time.After(5 * time.Minute):
-			//fmt.Println(c.topic.Name(), time.Now().Format("2006-01-02 15:04:05"))
+			fmt.Println(c.topic.Name(), time.Now().Format("2006-01-02 15:04:05"))
 			c.queueCountProcessor()
 		case <-c.fuseTerminationSignal:
 			c.fuseTerminationProcessor()
