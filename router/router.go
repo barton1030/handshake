@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"handshake/app"
+	"handshake/middlerware"
 )
 
 func Router() *gin.Engine {
@@ -16,7 +17,7 @@ func Router() *gin.Engine {
 }
 
 func role(r *gin.Engine) {
-	roleGroup := r.Group("/role")
+	roleGroup := r.Group("/role", middlerware.PermissionVerification)
 	roleGroup.POST("/add", app.Role.Add)
 	roleGroup.GET("/byId", app.Role.RoleById)
 	roleGroup.POST("/set/name", app.Role.EditName)

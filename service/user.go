@@ -14,11 +14,7 @@ type user struct {
 
 var User user
 
-func (u user) Add(operator, roleId int, name, phone, pwd, uri string) (err error) {
-	err = permissionVerification(operator, uri)
-	if err != nil {
-		return err
-	}
+func (u user) Add(operator, roleId int, name, phone, pwd string) (err error) {
 	begin := domain.Manager.Begin()
 	role3, err := begin.RoleList().ClapHisLockRoleById(roleId)
 	if err != nil {
@@ -57,11 +53,7 @@ func (u user) Add(operator, roleId int, name, phone, pwd, uri string) (err error
 	return
 }
 
-func (u user) SetRoleId(operator, userId, roleId int, uri string) (err error) {
-	err = permissionVerification(operator, uri)
-	if err != nil {
-		return
-	}
+func (u user) SetRoleId(operator, userId, roleId int) (err error) {
 	begin := domain.Manager.Begin()
 	role3, err := begin.RoleList().ClapHisLockRoleById(roleId)
 	if err != nil {
@@ -100,11 +92,7 @@ func (u user) SetRoleId(operator, userId, roleId int, uri string) (err error) {
 	return
 }
 
-func (u user) Delete(operator, userId int, uri string) (err error) {
-	err = permissionVerification(operator, uri)
-	if err != nil {
-		return
-	}
+func (u user) Delete(operator, userId int) (err error) {
 	begin := domain.Manager.Begin()
 	user3, err := begin.UserList().ClapHisLockUserById(userId)
 	if err != nil {
@@ -133,11 +121,7 @@ func (u user) Delete(operator, userId int, uri string) (err error) {
 	return
 }
 
-func (u user) List(operator, offset, limit int, uri string) (list []map[string]interface{}, err error) {
-	err = permissionVerification(operator, uri)
-	if err != nil {
-		return
-	}
+func (u user) List(operator, offset, limit int) (list []map[string]interface{}, err error) {
 	users, err := domain.Manager.UserList().List(offset, limit)
 	if err != nil {
 		return
@@ -151,11 +135,7 @@ func (u user) List(operator, offset, limit int, uri string) (list []map[string]i
 	return
 }
 
-func (u user) UserId(operator, userId int, uri string) (user4 map[string]interface{}, err error) {
-	err = permissionVerification(operator, uri)
-	if err != nil {
-		return
-	}
+func (u user) UserId(operator, userId int) (user4 map[string]interface{}, err error) {
 	user3, err := domain.Manager.UserList().UserById(userId)
 	if err != nil {
 		return

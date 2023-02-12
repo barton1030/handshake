@@ -49,8 +49,8 @@ func (u user) Add(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	uri := helper.ExtractRequestUri(c)
-	err := service.User.Add(request.Operator, request.RoleId, request.Name, request.Phone, request.Pwd, uri)
+	
+	err := service.User.Add(request.Operator, request.RoleId, request.Name, request.Phone, request.Pwd)
 	if err != nil {
 		err = fmt.Errorf("app user Add: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -67,8 +67,8 @@ func (u user) SetRoleId(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	uri := helper.ExtractRequestUri(c)
-	err := service.User.SetRoleId(request.Operator, request.UserId, request.RoleId, uri)
+
+	err := service.User.SetRoleId(request.Operator, request.UserId, request.RoleId)
 	if err != nil {
 		err = fmt.Errorf("app user SetRoleId: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -85,8 +85,8 @@ func (u user) Delete(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	uri := helper.ExtractRequestUri(c)
-	err := service.User.Delete(request.Operator, request.UserId, uri)
+
+	err := service.User.Delete(request.Operator, request.UserId)
 	if err != nil {
 		err = fmt.Errorf("app user Delete: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -103,8 +103,8 @@ func (u user) List(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	uri := helper.ExtractRequestUri(c)
-	userList, err := service.User.List(request.Operator, request.StartId, request.Limit, uri)
+
+	userList, err := service.User.List(request.Operator, request.StartId, request.Limit)
 	if err != nil {
 		err = fmt.Errorf("app user List: params %v error: %v", request, err)
 		helper.Response(c, 1001, nil, err.Error())
@@ -121,8 +121,8 @@ func (u user) UserById(c *gin.Context) {
 		helper.Response(c, 1000, nil, err.Error())
 		return
 	}
-	uri := helper.ExtractRequestUri(c)
-	user2, err := service.User.UserId(request.Operator, request.UserId, uri)
+
+	user2, err := service.User.UserId(request.Operator, request.UserId)
 	if err != nil {
 		err = fmt.Errorf("app user UserId: params %v error: %v",
 			request, err)

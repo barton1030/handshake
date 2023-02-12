@@ -14,11 +14,7 @@ type role struct {
 
 var Role role
 
-func (r role) Add(operator int, name, uri string) (err error) {
-	err = permissionVerification(operator, uri)
-	if err != nil {
-		return
-	}
+func (r role) Add(operator int, name string) (err error) {
 	begin := domain.Manager.Begin()
 	role3, err := begin.RoleList().ClapHisLockRoleByName(name)
 	if err != nil {
@@ -47,11 +43,7 @@ func (r role) Add(operator int, name, uri string) (err error) {
 	return err
 }
 
-func (r role) RoleById(operator, roleId int, uri string) (role4 map[string]interface{}, err error) {
-	err = permissionVerification(operator, uri)
-	if err != nil {
-		return
-	}
+func (r role) RoleById(operator, roleId int) (role4 map[string]interface{}, err error) {
 	role3, err := domain.Manager.RoleList().RoleById(roleId)
 	if err != nil {
 		return
@@ -60,11 +52,7 @@ func (r role) RoleById(operator, roleId int, uri string) (role4 map[string]inter
 	return
 }
 
-func (r role) EditName(operator, roleId int, roleName, uri string) (err error) {
-	err = permissionVerification(operator, uri)
-	if err != nil {
-		return
-	}
+func (r role) EditName(operator, roleId int, roleName string) (err error) {
 	begin := domain.Manager.Begin()
 	role3, err := begin.RoleList().ClapHisLockRoleByName(roleName)
 	if err != nil {
@@ -103,11 +91,7 @@ func (r role) EditName(operator, roleId int, roleName, uri string) (err error) {
 	return
 }
 
-func (r role) SetPermission(operator, roleId int, permissionKey string, permissionValue bool, uri string) (err error) {
-	err = permissionVerification(operator, uri)
-	if err != nil {
-		return
-	}
+func (r role) SetPermission(operator, roleId int, permissionKey string, permissionValue bool) (err error) {
 	begin := domain.Manager.Begin()
 	role3, err := begin.RoleList().ClapHisLockRoleById(roleId)
 	if err != nil {
@@ -136,11 +120,7 @@ func (r role) SetPermission(operator, roleId int, permissionKey string, permissi
 	return
 }
 
-func (r role) List(operator, offset, limit int, uri string) (list []map[string]interface{}, err error) {
-	err = permissionVerification(operator, uri)
-	if err != nil {
-		return
-	}
+func (r role) List(operator, offset, limit int) (list []map[string]interface{}, err error) {
 	domainRoles, err := domain.Manager.RoleList().List(offset, limit)
 	if err != nil {
 		return
@@ -154,11 +134,7 @@ func (r role) List(operator, offset, limit int, uri string) (list []map[string]i
 	return
 }
 
-func (r role) Delete(operator, roleId int, uri string) (err error) {
-	err = permissionVerification(operator, uri)
-	if err != nil {
-		return
-	}
+func (r role) Delete(operator, roleId int) (err error) {
 	begin := domain.Manager.Begin()
 	role3, err := begin.RoleList().RoleById(roleId)
 	if err != nil {

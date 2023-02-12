@@ -5,7 +5,7 @@ import (
 	"handshake/domain"
 )
 
-func permissionVerification(operator int, uri string) (err error) {
+func PermissionVerification(operator int, uri string) (err error) {
 	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return
