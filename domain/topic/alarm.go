@@ -59,11 +59,11 @@ func (a alarm) buildParameterSet(alarmInformation map[string]interface{}) map[st
 	params := make(map[string]interface{})
 	params = alarmInformation
 	recipientLen := len(a.recipients)
-	recipientMap := make([]int, recipientLen, recipientLen)
-	for key, recipient := range a.recipients {
-		recipientMap[key] = recipient
+	recipientMap := make([]int, 0, recipientLen)
+	for _, recipient := range a.recipients {
+		recipientMap = append(recipientMap, recipient)
 	}
-	recipientByte, _ := json.Marshal(a.recipients)
+	recipientByte, _ := json.Marshal(recipientMap)
 	params["recipients"] = string(recipientByte)
 	for templateKey, templateValue := range a.templateParameters {
 		params[templateKey] = templateValue
