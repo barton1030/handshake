@@ -3,6 +3,7 @@ package topic
 import (
 	inter "handshake/Interface"
 	"handshake/engine"
+	"time"
 )
 
 type topic struct {
@@ -17,6 +18,7 @@ type topic struct {
 	callback       callback
 	queue          MessageQueuing
 	creator        int
+	createTime     time.Time
 }
 
 const (
@@ -35,6 +37,7 @@ func NewTopic(name string, maxRetryCount, minConcurrency, maxConcurrency, fuseSa
 		fuseSalt:       fuseSalt,
 		queue:          newMessageQueuing(name),
 		creator:        creator,
+		createTime:     time.Now(),
 	}
 }
 
@@ -106,6 +109,10 @@ func (t *topic) SetCallback(topicCallback callback) {
 
 func (t *topic) Creator() int {
 	return t.creator
+}
+
+func (t *topic) CreateTime() time.Time {
+	return t.createTime
 }
 
 func (t *topic) DiscardOrNot() bool {

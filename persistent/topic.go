@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	inter "handshake/Interface"
 	"strconv"
+	"time"
 )
 
 type topicDao struct {
@@ -120,16 +121,17 @@ func (t topicDao) transformation(topic inter.Topic) (topic2 storageTopic) {
 }
 
 type storageTopic struct {
-	SId             int    `json:"id" gorm:"column:id;primary_key"`
-	SName           string `json:"name" gorm:"column:name"`
-	SStatus         int    `json:"status" gorm:"column:status"`
-	SMaxRetryCount  int    `json:"max_retry_count" gorm:"column:max_retry_count"`
-	SMinConcurrency int    `json:"min_concurrency" gorm:"column:min_concurrency"`
-	SMaxConcurrency int    `json:"max_concurrency" gorm:"column:max_concurrency"`
-	SFuseSalt       int    `json:"fuse_salt" gorm:"column:fuse_salt"`
-	SAlarm          string `json:"alarm" gorm:"column:alarm"`
-	SCallback       string `json:"callback" gorm:"column:callback"`
-	SCreator        int    `json:"creator" gorm:"column:creator"`
+	SId             int       `json:"id" gorm:"column:id;primary_key"`
+	SName           string    `json:"name" gorm:"column:name"`
+	SStatus         int       `json:"status" gorm:"column:status"`
+	SMaxRetryCount  int       `json:"max_retry_count" gorm:"column:max_retry_count"`
+	SMinConcurrency int       `json:"min_concurrency" gorm:"column:min_concurrency"`
+	SMaxConcurrency int       `json:"max_concurrency" gorm:"column:max_concurrency"`
+	SFuseSalt       int       `json:"fuse_salt" gorm:"column:fuse_salt"`
+	SAlarm          string    `json:"alarm" gorm:"column:alarm"`
+	SCallback       string    `json:"callback" gorm:"column:callback"`
+	SCreator        int       `json:"creator" gorm:"column:creator"`
+	SCreateTime     time.Time `json:"create_time" gorm:"column:create_time"`
 }
 
 func (t storageTopic) Id() int {
@@ -178,6 +180,10 @@ func (t storageTopic) MessageQueuingHandler() (queue inter.MessageQueuing) {
 
 func (t storageTopic) Creator() int {
 	return t.SCreator
+}
+
+func (t storageTopic) CreateTime() time.Time {
+	return t.SCreateTime
 }
 
 type storageCallback struct {

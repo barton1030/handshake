@@ -97,5 +97,6 @@ func (l *List) reconstruction(topic2 inter.Topic) (topic3 topic) {
 		headers: topic2CallbackHandler.Headers(),
 		cookies: topic2CallbackHandler.Cookies(),
 	}
+	topic3.createTime = topic2.CreateTime()
 	return
 }

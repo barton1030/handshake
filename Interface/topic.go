@@ -24,6 +24,7 @@ type Topic interface {
 	AlarmHandler() Alarm
 	MessageQueuingHandler() (queue MessageQueuing)
 	Creator() int
+	CreateTime() time.Time
 }
 
 type Callback interface {
