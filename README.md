@@ -89,19 +89,21 @@ KEY `businessIdAndType` (`business_id`,`business_type`) USING BTREE
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-2、插入基础数据：
+2、配置conf中数据库和redis的基础信息
+
+3、插入基础数据：
 insert into hand_shake_role (`status`, `name`, permission_map, creator) VALUES(1, "超级管理员", "{\"all\":true}", 0);
 insert into hand_shake_user (`status`, `name`, phone, pwd, role_id) VALUES (1, "admin", "1888888888", "", 1);
 
-3、添加用户和角色
+4、添加用户和角色
   1、通过admin账号，可以添加任意数量的角色和用户信息，其中角色名称不能重复，用户手机号不能重复
   2、用户创建完成后，将用户id提供给对方，其创建topic、修改、废弃、启动和关闭等动作都需要传该参数
   3、可以通过调整角色的权限来改变相关用户的权限，甚用。
   4、admin账号拥有，角色和用户操作的全部权限。
   5、角色权限设置方式，路由：true/false, true代表有该路由下的逻辑执行权限，false代表无。
 
-4、回调和预警逻辑因不同个人和公司的实现工具不同，故只完成基础逻辑，具体的实现逻辑，个人根据具体场景填充
+5、回调和预警逻辑因不同个人和公司的实现工具不同，故只完成基础逻辑，具体的实现逻辑，个人根据具体场景填充
    domain/topic/alarm.go
    domain/topic/callback.go
 
-5、编译启动、通过topic/start
+6、编译启动、通过topic/start
