@@ -2,7 +2,9 @@ package service
 
 import (
 	"errors"
+	inter "handshake/Interface"
 	"handshake/domain"
+	"handshake/domain/log"
 	role2 "handshake/domain/role"
 )
 
@@ -25,6 +27,12 @@ func (r role) Add(operator int, name, uri string) (err error) {
 	}
 	role4 := role2.NewRole(name, operator)
 	err = domain.Manager.RoleList().Add(role4)
+	if err != nil {
+		return err
+	}
+	roleLogData := r.reconstruction(&role4)
+	roleLog := log.NewLog(roleLogData, role4.Id(), operator, role4.CreateTime())
+	err = domain.Manager.LogList().AddRoleLog(roleLog)
 	return err
 }
 
@@ -37,12 +45,7 @@ func (r role) RoleById(operator, roleId int, uri string) (role4 map[string]inter
 	if err != nil {
 		return
 	}
-	role4 = make(map[string]interface{})
-	role4["id"] = role3.Id()
-	role4["name"] = role3.Name()
-	role4["creator"] = role3.Creator()
-	role4["create_time"] = role3.CreateTime()
-	role4["permission"] = role3.PermissionMap()
+	role4 = r.reconstruction(&role3)
 	return
 }
 
@@ -51,12 +54,25 @@ func (r role) EditName(operator, roleId int, roleName, uri string) (err error) {
 	if err != nil {
 		return
 	}
-	role3, err := domain.Manager.RoleList().RoleById(roleId)
+	role3, err := domain.Manager.RoleList().RoleByName(roleName)
+	if role3.Id() > 0 {
+		err = errors.New("不要重复添加")
+	}
+	if err != nil {
+		return err
+	}
+	role3, err = domain.Manager.RoleList().RoleById(roleId)
 	if err != nil {
 		return
 	}
 	role3.SetName(roleName)
 	err = domain.Manager.RoleList().Edit(role3)
+	if err != nil {
+		return err
+	}
+	roleLogData := r.reconstruction(&role3)
+	roleLog := log.NewLog(roleLogData, role3.Id(), operator, role3.CreateTime())
+	err = domain.Manager.LogList().AddRoleLog(roleLog)
 	return
 }
 
@@ -71,6 +87,12 @@ func (r role) SetPermission(operator, roleId int, permissionKey string, permissi
 	}
 	role3.SetPermission(permissionKey, permissionValue)
 	err = domain.Manager.RoleList().Edit(role3)
+	if err != nil {
+		return err
+	}
+	roleLogData := r.reconstruction(&role3)
+	roleLog := log.NewLog(roleLogData, role3.Id(), operator, role3.CreateTime())
+	err = domain.Manager.LogList().AddRoleLog(roleLog)
 	return
 }
 
@@ -86,12 +108,7 @@ func (r role) List(operator, offset, limit int, uri string) (list []map[string]i
 	roleNum := len(domainRoles)
 	list = make([]map[string]interface{}, roleNum, roleNum)
 	for index, role2 := range domainRoles {
-		role3 := make(map[string]interface{})
-		role3["id"] = role2.Id()
-		role3["name"] = role2.Name()
-		role3["creator"] = role2.Creator()
-		role3["create_time"] = role2.CreateTime()
-		role3["permission"] = role2.PermissionMap()
+		role3 := r.reconstruction(&role2)
 		list[index] = role3
 	}
 	return
@@ -112,5 +129,21 @@ func (r role) Delete(operator, roleId int, uri string) (err error) {
 	}
 	role3.Delete()
 	err = domain.Manager.RoleList().Edit(role3)
+	if err != nil {
+		return err
+	}
+	roleLogData := r.reconstruction(&role3)
+	roleLog := log.NewLog(roleLogData, role3.Id(), operator, role3.CreateTime())
+	err = domain.Manager.LogList().AddRoleLog(roleLog)
 	return
+}
+
+func (r role) reconstruction(role3 inter.Role) (role4 map[string]interface{}) {
+	role4 = make(map[string]interface{})
+	role4["id"] = role3.Id()
+	role4["name"] = role3.Name()
+	role4["creator"] = role3.Creator()
+	role4["create_time"] = role3.CreateTime()
+	role4["permission"] = role3.PermissionMap()
+	return role4
 }

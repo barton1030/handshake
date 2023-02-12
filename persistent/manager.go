@@ -95,6 +95,16 @@ func (m manager) QueueDao() inter.StorageQueueList {
 	}
 }
 
+func (m manager) LogDao() inter.StorageLogList {
+	if m.transactionId <= 0 {
+		return LogDao
+	}
+	return logDao{
+		transactionId: m.transactionId,
+		tableName:     LogDao.tableName,
+	}
+}
+
 type transaction struct {
 	nextId         int
 	transactionMap map[int]*gorm.DB

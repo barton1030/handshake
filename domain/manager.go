@@ -2,6 +2,7 @@ package domain
 
 import (
 	inter "handshake/Interface"
+	"handshake/domain/log"
 	"handshake/domain/role"
 	"handshake/domain/topic"
 	"handshake/domain/user"
@@ -47,5 +48,11 @@ func (m manager) UserList() *user.List {
 func (m manager) TopicList() *topic.List {
 	roleStorageInter := m.storageManager.TopicDao()
 	list := topic.ListExample.SetStorage(roleStorageInter)
+	return list
+}
+
+func (m manager) LogList() log.List {
+	roleStorageInter := m.storageManager.LogDao()
+	list := log.ListExample.SetStorage(roleStorageInter)
 	return list
 }
