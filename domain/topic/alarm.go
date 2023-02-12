@@ -11,10 +11,10 @@ type alarm struct {
 	cookies            map[string]interface{}
 	headers            map[string]interface{}
 	templateParameters map[string]interface{} // 模版参数，用于接收相关的可配置参数
-	recipients         []interface{}
+	recipients         map[int]int
 }
 
-func NewAlarm(url, method string, recipients []interface{}, headers, cookies, templateParameters map[string]interface{}) alarm {
+func NewAlarm(url, method string, recipients map[int]int, headers, cookies, templateParameters map[string]interface{}) alarm {
 	return alarm{
 		url:                url,
 		method:             method,
@@ -47,7 +47,7 @@ func (a alarm) Headers() map[string]interface{} {
 	return a.headers
 }
 
-func (a alarm) Recipients() []interface{} {
+func (a alarm) Recipients() map[int]int {
 	return a.recipients
 }
 
@@ -58,8 +58,13 @@ func (a alarm) TemplateParameters() map[string]interface{} {
 func (a alarm) buildParameterSet(alarmInformation map[string]interface{}) map[string]interface{} {
 	params := make(map[string]interface{})
 	params = alarmInformation
-	recipientMap, _ := json.Marshal(a.recipients)
-	params["recipients"] = string(recipientMap)
+	recipientLen := len(a.recipients)
+	recipientMap := make([]int, recipientLen, recipientLen)
+	for key, recipient := range a.recipients {
+		recipientMap[key] = recipient
+	}
+	recipientByte, _ := json.Marshal(a.recipients)
+	params["recipients"] = string(recipientByte)
 	for templateKey, templateValue := range a.templateParameters {
 		params[templateKey] = templateValue
 	}

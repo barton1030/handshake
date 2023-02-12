@@ -53,7 +53,7 @@ type setTopicAlarmRequest struct {
 	Headers            map[string]interface{} `json:"headers" form:"headers"`
 	Cookies            map[string]interface{} `json:"cookies" form:"cookies"`
 	TemplateParameters map[string]interface{} `json:"templateParameters" form:"templateParameters"`
-	Recipients         []interface{}          `json:"recipients" form:"recipients" binding:"required"`
+	Recipients         map[int]int            `json:"recipients" form:"recipients" binding:"required"`
 }
 
 type editTopicRequest struct {

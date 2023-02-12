@@ -126,6 +126,7 @@ func (t topicDao) transformation(topic inter.Topic) (topic2 storageTopic) {
 	}
 	alarmJson, _ := json.Marshal(alarm)
 	topic2.SAlarm = string(alarmJson)
+	topic2.SCreateTime = topic.CreateTime()
 	return topic2
 }
 
@@ -228,7 +229,7 @@ type storageAlarm struct {
 	SHeaders            map[string]interface{} `json:"s_headers" gorm:"s_headers"`
 	SCookies            map[string]interface{} `json:"s_cookies" gorm:"s_cookies"`
 	STemplateParameters map[string]interface{} `json:"s_parameters" gorm:"s_parameters"`
-	SRecipients         []interface{}          `json:"s_recipients" gorm:"s_recipients"`
+	SRecipients         map[int]int            `json:"s_recipients" gorm:"s_recipients"`
 }
 
 func (a storageAlarm) Do(information map[string]interface{}) (res map[string]interface{}, err error) {
@@ -251,7 +252,7 @@ func (a storageAlarm) Cookies() map[string]interface{} {
 	return a.SCookies
 }
 
-func (a storageAlarm) Recipients() []interface{} {
+func (a storageAlarm) Recipients() map[int]int {
 	return a.SRecipients
 }
 

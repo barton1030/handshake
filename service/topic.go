@@ -260,7 +260,7 @@ func (t topic) SetCallback(operator, topicId int, url, method string, headers, c
 	return
 }
 
-func (t topic) SetAlarm(operator, topicId int, url, method string, recipients []interface{}, headers, cookies, templateParameters map[string]interface{}) (err error) {
+func (t topic) SetAlarm(operator, topicId int, url, method string, recipients map[int]int, headers, cookies, templateParameters map[string]interface{}) (err error) {
 	user3, err := domain.Manager.UserList().UserById(operator)
 	if err != nil {
 		return

@@ -42,7 +42,7 @@ type Alarm interface {
 	Method() string
 	Cookies() map[string]interface{}
 	Headers() map[string]interface{}
-	Recipients() []interface{}
+	Recipients() map[int]int
 	TemplateParameters() map[string]interface{}
 }
 
