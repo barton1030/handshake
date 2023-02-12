@@ -26,3 +26,18 @@ func PermissionVerification(c *gin.Context) {
 		c.Abort()
 	}
 }
+
+func VerifyUserStatus(c *gin.Context) {
+	request := middleware{}
+	if err := c.ShouldBind(&request); err != nil {
+		err = fmt.Errorf("middleware VerifyUserStatus: params %v error: %v", request, err)
+		helper.Response(c, 908, nil, err.Error())
+		c.Abort()
+	}
+	err := service.UserStatusVerification(request.Operator)
+	if err != nil {
+		err = fmt.Errorf("middleware VerifyUserStatus: params %v error: %v", request, err)
+		helper.Response(c, 909, nil, err.Error())
+		c.Abort()
+	}
+}

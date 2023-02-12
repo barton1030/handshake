@@ -75,3 +75,10 @@ func (u *user) Status() int {
 func (u *user) Delete() {
 	u.status = DeleteStatus
 }
+
+func (u *user) DeleteOrNot() bool {
+	if u.status == DeleteStatus {
+		return true
+	}
+	return false
+}

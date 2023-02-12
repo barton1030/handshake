@@ -17,7 +17,7 @@ func Router() *gin.Engine {
 }
 
 func role(r *gin.Engine) {
-	roleGroup := r.Group("/role", middlerware.PermissionVerification)
+	roleGroup := r.Group("/role", middlerware.VerifyUserStatus, middlerware.PermissionVerification)
 	roleGroup.POST("/add", app.Role.Add)
 	roleGroup.GET("/byId", app.Role.RoleById)
 	roleGroup.POST("/set/name", app.Role.EditName)
@@ -27,7 +27,7 @@ func role(r *gin.Engine) {
 }
 
 func user(r *gin.Engine) {
-	userGroup := r.Group("/user")
+	userGroup := r.Group("/user", middlerware.VerifyUserStatus, middlerware.PermissionVerification)
 	userGroup.POST("/add", app.User.Add)
 	userGroup.POST("/set/roleId", app.User.SetRoleId)
 	userGroup.GET("/delete", app.User.Delete)
@@ -36,7 +36,7 @@ func user(r *gin.Engine) {
 }
 
 func topic(r *gin.Engine) {
-	topicGroup := r.Group("/topic")
+	topicGroup := r.Group("/topic", middlerware.VerifyUserStatus)
 	topicGroup.POST("/add", app.Topic.Add)
 	topicGroup.GET("/delete", app.Topic.Delete)
 	topicGroup.POST("/start", app.Topic.Start)
