@@ -68,6 +68,9 @@ func (r *role) SetPermission(permissionKey string, permissionValue bool) {
 }
 
 func (r *role) Permission(permissionKey string) (permissionValue bool) {
+	if value, ok := r.permissionMap["all"]; ok && value {
+		return true
+	}
 	value, ok := r.permissionMap[permissionKey]
 	if ok {
 		permissionValue = value
