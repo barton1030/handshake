@@ -6,6 +6,7 @@ import (
 	"handshake/domain"
 	"handshake/domain/log"
 	topic2 "handshake/domain/topic"
+	"time"
 )
 
 type topic struct {
@@ -93,7 +94,7 @@ func (t topic) Start(operator, topicId int) (err error) {
 		return err
 	}
 	topicLogData := t.reconstruction(&topic3)
-	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, topic3.CreateTime())
+	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, time.Now())
 	err = begin.LogList().AddTopicLog(topicLog)
 	if err != nil {
 		_ = begin.Rollback()
@@ -149,7 +150,7 @@ func (t topic) Stop(operator, topicId int) (err error) {
 		return err
 	}
 	topicLogData := t.reconstruction(&topic3)
-	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, topic3.CreateTime())
+	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, time.Now())
 	err = begin.LogList().AddTopicLog(topicLog)
 	if err != nil {
 		_ = begin.Rollback()
@@ -207,7 +208,7 @@ func (t topic) Delete(operator, topicId int) (err error) {
 		return err
 	}
 	topicLogData := t.reconstruction(&topic3)
-	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, topic3.CreateTime())
+	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, time.Now())
 	err = begin.LogList().AddTopicLog(topicLog)
 	if err != nil {
 		_ = begin.Rollback()
@@ -250,7 +251,7 @@ func (t topic) SetCallback(operator, topicId int, url, method string, headers, c
 		return err
 	}
 	topicLogData := t.reconstruction(&topic3)
-	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, topic3.CreateTime())
+	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, time.Now())
 	err = begin.LogList().AddTopicLog(topicLog)
 	if err != nil {
 		_ = begin.Rollback()
@@ -293,7 +294,7 @@ func (t topic) SetAlarm(operator, topicId int, url, method string, recipients ma
 		return err
 	}
 	topicLogData := t.reconstruction(&topic3)
-	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, topic3.CreateTime())
+	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, time.Now())
 	err = begin.LogList().AddTopicLog(topicLog)
 	if err != nil {
 		_ = begin.Rollback()
@@ -338,7 +339,7 @@ func (t topic) Edit(operator, topicId, maxRetryCount, minConcurrency, maxConcurr
 		return err
 	}
 	topicLogData := t.reconstruction(&topic3)
-	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, topic3.CreateTime())
+	topicLog := log.NewLog(topicLogData, topic3.Id(), operator, time.Now())
 	err = begin.LogList().AddTopicLog(topicLog)
 	if err != nil {
 		_ = begin.Rollback()
