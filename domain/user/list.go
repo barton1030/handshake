@@ -92,5 +92,6 @@ func (l *List) reconstruction(user inter.User) (user2 user) {
 	user2.roleId = user.RoleId()
 	user2.pwd = user.Pwd()
 	user2.createTime = user.CreateTime()
+	user2.status = user.Status()
 	return
 }
