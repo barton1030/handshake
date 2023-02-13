@@ -1,0 +1,19 @@
+[server]
+server_name = "handshake"
+server_port = 8001
+[database]
+host = "127.0.0.1"
+port = 3306
+user = "root"
+password = ""
+type = "mysql"
+db_name = "handshake"
+init_conn = 20
+max_conn = 200
+[redis]
+host = "127.0.0.1"
+port = 6379
+user = "root"
+password = ""
+init_conn = 30
+max_conn = 120
