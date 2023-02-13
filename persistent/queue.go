@@ -10,7 +10,7 @@ import (
 )
 
 type queueDao struct {
-	transactionId int
+	transactionId string
 	tableName     string
 }
 

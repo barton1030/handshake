@@ -5,11 +5,13 @@ import (
 	"github.com/jinzhu/gorm"
 	inter "handshake/Interface"
 	"handshake/persistent/internal"
+	"strconv"
 	"sync"
+	"time"
 )
 
 type manager struct {
-	transactionId int
+	transactionId string
 }
 
 var Manager = manager{}
@@ -56,7 +58,7 @@ func (m manager) Rollback() error {
 }
 
 func (m manager) UserDao() inter.StorageUserList {
-	if m.transactionId <= 0 {
+	if len(m.transactionId) <= 0 {
 		return UserDao
 	}
 	return userDao{
@@ -66,7 +68,7 @@ func (m manager) UserDao() inter.StorageUserList {
 }
 
 func (m manager) TopicDao() inter.StorageTopicList {
-	if m.transactionId <= 0 {
+	if len(m.transactionId) <= 0 {
 		return TopicDao
 	}
 	return topicDao{
@@ -76,7 +78,7 @@ func (m manager) TopicDao() inter.StorageTopicList {
 }
 
 func (m manager) RoleDao() inter.StorageRoleList {
-	if m.transactionId <= 0 {
+	if len(m.transactionId) <= 0 {
 		return RoleDao
 	}
 	return roleDao{
@@ -86,7 +88,7 @@ func (m manager) RoleDao() inter.StorageRoleList {
 }
 
 func (m manager) QueueDao() inter.StorageQueueList {
-	if m.transactionId <= 0 {
+	if len(m.transactionId) <= 0 {
 		return QueueDao
 	}
 	return queueDao{
@@ -96,7 +98,7 @@ func (m manager) QueueDao() inter.StorageQueueList {
 }
 
 func (m manager) LogDao() inter.StorageLogList {
-	if m.transactionId <= 0 {
+	if len(m.transactionId) <= 0 {
 		return LogDao
 	}
 	return logDao{
@@ -106,27 +108,37 @@ func (m manager) LogDao() inter.StorageLogList {
 }
 
 type transaction struct {
+	currentDate    string
 	nextId         int
-	transactionMap map[int]*gorm.DB
+	transactionMap map[string]*gorm.DB
 	lock           sync.Mutex
 }
 
 var transactionController = transaction{
+	currentDate:    time.Now().Format("2006-01-02"),
 	nextId:         1,
-	transactionMap: make(map[int]*gorm.DB),
+	transactionMap: make(map[string]*gorm.DB),
 }
 
-func (t *transaction) begin() (transactionId int) {
+func (t *transaction) begin() (transactionId string) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 	dbConn := internal.DbConn().Begin()
-	t.transactionMap[t.nextId] = dbConn
-	transactionId = t.nextId
+	// 事务标识生成规则
+	currentData := time.Now().Format("2006-01-02")
+	if t.currentDate != currentData {
+		t.currentDate = currentData
+		t.nextId = 1
+	}
+	currentDateNextId := strconv.Itoa(t.nextId)
+	transactionId = t.currentDate + ":" + currentDateNextId
+
+	t.transactionMap[transactionId] = dbConn
 	t.nextId++
 	return transactionId
 }
 
-func (t *transaction) dbConn(transactionId int) *gorm.DB {
+func (t *transaction) dbConn(transactionId string) *gorm.DB {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 	dbConn, ok := t.transactionMap[transactionId]
@@ -136,7 +148,7 @@ func (t *transaction) dbConn(transactionId int) *gorm.DB {
 	return dbConn
 }
 
-func (t *transaction) delete(transactionId int) {
+func (t *transaction) delete(transactionId string) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 	delete(t.transactionMap, transactionId)

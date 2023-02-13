@@ -8,7 +8,7 @@ import (
 )
 
 type topicDao struct {
-	transactionId int
+	transactionId string
 	tableName     string
 }
 

@@ -7,7 +7,7 @@ import (
 )
 
 type logDao struct {
-	transactionId int
+	transactionId string
 	tableName     string
 }
 

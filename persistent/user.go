@@ -7,7 +7,7 @@ import (
 )
 
 type userDao struct {
-	transactionId int
+	transactionId string
 	tableName     string
 }
 
